@@ -50,7 +50,7 @@ const TotalPriceChart = ({ persons, totalPrice }) => {
       datalabels: {
         color: 'white', // Barva textu
         font: {
-          weight: 'normal', // Tučné písmo
+          weight: 'normal', // Normální písmo
           size: 14, // Velikost písma
         },
         formatter: (value, context) => {
@@ -63,6 +63,7 @@ const TotalPriceChart = ({ persons, totalPrice }) => {
         display: false, // Tímto zakážeme legendu (popisky nad grafem)
       },
     },
+    cutout: '50%', // Změní koláčový graf na donut graf s 50% vyříznutým středem
   };
 
   return (
