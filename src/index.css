@@ -17,3 +17,23 @@ th {
   background-color: #4CAF50;
   color: white;
 }
+
+.title {
+  text-align: center;
+  margin-top: 50px;
+
+}
+
+.subtitle {
+
+}
+
+
+.section {
+  border: 2px solid red;
+  border-radius: 20px;
+  margin: 50px;
+  text-align: center;
+  padding: 20px;
+}
+
