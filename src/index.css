@@ -1,6 +1,17 @@
+* {
+  box-sizing: border-box;
+}
+
 body {
   font-family: Arial, sans-serif;
   background-color: #f7f7f7;
+  margin: 0;
+  padding: 0;
+}
+
+.wrapper {
+  width: 1200px;
+  margin: 0 auto;
 }
 
 table {
@@ -18,22 +29,62 @@ th {
   color: white;
 }
 
-.title {
-  text-align: center;
-  margin-top: 50px;
-
+.heading-container{
+  position: relative;
 }
 
-.subtitle {
+.title-decor {
+  font-size: 100px;
+  margin-top: 50px;
+  margin-bottom: 0;
+  font-family: "Mountains of Christmas", serif;
+  font-weight: 400;
 
+ 
+  
+}
+
+.title {
+ text-align: center;
+ font-size: 120px;
+ margin-top: -50px;
+ margin-left: 15px;
+ font-family: "Montserrat", sans-serif;
+ font-weight: 400;
+
+ 
+}
+
+
+
+.subtitle {
+  text-align: center;
+  font-family: "Montserrat", sans-serif;
 }
 
 
 .section {
-  border: 2px solid red;
+  /* border: 2px solid black; */
   border-radius: 20px;
-  margin: 50px;
-  text-align: center;
+  margin-bottom: 50px;
   padding: 20px;
 }
 
+.heading-icons {
+display: flex;
+justify-content: space-around;
+}
+
+.icon-head {
+  width: 80px;
+  margin-top: 50px;
+}
+
+.icon-head-sm {
+  width: 60px;
+  margin-top: 100px;
+}
+
+.icon-head-lg {
+width: 100px;
+}

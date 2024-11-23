@@ -17,7 +17,7 @@ const TotalPriceChart = ({ persons, totalPrice }) => {
   const colors = [
     'rgba(128, 0, 128, 0.8)', // Fialová
     'rgba(0, 0, 255, 0.8)',   // Modrá
-    'rgba(255, 0, 0, 0.8)',   // Červená
+    'rgba(214, 69, 65, 1)',   // Červená
     'rgba(0, 128, 0, 0.8)',   // Zelená
     'rgba(255, 165, 0, 0.8)', // Oranžová
     'rgba(255, 215, 0, 0.8)', // Zlatá
@@ -63,7 +63,7 @@ const TotalPriceChart = ({ persons, totalPrice }) => {
         display: false, // Tímto zakážeme legendu (popisky nad grafem)
       },
     },
-    cutout: '50%', // Změní koláčový graf na donut graf s 50% vyříznutým středem
+    cutout: '40%', // Změní koláčový graf na donut graf s 50% vyříznutým středem
   };
 
   return (

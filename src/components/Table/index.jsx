@@ -14,7 +14,7 @@ const Table = ({ gifts, onSummaryUpdate }) => {
 
   return (
     <div>
-      <h2>Seznam dárků</h2>
+      <h2 className='subtitle'>Seznam dárků</h2>
       <table border="1" cellPadding="10" style={{ width: "100%", marginTop: "20px", borderCollapse: "collapse" }}>
         <thead>
           <tr>

@@ -1,11 +1,19 @@
 import PropTypes from 'prop-types';
+import './style.css'
 
 // Komponenta pro zobrazení jedné položky (buď totalItems nebo totalPrice)
 const SummaryItem = ({ label, value }) => {
   return (
-    <p>
-      <strong>{label}:</strong> {value}
-    </p>
+    <div className="summary-item">
+      {/* Pokud je `label` cesta k ikoně, zobrazíme ji */}
+      {label?.includes(".svg") ? (
+        <img src={label} alt="Ikona" className="summary-item-icon" />
+      ) : (
+        <strong>{label}</strong> // Jinak zobraz textový popis
+      )}
+      {/* Zobrazení hodnoty */}
+      <p className='summary-value'>{value}</p>
+    </div>
   );
 };
 

@@ -9,7 +9,7 @@ const GiftCountChart = ({ persons, giftCount }) => {
   const colors = [
     'rgba(128, 0, 128, 0.8)', // Fialová
     'rgba(0, 0, 255, 0.8)',   // Modrá
-    'rgba(255, 0, 0, 0.8)',   // Červená
+    'rgba(214, 69, 65, 1)',   // Červená
     'rgba(0, 128, 0, 0.8)',   // Zelená
     'rgba(255, 165, 0, 0.8)', // Oranžová
     'rgba(255, 215, 0, 0.8)', // Zlatá
@@ -68,7 +68,7 @@ const GiftCountChart = ({ persons, giftCount }) => {
           size: 14, // Velikost písma
         },
         formatter: (value, context) => {
-          return `${context.chart.data.labels[context.dataIndex]}: ${value}`; // Zobrazení jména osoby a počtu dárků
+          return `${context.chart.data.labels[context.dataIndex]}`; // Zobrazení jména osoby a počtu dárků
         },
         anchor: 'center', // Umístění textu do středu sloupce
         align: 'center',  // Zarovnání textu na střed

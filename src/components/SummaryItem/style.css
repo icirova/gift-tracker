@@ -1,0 +1,21 @@
+.summary-item {
+    width: 200px;
+    height: 150px;
+    /* border: 2px solid black; */
+    /* padding: 20px 25px; */
+    margin: 0;
+
+    /* Flexbox nastavení pro zarovnání textu */
+    display: flex;
+    justify-content: center; /* Horizontální zarovnání */
+    align-items: center;    /* Vertikální zarovnání */
+}
+
+.summary-item-icon {
+    width: 80px;
+}
+
+.summary-value {
+    font-size: 24px;
+    font-weight: 700;
+}
