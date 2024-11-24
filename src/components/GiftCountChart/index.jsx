@@ -23,8 +23,9 @@ const GiftCountChart = ({ persons, giftCount }) => {
         label: 'Počet dárků',
         data: giftCount,
         backgroundColor: colors,
-        borderColor: colors.map(color => color.replace('0.8', '1')), // Použití stejné barvy pro okraje
-        borderWidth: 1,
+        borderColor: 'black', // Použití stejné barvy pro okraje
+        borderWidth: 2.5,
+        borderRadius: 10,
       },
     ],
   };
@@ -57,7 +58,7 @@ const GiftCountChart = ({ persons, giftCount }) => {
       tooltip: {
         callbacks: {
           label: function (tooltipItem) {
-            return `${tooltipItem.label}: ${tooltipItem.raw} dárků`; // Formátování tooltipu
+            return `${tooltipItem.raw}`; // Formátování tooltipu
           },
         },
       },
@@ -68,7 +69,8 @@ const GiftCountChart = ({ persons, giftCount }) => {
           size: 14, // Velikost písma
         },
         formatter: (value, context) => {
-          return `${context.chart.data.labels[context.dataIndex]}`; // Zobrazení jména osoby a počtu dárků
+          const firstLetter = context.chart.data.labels[context.dataIndex].charAt(0); // První písmeno jména
+          return firstLetter; // Zobrazení prvního písmena
         },
         anchor: 'center', // Umístění textu do středu sloupce
         align: 'center',  // Zarovnání textu na střed

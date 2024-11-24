@@ -16,7 +16,17 @@ function App() {
     { name: "Sofinka", gift: "Parfém", price: 500 },
     { name: "Sofinka", gift: "Parfém", price: 500 },
     { name: "Adámek", gift: "Hodinky", price: 1500 },
+    { name: "Babička", gift: "Lama", price: 15000 },
+    { name: "Děda", gift: "Ponožky", price: 120 },
   ]);
+
+  //Data o Kč/rok
+  const giftData = [
+    { year: 2022, total: 40000 },
+    { year: 2023, total: 32000 },
+    { year: 2024, total: 35000 },
+  ];
+  
 
   // Stav pro souhrn (počet dárků a celková cena)
   const [summary, setSummary] = useState({ totalItems: 0, totalPrice: 0 });
@@ -57,7 +67,7 @@ function App() {
       <div className='section'>
 
       
-        <GiftCharts gifts={gifts} />
+        <GiftCharts gifts={gifts} giftData={giftData}/>
         </div>
      
      <div className='section'>

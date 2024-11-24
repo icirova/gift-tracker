@@ -1,6 +1,6 @@
 .chart--bar {
-   flex: 1;
-   max-width: 50%;
+   flex: 1 1 30%;  /* Každý graf zabírá minimálně 30% šířky */
+   max-width: 33%;  /* Maximální šířka grafu na větších obrazovkách */
    display: flex;
    flex-direction: column;
    justify-content: center;

@@ -30,8 +30,8 @@ const TotalPriceChart = ({ persons, totalPrice }) => {
         label: 'Celková cena',
         data: totalPrice,
         backgroundColor: colors,
-        borderColor: colors.map(color => color.replace('0.8', '1')), // Použití stejné barvy pro okraje
-        borderWidth: 1,
+        borderColor: 'black', // Použití stejné barvy pro okraje
+        borderWidth: 2,
       },
     ],
   };
@@ -43,7 +43,7 @@ const TotalPriceChart = ({ persons, totalPrice }) => {
       tooltip: {
         callbacks: {
           label: function (tooltipItem) {
-            return `${tooltipItem.label}: ${tooltipItem.raw} Kč`; // Ukáže cenu v tooltipu
+            return `${tooltipItem.raw} Kč`; // Ukáže cenu v tooltipu
           },
         },
       },
@@ -54,7 +54,8 @@ const TotalPriceChart = ({ persons, totalPrice }) => {
           size: 14, // Velikost písma
         },
         formatter: (value, context) => {
-          return context.chart.data.labels[context.dataIndex]; // Zobrazí jméno osoby v segmentech
+          const firstLetter = context.chart.data.labels[context.dataIndex].charAt(0); // První písmeno jména
+          return firstLetter; // Zobrazení prvního písmena
         },
         anchor: 'center', // Umístění textu do středu segmentu
         align: 'center',  // Zarovnání textu na střed
