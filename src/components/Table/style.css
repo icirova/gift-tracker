@@ -1,0 +1,41 @@
+.table-container {
+    border-top-radius: 10px; /* Zaoblení rohů */
+    overflow: hidden; /* Zajistí, že se rohy opravdu zaoblí */
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse; /* Odstraní mezery mezi buňkami */
+    margin-top: 20px;
+    
+}
+  .table thead {
+    color: green;
+  }
+  .table th, 
+  .table td {
+    border: none; /* Rámečky kolem buněk */
+    padding: 10px; /* Vnitřní odsazení */
+    text-align: left;
+    border-bottom: 3px solid black;
+    
+  }
+  
+  .table th {
+    background-color:rgba(0, 128, 0, 0.8); /* Světle šedé pozadí záhlaví */
+    font-weight: bold;
+    
+  }
+  
+  .table th:first-child {
+    border-top-left-radius: 10px;
+    
+  }
+
+  .table th:last-child {
+    border-top-right-radius: 10px;
+  }
+
+  /* .table tbody {
+    background-color:rgba(255, 215, 0, 0.8) ;
+  } */

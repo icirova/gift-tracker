@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import './style.css';
 
 const Table = ({ gifts, onSummaryUpdate }) => {
   // Počet dárků
@@ -15,12 +16,13 @@ const Table = ({ gifts, onSummaryUpdate }) => {
   return (
     <div>
       <h2 className='subtitle'>Seznam dárků</h2>
-      <table border="1" cellPadding="10" style={{ width: "100%", marginTop: "20px", borderCollapse: "collapse" }}>
+      <div className="table-container">
+      <table className='table'>
         <thead>
           <tr>
-            <th>Jméno</th>
-            <th>Dárek</th>
-            <th>Cena</th>
+            <th>Pro koho</th>
+            <th>Co</th>
+            <th>Za kolik</th>
           </tr>
         </thead>
         <tbody>
@@ -34,6 +36,8 @@ const Table = ({ gifts, onSummaryUpdate }) => {
         </tbody>
       </table>
     </div>
+      </div>
+     
   );
 };
 
