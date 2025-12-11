@@ -121,39 +121,45 @@ function App() {
 
   return <div className='wrapper'>
 
-    <div className='heading-icons'>
-      <img className='icon-head' src="snowflake1.svg" alt="vločka" />
-      <img className='icon-head-lg' src="snowflake2.svg" alt="vločka" />
-      <img className='icon-head-sm' src="snowflake3.svg" alt="vločka" />
-      <img className='icon-head' src="snowflake4.svg" alt="vločka" />
-      <img className='icon-head-sm' src="snowflake5.svg" alt="vločka" />
-      <img className='icon-head-lg' src="snowflake14.svg" alt="vločka" />
-      <img className='icon-head' src="snowflake13.svg" alt="vločka" />
-      <img className='icon-head-sm' src="snowflake8.svg" alt="vločka" />
-      <img className='icon-head' src="snowflake9.svg" alt="vločka" />
-      <img className='icon-head-lg' src="snowflake10.svg" alt="vločka" />
-      <img className='icon-head-sm' src="snowflake11.svg" alt="vločka" />
-      <img className='icon-head' src="snowflake12.svg" alt="vločka" />
-
-    </div>
-
-    <div className='heading-container'>
-      <h1 className='title-decor'>Christmas</h1>
-      <h1 className='title'> Gift Tracker</h1>
-    </div>
-
-      <div className='toolbar'>
-        <label htmlFor="year-select" className='year-filter'>
-          <span>Vyber rok</span>
-          <select id="year-select" value={selectedYear} onChange={handleYearChange}>
-            {availableYears.map((year) => (
-              <option value={year} key={year}>
-                {year}
-              </option>
-            ))}
-          </select>
-        </label>
+    <div className='hero'>
+      <div className='hero__decor'>
+        <img className='icon-head' src="snowflake1.svg" alt="vločka" />
+        <img className='icon-head-lg' src="snowflake2.svg" alt="vločka" />
+        <img className='icon-head-sm' src="snowflake3.svg" alt="vločka" />
+        <img className='icon-head' src="snowflake4.svg" alt="vločka" />
+        <img className='icon-head-sm' src="snowflake5.svg" alt="vločka" />
+        <img className='icon-head-lg' src="snowflake14.svg" alt="vločka" />
+        <img className='icon-head' src="snowflake13.svg" alt="vločka" />
+        <img className='icon-head-sm' src="snowflake8.svg" alt="vločka" />
+        <img className='icon-head' src="snowflake9.svg" alt="vločka" />
+        <img className='icon-head-lg' src="snowflake10.svg" alt="vločka" />
+        <img className='icon-head-sm' src="snowflake11.svg" alt="vločka" />
+        <img className='icon-head' src="snowflake12.svg" alt="vločka" />
       </div>
+      <div className='hero__content'>
+        <p className='hero__eyebrow'>Holiday planning</p>
+        <h1 className='hero__title'>Christmas Gift Tracker</h1>
+        <p className='hero__lead'>
+          Sleduj rozpočet, dárky i radost v rodině. Všechny roky na jednom místě s okamžitými grafy.
+        </p>
+        <div className='hero__meta'>
+          <span className='hero__tag'>Rok {selectedYear}</span>
+          <span className='hero__tag'>{summary.totalItems} položek</span>
+        </div>
+        <div className='toolbar toolbar--hero'>
+          <label htmlFor="year-select" className='year-filter'>
+            <span>Vyber rok</span>
+            <select id="year-select" value={selectedYear} onChange={handleYearChange}>
+              {availableYears.map((year) => (
+                <option value={year} key={year}>
+                  {year}
+                </option>
+              ))}
+            </select>
+          </label>
+        </div>
+      </div>
+    </div>
 
 
       <div className='section'>

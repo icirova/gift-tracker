@@ -1,12 +1,13 @@
 .gift-form {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 18px;
   margin-bottom: 30px;
-  padding: 24px;
-  border-radius: 20px;
-  background: rgba(0, 0, 0, 0.02);
-  border: 1px dashed rgba(0, 0, 0, 0.1);
+  padding: 26px;
+  border-radius: 30px;
+  background: var(--surface);
+  border: 1px solid var(--stroke);
+  box-shadow: 0 25px 50px rgba(15, 23, 42, 0.08);
 }
 
 .gift-form h3 {
@@ -28,13 +29,13 @@
   font-size: 14px;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: rgba(0, 0, 0, 0.6);
+  color: var(--text-muted);
 }
 
 .gift-form input,
 .gift-form select {
   border-radius: 14px;
-  border: 2px solid transparent;
+  border: 1px solid rgba(15, 23, 42, 0.1);
   padding: 12px 14px;
   font-size: 16px;
   font-family: inherit;
@@ -45,9 +46,9 @@
 
 .gift-form input:focus,
 .gift-form select:focus {
-  border-color: rgba(214, 69, 65, 0.6);
+  border-color: rgba(244, 63, 94, 0.6);
   outline: none;
-  box-shadow: 0 0 0 3px rgba(214, 69, 65, 0.15);
+  box-shadow: 0 0 0 3px rgba(244, 63, 94, 0.1);
 }
 
 .gift-form select {
@@ -65,7 +66,7 @@
   padding: 12px 28px;
   border: none;
   border-radius: 999px;
-  background: linear-gradient(90deg, rgba(0, 128, 0, 0.9), rgba(214, 69, 65, 0.9));
+  background: linear-gradient(120deg, var(--primary), var(--accent));
   color: #fff;
   font-size: 16px;
   font-weight: 600;
@@ -81,7 +82,7 @@
 
 .gift-form__error {
   margin: 0;
-  color: #d64541;
+  color: var(--primary);
   font-size: 14px;
 }
 
