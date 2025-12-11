@@ -1,25 +1,24 @@
 import PropTypes from 'prop-types';
-import './style.css'
+import './style.css';
 
-// Komponenta pro zobrazení jedné položky (buď totalItems nebo totalPrice)
 const SummaryItem = ({ label, value }) => {
+  const isIcon = label?.includes('.svg');
+
   return (
     <div className="summary-item">
-      {/* Pokud je `label` cesta k ikoně, zobrazíme ji */}
-      {label?.includes(".svg") ? (
-        <img src={label} alt="Ikona" className="summary-item-icon" />
+      {isIcon ? (
+        <img src={label} alt="Ikona metriky" className="summary-item-icon" />
       ) : (
-        <strong>{label}</strong> // Jinak zobraz textový popis
+        <strong>{label}</strong>
       )}
-      {/* Zobrazení hodnoty */}
       <p className='summary-value'>{value}</p>
     </div>
   );
 };
 
 SummaryItem.propTypes = {
-  label: PropTypes.string.isRequired,  // Popis položky (např. 'Počet dárků' nebo 'Celková cena')
-  value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,  // Hodnota položky (počet dárků nebo cena)
+  label: PropTypes.string.isRequired,
+  value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
 };
 
 export default SummaryItem;

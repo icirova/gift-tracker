@@ -1,35 +1,42 @@
 import './style.css';
-import { Line } from "react-chartjs-2";
-import PropTypes from "prop-types";
-import {
-  Chart as ChartJS,
-  LineElement,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  Tooltip,
-  Legend,
-} from "chart.js";
+import { Line } from 'react-chartjs-2';
+import PropTypes from 'prop-types';
+import { ensureChartSetup } from '../../chartConfig';
+import { formatCurrency } from '../../utils/formatCurrency';
 
-// Registrace potřebných komponent Chart.js
-ChartJS.register(LineElement, CategoryScale, LinearScale, PointElement, Tooltip, Legend);
+ensureChartSetup();
 
 const YearlySpendingChart = ({ data }) => {
+  if (!data.length) {
+    return (
+      <div className='chart chart--line chart--empty'>
+        <h2 className='subtitle'>Historie celkové ceny</h2>
+        <p className='chart-message'>Zatím nemáme žádné historické údaje.</p>
+      </div>
+    );
+  }
+
+  const totals = data.map((item) => item.total);
+  const labels = data.map((item) => item.year);
+  const minTotal = Math.min(...totals);
+  const maxTotal = Math.max(...totals);
+  const padding = Math.max(500, (maxTotal - minTotal) * 0.15);
+
   const chartData = {
-    labels: data.map((item) => item.year),
+    labels,
     datasets: [
       {
-        label: "Celková suma za dárky (Kč)",
-        data: data.map((item) => item.total),
-        borderColor: "red",
-        backgroundColor: "rgba(54, 162, 235, 0.2)",
-        tension: 0.4,
-        pointRadius: 5,
-        pointBackgroundColor: 'black',
-        pointHoverRadius: 7, // Zvětšení bodu při najetí myší
-        // Zajistí, že popisky nad body nebudou zobrazeny
+        label: 'Celková suma za dárky (Kč)',
+        data: totals,
+        borderColor: '#d64541',
+        backgroundColor: 'rgba(214, 69, 65, 0.15)',
+        tension: 0.35,
+        pointRadius: 6,
+        pointBackgroundColor: '#000',
+        pointHoverRadius: 8,
+        fill: true,
         datalabels: {
-          display: false, // Zákaz datových popisků
+          display: false,
         },
       },
     ],
@@ -37,66 +44,55 @@ const YearlySpendingChart = ({ data }) => {
 
   const options = {
     responsive: true,
-    maintainAspectRatio: true, // Aby graf nebyl příliš vysoký
+    maintainAspectRatio: false,
+    interaction: {
+      intersect: false,
+      mode: 'index',
+    },
     plugins: {
-        legend: { display: false }, // Skrytí legendy
-        tooltip: {
-          enabled: true, // Necháme tooltipy aktivní
-          position: 'nearest', // Tooltip bude blíže k bodu
-          caretSize: 10, // Velikost šipky ukazující na bod (caret)
-          caretPadding: 10, // Vzdálenost tooltipu od bodu
-          callbacks: {
-            label: function(tooltipItem) {
-              return `${tooltipItem.raw} Kč`; // Upravený text tooltipu
-            },
+      legend: { display: false },
+      tooltip: {
+        callbacks: {
+          label: function (context) {
+            return `${context.label}: ${formatCurrency(context.raw)}`;
           },
         },
       },
-
-    // Skrytí datových popisků nad body (pokud je používáte)
-    datalabels: {
-    display: false, // Zakáže zobrazení hodnot nad body
+      datalabels: {
+        display: false,
+      },
     },
-
     scales: {
       x: {
-        title: { display: false },
         ticks: {
-          display: false,
-          color: '#000', // Barva popisků na ose X
+          color: '#333',
+          font: { weight: 600 },
         },
         grid: {
-          display: false, // Vypnutí mřížky pro osu X
+          display: false,
         },
-        borderColor: '#000', // Barva osy X na černo
-        borderWidth: 3, // Zvětšení tloušťky osy X
       },
       y: {
-        title: { display: false },
         beginAtZero: false,
-        min: 20000, // Začátek osy Y na hodnotě 20000
-        max: 50000, // Maximální hodnota na ose Y
+        min: Math.max(0, Math.floor((minTotal - padding) / 100) * 100),
+        max: Math.ceil((maxTotal + padding) / 100) * 100,
         ticks: {
-          display: false, // Zobrazení popisků na ose Y
-          stepSize: 1000, // Krok mezi hodnotami na ose Y
-          color: '#000', // Barva popisků na ose Y
+          color: '#333',
+          callback: (value) => `${value.toLocaleString('cs-CZ')} Kč`,
         },
         grid: {
-          display: false, // Vypnutí mřížky pro osu Y
+          color: 'rgba(0, 0, 0, 0.05)',
         },
-        borderColor: '#000', // Barva osy Y na černo
-        borderWidth: 3, // Zvětšení tloušťky osy Y
       },
     },
     layout: {
-      padding: 20, // Padding pro lepší zarovnání
+      padding: 10,
     },
-    backgroundColor: '#fff', // Bílé pozadí grafu
   };
 
   return (
     <div className='chart chart--line'>
-      <h2 className='subtitle'>Historie celkové ceny </h2>
+      <h2 className='subtitle'>Historie celkové ceny</h2>
       <Line data={chartData} options={options} />
     </div>
   );
@@ -107,7 +103,7 @@ YearlySpendingChart.propTypes = {
     PropTypes.shape({
       year: PropTypes.number.isRequired,
       total: PropTypes.number.isRequired,
-    })
+    }),
   ).isRequired,
 };
 

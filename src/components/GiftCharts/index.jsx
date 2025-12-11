@@ -1,51 +1,74 @@
-import './style.css'
+import { useMemo } from 'react';
 import PropTypes from 'prop-types';
 import GiftCountChart from '../GiftCountChart';
 import TotalPriceChart from '../TotalPriceChart';
 import YearlySpendingChart from '../YearlySpendingChart';
-import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
+import './style.css';
 
-// Registrace potřebných komponent Chart.js
-ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
+const GiftCharts = ({ gifts, yearlyTotals }) => {
+  const { persons, giftCount, totalPrice } = useMemo(() => {
+    const aggregations = gifts.reduce(
+      (acc, gift) => {
+        const index = acc.map.get(gift.name) ?? acc.order.length;
+        if (!acc.map.has(gift.name)) {
+          acc.map.set(gift.name, acc.order.length);
+          acc.order.push(gift.name);
+          acc.counts.push(0);
+          acc.totals.push(0);
+        }
 
-const GiftCharts = ({ gifts, giftData }) => {
+        acc.counts[index] += 1;
+        acc.totals[index] += gift.price;
+        return acc;
+      },
+      {
+        map: new Map(),
+        order: [],
+        counts: [],
+        totals: [],
+      },
+    );
 
-  
+    return {
+      persons: aggregations.order,
+      giftCount: aggregations.counts,
+      totalPrice: aggregations.totals,
+    };
+  }, [gifts]);
 
-  // Seznam osob
-  const persons = [...new Set(gifts.map((gift) => gift.name))];
+  const hasYearData = gifts.length > 0;
 
-  // Počet dárků pro každou osobu
-  const giftCount = persons.map((person) => gifts.filter((gift) => gift.name === person).length);
-
-  // Celková cena pro každou osobu
-  const totalPrice = persons.map((person) =>
-    gifts
-      .filter((gift) => gift.name === person)
-      .reduce((sum, gift) => sum + gift.price, 0)
-  );
-
-  return <div className='charts'>
-      <GiftCountChart persons={persons} giftCount={giftCount} />
-      <TotalPriceChart persons={persons} totalPrice={totalPrice} /> {/* Předání totalPrice správně */}
-      <YearlySpendingChart data={giftData} />
-
+  return (
+    <div className='charts'>
+      {hasYearData ? (
+        <>
+          <GiftCountChart persons={persons} giftCount={giftCount} />
+          <TotalPriceChart persons={persons} totalPrice={totalPrice} />
+        </>
+      ) : (
+        <div className='chart chart--empty'>
+          <p className='chart-message'>Pro vybraný rok nemáme žádná data.</p>
+        </div>
+      )}
+      <YearlySpendingChart data={yearlyTotals} />
     </div>
+  );
 };
 
-// Validace props pomocí PropTypes
 GiftCharts.propTypes = {
   gifts: PropTypes.arrayOf(
     PropTypes.shape({
-      name: PropTypes.string.isRequired, // Jméno osoby
-      gift: PropTypes.string.isRequired, // Název dárku
-      price: PropTypes.number.isRequired, // Cena dárku
+      id: PropTypes.string.isRequired,
+      year: PropTypes.number.isRequired,
+      name: PropTypes.string.isRequired,
+      gift: PropTypes.string.isRequired,
+      price: PropTypes.number.isRequired,
     })
   ).isRequired,
-  giftData: PropTypes.arrayOf(
+  yearlyTotals: PropTypes.arrayOf(
     PropTypes.shape({
-      year: PropTypes.number.isRequired, // Rok
-      total: PropTypes.number.isRequired, // Celková částka
+      year: PropTypes.number.isRequired,
+      total: PropTypes.number.isRequired,
     })
   ).isRequired,
 };

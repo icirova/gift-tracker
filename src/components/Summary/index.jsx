@@ -1,20 +1,22 @@
 import PropTypes from 'prop-types';
 import SummaryItem from '../SummaryItem';
-import './style.css'
+import { formatCurrency } from '../../utils/formatCurrency';
+import './style.css';
 
-const Summary = ({ totalItems, totalPrice }) => {
-  return <div className='summary'>
-      {/* Komponenta pro zobrazení počtu dárků */}
+const Summary = ({ totalItems, totalPrice, year }) => {
+  return (
+    <div className='summary'>
+      <SummaryItem label="Rok" value={year} />
       <SummaryItem label="/gift.svg" value={totalItems} />
-      {/* Komponenta pro zobrazení celkové ceny */}
-      <SummaryItem label="/cash.svg" value={`${totalPrice} Kč`} />
-    </div>;
+      <SummaryItem label="/cash.svg" value={formatCurrency(totalPrice)} />
+    </div>
+  );
 };
 
-// Validace props pomocí PropTypes
 Summary.propTypes = {
-  totalItems: PropTypes.number.isRequired,  // totalItems musí být číslo
-  totalPrice: PropTypes.number.isRequired,  // totalPrice musí být číslo
+  totalItems: PropTypes.number.isRequired,
+  totalPrice: PropTypes.number.isRequired,
+  year: PropTypes.number.isRequired,
 };
 
 export default Summary;

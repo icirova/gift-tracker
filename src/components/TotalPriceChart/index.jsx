@@ -1,27 +1,18 @@
 import PropTypes from 'prop-types';
-import { Pie } from 'react-chartjs-2'; // Pokud používáte `react-chartjs-2` pro koláčový graf
-import { Chart as ChartJS, ArcElement, Tooltip, Legend, Title } from 'chart.js';
-import ChartDataLabels from 'chartjs-plugin-datalabels'; // Načítání pluginu
+import { Pie } from 'react-chartjs-2';
+import { ensureChartSetup } from '../../chartConfig';
+import { buildColorPalette } from '../../utils/colorPalette';
+import { formatCurrency } from '../../utils/formatCurrency';
 import './style.css';
 
-// Registrace potřebných komponent pro Chart.js a pluginu pro datové popisky
-ChartJS.register(ArcElement, Tooltip, Legend, Title, ChartDataLabels);
+ensureChartSetup();
 
 const TotalPriceChart = ({ persons, totalPrice }) => {
   if (!totalPrice || totalPrice.length === 0) {
-    console.error('Chyba: totalPrice je prázdné nebo undefined.');
-    return null; // Pokud totalPrice je prázdné, nebudeme renderovat graf
+    return null;
   }
 
-  // Vánoční barvy pro segmenty grafu
-  const colors = [
-    'rgba(128, 0, 128, 0.8)', // Fialová
-    'rgba(0, 0, 255, 0.8)',   // Modrá
-    'rgba(214, 69, 65, 1)',   // Červená
-    'rgba(0, 128, 0, 0.8)',   // Zelená
-    'rgba(255, 165, 0, 0.8)', // Oranžová
-    'rgba(255, 215, 0, 0.8)', // Zlatá
-  ];
+  const colors = buildColorPalette(totalPrice.length, 0.85);
 
   const data = {
     labels: persons,
@@ -30,7 +21,7 @@ const TotalPriceChart = ({ persons, totalPrice }) => {
         label: 'Celková cena',
         data: totalPrice,
         backgroundColor: colors,
-        borderColor: 'black', // Použití stejné barvy pro okraje
+        borderColor: '#fff',
         borderWidth: 2,
       },
     ],
@@ -39,32 +30,33 @@ const TotalPriceChart = ({ persons, totalPrice }) => {
   // Možnosti pro graf
   const options = {
     responsive: true,
+    maintainAspectRatio: false,
     plugins: {
       tooltip: {
         callbacks: {
           label: function (tooltipItem) {
-            return `${tooltipItem.raw} Kč`; // Ukáže cenu v tooltipu
+            return `${tooltipItem.label}: ${formatCurrency(tooltipItem.raw)}`;
           },
         },
       },
       datalabels: {
-        color: 'white', // Barva textu
+        color: '#fff',
         font: {
-          weight: 'normal', // Normální písmo
-          size: 14, // Velikost písma
+          weight: '600',
+          size: 14,
         },
         formatter: (value, context) => {
-          const firstLetter = context.chart.data.labels[context.dataIndex].charAt(0); // První písmeno jména
-          return firstLetter; // Zobrazení prvního písmena
+          const label = context.chart.data.labels[context.dataIndex];
+          return label?.charAt(0) ?? '';
         },
-        anchor: 'center', // Umístění textu do středu segmentu
-        align: 'center',  // Zarovnání textu na střed
+        anchor: 'center',
+        align: 'center',
       },
       legend: {
-        display: false, // Tímto zakážeme legendu (popisky nad grafem)
+        display: false,
       },
     },
-    cutout: '40%', // Změní koláčový graf na donut graf s 50% vyříznutým středem
+    cutout: '50%',
   };
 
   return (

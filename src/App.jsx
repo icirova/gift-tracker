@@ -1,40 +1,123 @@
-import { useState, useCallback } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Table from './components/Table';
 import Summary from './components/Summary';
 import GiftCharts from './components/GiftCharts';
+import GiftForm from './components/GiftForm';
+import DEFAULT_GIFTS from './data/defaultGifts';
+
+const STORAGE_KEY = 'gift-tracker:gifts';
+
+const loadStoredGifts = () => {
+  if (typeof window === 'undefined') {
+    return DEFAULT_GIFTS;
+  }
+
+  try {
+    const rawValue = window.localStorage.getItem(STORAGE_KEY);
+    if (rawValue) {
+      const parsedValue = JSON.parse(rawValue);
+      if (Array.isArray(parsedValue)) {
+        return parsedValue;
+      }
+    }
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_GIFTS));
+  } catch (error) {
+    console.warn('Nepodařilo se načíst dárky z localStorage.', error);
+  }
+
+  return DEFAULT_GIFTS;
+};
 
 function App() {
-  // Data o dárcích
-  const [gifts] = useState([
-    { name: "Ivetka", gift: "Parfém", price: 200 },
-    { name: "Ivetka", gift: "Parfém", price: 200 },
-    { name: "Lukášek", gift: "Kniha", price: 350 },
-    { name: "Lukášek", gift: "Kniha", price: 350 },
-    { name: "Lukášek", gift: "Kniha", price: 350 },
-    { name: "Sofinka", gift: "Parfém", price: 500 },
-    { name: "Sofinka", gift: "Parfém", price: 500 },
-    { name: "Sofinka", gift: "Parfém", price: 500 },
-    { name: "Sofinka", gift: "Parfém", price: 500 },
-    { name: "Adámek", gift: "Hodinky", price: 1500 },
-    { name: "Babička", gift: "Lama", price: 15000 },
-    { name: "Děda", gift: "Ponožky", price: 120 },
-  ]);
+  const [gifts, setGifts] = useState(DEFAULT_GIFTS);
+  const [selectedYear, setSelectedYear] = useState(DEFAULT_GIFTS[0]?.year ?? new Date().getFullYear());
+  const [isInitialized, setIsInitialized] = useState(false);
 
-  //Data o Kč/rok
-  const giftData = [
-    { year: 2022, total: 40000 },
-    { year: 2023, total: 32000 },
-    { year: 2024, total: 35000 },
-  ];
-  
-
-  // Stav pro souhrn (počet dárků a celková cena)
-  const [summary, setSummary] = useState({ totalItems: 0, totalPrice: 0 });
-
-  // Funkce pro aktualizaci souhrnu - stabilizováno pomocí useCallback
-  const handleSummaryUpdate = useCallback((totalItems, totalPrice) => {
-    setSummary({ totalItems, totalPrice });
+  useEffect(() => {
+    const storedGifts = loadStoredGifts();
+    setGifts(storedGifts);
+    if (storedGifts.length) {
+      const newestYear = Math.max(...storedGifts.map((gift) => gift.year));
+      setSelectedYear(newestYear);
+    }
+    setIsInitialized(true);
   }, []);
+
+  useEffect(() => {
+    if (!isInitialized || typeof window === 'undefined') {
+      return;
+    }
+
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(gifts));
+  }, [gifts, isInitialized]);
+
+  const availableYears = useMemo(
+    () => [...new Set(gifts.map((gift) => gift.year))].sort((a, b) => b - a),
+    [gifts],
+  );
+
+  const availableNames = useMemo(
+    () => [...new Set(gifts.map((gift) => gift.name))].sort((a, b) => a.localeCompare(b, 'cs')),
+    [gifts],
+  );
+
+  useEffect(() => {
+    if (!availableYears.length) {
+      return;
+    }
+
+    if (!availableYears.includes(selectedYear)) {
+      setSelectedYear(availableYears[0]);
+    }
+  }, [availableYears, selectedYear]);
+
+  const giftsForActiveYear = useMemo(
+    () => gifts.filter((gift) => gift.year === selectedYear),
+    [gifts, selectedYear],
+  );
+
+  const summary = useMemo(() => {
+    const totalItems = giftsForActiveYear.length;
+    const totalPrice = giftsForActiveYear.reduce((sum, gift) => sum + gift.price, 0);
+    return { totalItems, totalPrice };
+  }, [giftsForActiveYear]);
+
+  const yearlyTotals = useMemo(() => {
+    const annualTotals = gifts.reduce((acc, gift) => {
+      acc[gift.year] = (acc[gift.year] ?? 0) + gift.price;
+      return acc;
+    }, {});
+
+    return Object.entries(annualTotals)
+      .map(([year, total]) => ({ year: Number(year), total }))
+      .sort((a, b) => a.year - b.year);
+  }, [gifts]);
+
+  const handleYearChange = (event) => {
+    setSelectedYear(Number(event.target.value));
+  };
+
+  const handleGiftAdd = (giftInput) => {
+    const trimmedName = giftInput.name.trim();
+    const trimmedGift = giftInput.gift.trim();
+    const year = Number(giftInput.year) || selectedYear;
+    const price = Number(giftInput.price);
+
+    if (!trimmedName || !trimmedGift || !price) {
+      return;
+    }
+
+    const newGift = {
+      id: `gift-${year}-${Date.now()}`,
+      year,
+      name: trimmedName,
+      gift: trimmedGift,
+      price,
+    };
+
+    setGifts((prev) => [...prev, newGift]);
+    setSelectedYear(year);
+  };
 
   return <div className='wrapper'>
 
@@ -58,20 +141,34 @@ function App() {
       <h1 className='title-decor'>Christmas</h1>
       <h1 className='title'> Gift Tracker</h1>
     </div>
-      
+
+      <div className='toolbar'>
+        <label htmlFor="year-select" className='year-filter'>
+          <span>Vyber rok</span>
+          <select id="year-select" value={selectedYear} onChange={handleYearChange}>
+            {availableYears.map((year) => (
+              <option value={year} key={year}>
+                {year}
+              </option>
+            ))}
+          </select>
+        </label>
+      </div>
+
 
       <div className='section'>
-        <Summary totalItems={summary.totalItems} totalPrice={summary.totalPrice} />
+        <Summary totalItems={summary.totalItems} totalPrice={summary.totalPrice} year={selectedYear} />
       </div>
 
       <div className='section'>
 
       
-        <GiftCharts gifts={gifts} giftData={giftData}/>
+        <GiftCharts gifts={giftsForActiveYear} yearlyTotals={yearlyTotals}/>
         </div>
      
      <div className='section'>
-     <Table gifts={gifts} onSummaryUpdate={handleSummaryUpdate} />
+      <GiftForm onAddGift={handleGiftAdd} defaultYear={selectedYear} existingNames={availableNames} />
+      <Table gifts={giftsForActiveYear} selectedYear={selectedYear} />
      </div>
      
     </div>
