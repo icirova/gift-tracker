@@ -28,8 +28,8 @@ const YearlySpendingChart = ({ data }) => {
       {
         label: 'Celková suma za dárky (Kč)',
         data: totals,
-        borderColor: '#d64541',
-        backgroundColor: 'rgba(214, 69, 65, 0.15)',
+        borderColor: 'rgba(244, 63, 94, 0.9)',
+        backgroundColor: 'rgba(244, 63, 94, 0.12)',
         tension: 0.35,
         pointRadius: 6,
         pointBackgroundColor: '#000',

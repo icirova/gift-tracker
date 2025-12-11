@@ -1,18 +1,15 @@
 import PropTypes from 'prop-types';
 import { Pie } from 'react-chartjs-2';
 import { ensureChartSetup } from '../../chartConfig';
-import { buildColorPalette } from '../../utils/colorPalette';
 import { formatCurrency } from '../../utils/formatCurrency';
 import './style.css';
 
 ensureChartSetup();
 
-const TotalPriceChart = ({ persons, totalPrice }) => {
+const TotalPriceChart = ({ persons, totalPrice, colors }) => {
   if (!totalPrice || totalPrice.length === 0) {
     return null;
   }
-
-  const colors = buildColorPalette(totalPrice.length, 0.85);
 
   const data = {
     labels: persons,
@@ -27,7 +24,6 @@ const TotalPriceChart = ({ persons, totalPrice }) => {
     ],
   };
 
-  // Možnosti pro graf
   const options = {
     responsive: true,
     maintainAspectRatio: false,
@@ -40,10 +36,10 @@ const TotalPriceChart = ({ persons, totalPrice }) => {
         },
       },
       datalabels: {
-        color: '#fff',
+        color: '#0f172a',
         font: {
           weight: '600',
-          size: 14,
+          size: 13,
         },
         formatter: (value, context) => {
           const label = context.chart.data.labels[context.dataIndex];
@@ -67,10 +63,10 @@ const TotalPriceChart = ({ persons, totalPrice }) => {
   );
 };
 
-// Validace props pomocí PropTypes
 TotalPriceChart.propTypes = {
   persons: PropTypes.arrayOf(PropTypes.string).isRequired,
   totalPrice: PropTypes.arrayOf(PropTypes.number).isRequired,
+  colors: PropTypes.arrayOf(PropTypes.string).isRequired,
 };
 
 export default TotalPriceChart;

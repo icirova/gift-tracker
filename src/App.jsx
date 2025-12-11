@@ -4,12 +4,16 @@ import Summary from './components/Summary';
 import GiftCharts from './components/GiftCharts';
 import GiftForm from './components/GiftForm';
 import DEFAULT_GIFTS from './data/defaultGifts';
+import ALLOWED_NAMES from './data/allowedNames';
 
 const STORAGE_KEY = 'gift-tracker:gifts';
 
+const normalizeGifts = (entries) =>
+  entries.filter((gift) => ALLOWED_NAMES.includes(gift.name));
+
 const loadStoredGifts = () => {
   if (typeof window === 'undefined') {
-    return DEFAULT_GIFTS;
+    return normalizeGifts(DEFAULT_GIFTS);
   }
 
   try {
@@ -17,19 +21,19 @@ const loadStoredGifts = () => {
     if (rawValue) {
       const parsedValue = JSON.parse(rawValue);
       if (Array.isArray(parsedValue)) {
-        return parsedValue;
+        return normalizeGifts(parsedValue);
       }
     }
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_GIFTS));
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(normalizeGifts(DEFAULT_GIFTS)));
   } catch (error) {
     console.warn('Nepodařilo se načíst dárky z localStorage.', error);
   }
 
-  return DEFAULT_GIFTS;
+  return normalizeGifts(DEFAULT_GIFTS);
 };
 
 function App() {
-  const [gifts, setGifts] = useState(DEFAULT_GIFTS);
+  const [gifts, setGifts] = useState(normalizeGifts(DEFAULT_GIFTS));
   const [selectedYear, setSelectedYear] = useState(DEFAULT_GIFTS[0]?.year ?? new Date().getFullYear());
   const [isInitialized, setIsInitialized] = useState(false);
 
@@ -53,11 +57,6 @@ function App() {
 
   const availableYears = useMemo(
     () => [...new Set(gifts.map((gift) => gift.year))].sort((a, b) => b - a),
-    [gifts],
-  );
-
-  const availableNames = useMemo(
-    () => [...new Set(gifts.map((gift) => gift.name))].sort((a, b) => a.localeCompare(b, 'cs')),
     [gifts],
   );
 
@@ -103,7 +102,7 @@ function App() {
     const year = Number(giftInput.year) || selectedYear;
     const price = Number(giftInput.price);
 
-    if (!trimmedName || !trimmedGift || !price) {
+    if (!trimmedName || !trimmedGift || !price || !ALLOWED_NAMES.includes(trimmedName)) {
       return;
     }
 
@@ -173,7 +172,11 @@ function App() {
         </div>
      
      <div className='section'>
-      <GiftForm onAddGift={handleGiftAdd} defaultYear={selectedYear} existingNames={availableNames} />
+      <GiftForm
+        onAddGift={handleGiftAdd}
+        defaultYear={selectedYear}
+        allowedNames={ALLOWED_NAMES}
+      />
       <Table gifts={giftsForActiveYear} selectedYear={selectedYear} />
      </div>
      

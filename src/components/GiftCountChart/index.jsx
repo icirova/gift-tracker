@@ -1,14 +1,11 @@
 import PropTypes from 'prop-types';
 import { Bar } from 'react-chartjs-2';
 import { ensureChartSetup } from '../../chartConfig';
-import { buildColorPalette } from '../../utils/colorPalette';
 import './style.css';
 
 ensureChartSetup();
 
-const GiftCountChart = ({ persons, giftCount }) => {
-  const colors = buildColorPalette(persons.length);
-
+const GiftCountChart = ({ persons, giftCount, colors }) => {
   // Data pro graf Počet dárků
   const giftCountData = {
     labels: persons,
@@ -17,9 +14,11 @@ const GiftCountChart = ({ persons, giftCount }) => {
         label: 'Počet dárků',
         data: giftCount,
         backgroundColor: colors,
-        borderColor: 'rgba(0, 0, 0, 0.4)',
-        borderWidth: 2,
-        borderRadius: 10,
+        borderColor: 'rgba(15, 23, 42, 0.08)',
+        borderWidth: 1,
+        borderRadius: 12,
+        hoverBorderWidth: 2,
+        hoverBorderColor: 'rgba(15, 23, 42, 0.2)',
       },
     ],
   };
@@ -53,22 +52,22 @@ const GiftCountChart = ({ persons, giftCount }) => {
       tooltip: {
         callbacks: {
           label: function (tooltipItem) {
-            return `${tooltipItem.raw} ks`;
+            return `${tooltipItem.label}: ${tooltipItem.raw} ks`;
           },
         },
       },
       datalabels: {
-        color: '#fff',
+        color: '#0f172a',
         font: {
-          weight: 'bold', // Tučné písmo
-          size: 14, // Velikost písma
+          weight: '600',
+          size: 12,
         },
         formatter: (value, context) => {
-          const firstLetter = context.chart.data.labels[context.dataIndex].charAt(0); // První písmeno jména
-          return firstLetter; // Zobrazení prvního písmena
+          const label = context.chart.data.labels[context.dataIndex];
+          return label?.charAt(0) ?? '';
         },
-        anchor: 'center', // Umístění textu do středu sloupce
-        align: 'center',  // Zarovnání textu na střed
+        anchor: 'center',
+        align: 'center',
       },
       legend: {
         display: false, // Zneviditelní legendu mimo graf
@@ -88,6 +87,7 @@ const GiftCountChart = ({ persons, giftCount }) => {
 GiftCountChart.propTypes = {
   persons: PropTypes.arrayOf(PropTypes.string).isRequired, // Seznam jmen osob
   giftCount: PropTypes.arrayOf(PropTypes.number).isRequired, // Počet dárků pro každou osobu
+  colors: PropTypes.arrayOf(PropTypes.string).isRequired,
 };
 
 export default GiftCountChart;

@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import GiftCountChart from '../GiftCountChart';
 import TotalPriceChart from '../TotalPriceChart';
 import YearlySpendingChart from '../YearlySpendingChart';
+import { buildColorPalette } from '../../utils/colorPalette';
 import './style.css';
 
 const GiftCharts = ({ gifts, yearlyTotals }) => {
@@ -37,17 +38,34 @@ const GiftCharts = ({ gifts, yearlyTotals }) => {
   }, [gifts]);
 
   const hasYearData = gifts.length > 0;
+  const sharedColors = useMemo(
+    () => (persons.length ? buildColorPalette(persons.length) : []),
+    [persons.length],
+  );
 
   return (
     <div className='charts'>
       {hasYearData ? (
         <>
-          <GiftCountChart persons={persons} giftCount={giftCount} />
-          <TotalPriceChart persons={persons} totalPrice={totalPrice} />
+          <GiftCountChart persons={persons} giftCount={giftCount} colors={sharedColors} />
+          <TotalPriceChart persons={persons} totalPrice={totalPrice} colors={sharedColors} />
         </>
       ) : (
         <div className='chart chart--empty'>
           <p className='chart-message'>Pro vybraný rok nemáme žádná data.</p>
+        </div>
+      )}
+      {hasYearData && persons.length > 0 && (
+        <div className='charts-legend'>
+          {persons.map((person, index) => (
+            <div className='charts-legend__item' key={person}>
+              <span
+                className='charts-legend__swatch'
+                style={{ backgroundColor: sharedColors[index % sharedColors.length] }}
+              />
+              <span>{person}</span>
+            </div>
+          ))}
         </div>
       )}
       <YearlySpendingChart data={yearlyTotals} />

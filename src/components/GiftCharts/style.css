@@ -20,6 +20,30 @@
   height: 320px !important;
 }
 
+.charts-legend {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 20px;
+  padding: 12px 4px 4px;
+}
+
+.charts-legend__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  color: var(--text-muted);
+  letter-spacing: 0.02em;
+}
+
+.charts-legend__swatch {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.06);
+}
+
 .chart--empty {
   display: flex;
   align-items: center;
