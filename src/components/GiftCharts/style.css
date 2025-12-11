@@ -6,6 +6,7 @@
 }
 
 .chart {
+  position: relative;
   flex: 1 1 320px;
   min-width: 260px;
   background: var(--surface);
@@ -13,6 +14,25 @@
   padding: 28px;
   border: 1px solid var(--stroke);
   box-shadow: 0 30px 60px rgba(15, 23, 42, 0.08);
+  overflow: hidden;
+}
+
+.chart::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(135deg, rgba(20, 184, 166, 0.4), rgba(244, 63, 94, 0.4));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+          mask-composite: exclude;
+  pointer-events: none;
+}
+
+.chart > * {
+  position: relative;
+  z-index: 1;
 }
 
 .chart canvas {
@@ -26,6 +46,8 @@
   flex-wrap: wrap;
   gap: 12px 20px;
   padding: 12px 4px 4px;
+  border-top: 1px solid rgba(15, 23, 42, 0.05);
+  margin-top: 8px;
 }
 
 .charts-legend__item {

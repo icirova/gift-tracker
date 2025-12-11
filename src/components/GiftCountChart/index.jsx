@@ -14,7 +14,7 @@ const GiftCountChart = ({ persons, giftCount, colors }) => {
         label: 'Počet dárků',
         data: giftCount,
         backgroundColor: colors,
-        borderColor: 'rgba(15, 23, 42, 0.08)',
+        borderColor: 'rgba(0, 0, 0, 0.4)',
         borderWidth: 1,
         borderRadius: 12,
         hoverBorderWidth: 2,

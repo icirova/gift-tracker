@@ -121,23 +121,24 @@ function App() {
   return <div className='wrapper'>
 
     <div className='hero'>
-      <div className='hero__decor'>
-        <img className='icon-head' src="snowflake1.svg" alt="vločka" />
-        <img className='icon-head-lg' src="snowflake2.svg" alt="vločka" />
-        <img className='icon-head-sm' src="snowflake3.svg" alt="vločka" />
-        <img className='icon-head' src="snowflake4.svg" alt="vločka" />
-        <img className='icon-head-sm' src="snowflake5.svg" alt="vločka" />
-        <img className='icon-head-lg' src="snowflake14.svg" alt="vločka" />
-        <img className='icon-head' src="snowflake13.svg" alt="vločka" />
-        <img className='icon-head-sm' src="snowflake8.svg" alt="vločka" />
-        <img className='icon-head' src="snowflake9.svg" alt="vločka" />
-        <img className='icon-head-lg' src="snowflake10.svg" alt="vločka" />
-        <img className='icon-head-sm' src="snowflake11.svg" alt="vločka" />
-        <img className='icon-head' src="snowflake12.svg" alt="vločka" />
+      <div className='hero__decor' aria-hidden="true">
+        <span className='hero__spark hero__spark--left-lg' />
+        <span className='hero__spark hero__spark--left-sm' data-variant="rose" />
+        <span className='hero__spark hero__spark--right-lg' />
+        <span className='hero__spark hero__spark--right-sm' data-variant="rose" />
+        <span className='hero__spark hero__spark--top' />
+        <span className='hero__spark hero__spark--center' />
+        <span className='hero__spark hero__spark--left-mini' />
+        <span className='hero__spark hero__spark--right-mini' data-variant="rose" />
+        <span className='hero__spark hero__spark--bottom' />
+        <span className='hero__spark hero__spark--midline' />
+        <span className='hero__spark hero__spark--scatter-one' />
+        <span className='hero__spark hero__spark--scatter-two' />
       </div>
       <div className='hero__content'>
         <p className='hero__eyebrow'>Holiday planning</p>
-        <h1 className='hero__title'>Christmas Gift Tracker</h1>
+        <div className='hero__ribbon'>Sezona štědrosti</div>
+        <h1 className='hero__title'>Christmas <span className='hero__title-accent'>Gift</span> Tracker</h1>
         <p className='hero__lead'>
           Sleduj rozpočet, dárky i radost v rodině. Všechny roky na jednom místě s okamžitými grafy.
         </p>

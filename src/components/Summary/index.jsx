@@ -6,9 +6,9 @@ import './style.css';
 const Summary = ({ totalItems, totalPrice, year }) => {
   return (
     <div className='summary'>
-      <SummaryItem label="Rok" value={year} />
-      <SummaryItem label="/gift.svg" value={totalItems} />
-      <SummaryItem label="/cash.svg" value={formatCurrency(totalPrice)} />
+      <SummaryItem label="Aktuální rok" value={year} variant="year" />
+      <SummaryItem label="Počet dárků" value={totalItems} variant="gifts" />
+      <SummaryItem label="Celkem utraceno" value={formatCurrency(totalPrice)} variant="budget" />
     </div>
   );
 };
