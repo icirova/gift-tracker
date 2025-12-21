@@ -355,6 +355,36 @@ body {
   backdrop-filter: blur(16px);
 }
 
+.undo-toast {
+  position: fixed;
+  right: 32px;
+  bottom: 32px;
+  display: inline-flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 18px;
+  border-radius: 16px;
+  background: rgba(15, 23, 42, 0.94);
+  color: #f8fafc;
+  box-shadow: 0 18px 30px rgba(15, 23, 42, 0.35);
+  z-index: 20;
+}
+
+.undo-toast__button {
+  border: none;
+  border-radius: 999px;
+  padding: 8px 14px;
+  background: var(--accent);
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.undo-toast__button:hover,
+.undo-toast__button:focus-visible {
+  filter: brightness(1.05);
+}
+
 .subtitle {
   text-align: left;
   font-size: 15px;

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import Table from './components/Table';
 import Summary from './components/Summary';
 import GiftCharts from './components/GiftCharts';
@@ -36,6 +36,8 @@ function App() {
   const [gifts, setGifts] = useState(normalizeGifts(DEFAULT_GIFTS));
   const [selectedYear, setSelectedYear] = useState(DEFAULT_GIFTS[0]?.year ?? new Date().getFullYear());
   const [isInitialized, setIsInitialized] = useState(false);
+  const [pendingDelete, setPendingDelete] = useState(null);
+  const deleteTimeoutRef = useRef(null);
 
   useEffect(() => {
     const storedGifts = loadStoredGifts();
@@ -54,6 +56,14 @@ function App() {
 
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(gifts));
   }, [gifts, isInitialized]);
+
+  useEffect(() => {
+    return () => {
+      if (deleteTimeoutRef.current) {
+        clearTimeout(deleteTimeoutRef.current);
+      }
+    };
+  }, []);
 
   const availableYears = useMemo(
     () => [...new Set(gifts.map((gift) => gift.year))].sort((a, b) => b - a),
@@ -116,6 +126,51 @@ function App() {
 
     setGifts((prev) => [...prev, newGift]);
     setSelectedYear(year);
+  };
+
+  const handleGiftDelete = (giftId) => {
+    setGifts((prev) => {
+      const index = prev.findIndex((gift) => gift.id === giftId);
+      if (index === -1) {
+        return prev;
+      }
+
+      const removedGift = prev[index];
+      if (deleteTimeoutRef.current) {
+        clearTimeout(deleteTimeoutRef.current);
+      }
+      setPendingDelete({ gift: removedGift, index });
+      deleteTimeoutRef.current = setTimeout(() => {
+        setPendingDelete(null);
+        deleteTimeoutRef.current = null;
+      }, 5000);
+
+      return prev.filter((gift) => gift.id !== giftId);
+    });
+  };
+
+  const handleUndoDelete = () => {
+    if (!pendingDelete) {
+      return;
+    }
+
+    const { gift, index } = pendingDelete;
+    setGifts((prev) => {
+      if (prev.some((item) => item.id === gift.id)) {
+        return prev;
+      }
+
+      const next = [...prev];
+      const safeIndex = Math.min(Math.max(index, 0), next.length);
+      next.splice(safeIndex, 0, gift);
+      return next;
+    });
+
+    if (deleteTimeoutRef.current) {
+      clearTimeout(deleteTimeoutRef.current);
+      deleteTimeoutRef.current = null;
+    }
+    setPendingDelete(null);
   };
 
   return <div className='wrapper'>
@@ -181,9 +236,18 @@ function App() {
       <Table
         gifts={giftsForActiveYear}
         selectedYear={selectedYear}
+        onDeleteGift={handleGiftDelete}
       />
      </div>
      
+     {pendingDelete && (
+       <div className="undo-toast" role="status">
+         <span>Dárek byl smazán.</span>
+         <button type="button" className="undo-toast__button" onClick={handleUndoDelete}>
+           Vrátit zpět
+         </button>
+       </div>
+     )}
     </div>
 }
 
