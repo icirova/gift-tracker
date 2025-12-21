@@ -1,9 +1,26 @@
+import { Fragment, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { formatCurrency } from '../../utils/formatCurrency';
 import './style.css';
 
 const Table = ({ gifts, selectedYear, onDeleteGift }) => {
-  const hasGifts = gifts.length > 0;
+  const groupedGifts = useMemo(() => {
+    if (!gifts.length) {
+      return [];
+    }
+
+    const groups = gifts.reduce((acc, gift) => {
+      acc[gift.name] = acc[gift.name] ?? [];
+      acc[gift.name].push(gift);
+      return acc;
+    }, {});
+
+    return Object.keys(groups)
+      .sort((a, b) => a.localeCompare(b, 'cs', { sensitivity: 'base' }))
+      .map((name) => ({ name, items: groups[name] }));
+  }, [gifts]);
+
+  const hasGifts = groupedGifts.length > 0;
 
   return (
     <div>
@@ -20,22 +37,30 @@ const Table = ({ gifts, selectedYear, onDeleteGift }) => {
               </tr>
             </thead>
             <tbody>
-              {gifts.map((gift) => (
-                <tr key={gift.id}>
-                  <td>{gift.name}</td>
-                  <td>{gift.gift}</td>
-                  <td>{formatCurrency(gift.price)}</td>
-                  <td className="table-action">
-                    <button
-                      type="button"
-                      className="table-delete"
-                      aria-label={`Smazat dárek ${gift.gift} pro ${gift.name}`}
-                      onClick={() => onDeleteGift(gift.id)}
-                    >
-                      &times;
-                    </button>
-                  </td>
-                </tr>
+              {groupedGifts.map(({ name, items }) => (
+                <Fragment key={name}>
+                  {items.map((gift, index) => (
+                    <tr key={gift.id}>
+                      {index === 0 && (
+                        <td className="table-name" rowSpan={items.length}>
+                          {name}
+                        </td>
+                      )}
+                      <td>{gift.gift}</td>
+                      <td>{formatCurrency(gift.price)}</td>
+                      <td className="table-action">
+                        <button
+                          type="button"
+                          className="table-delete"
+                          aria-label={`Smazat dárek ${gift.gift} pro ${gift.name}`}
+                          onClick={() => onDeleteGift(gift.id)}
+                        >
+                          &times;
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </Fragment>
               ))}
             </tbody>
           </table>
