@@ -37,7 +37,9 @@ function App() {
   const [selectedYear, setSelectedYear] = useState(DEFAULT_GIFTS[0]?.year ?? new Date().getFullYear());
   const [isInitialized, setIsInitialized] = useState(false);
   const [pendingDelete, setPendingDelete] = useState(null);
+  const [highlightedGiftId, setHighlightedGiftId] = useState(null);
   const deleteTimeoutRef = useRef(null);
+  const highlightTimeoutRef = useRef(null);
   const [quickGift, setQuickGift] = useState({
     name: ALLOWED_NAMES[0] ?? '',
     gift: '',
@@ -66,6 +68,9 @@ function App() {
     return () => {
       if (deleteTimeoutRef.current) {
         clearTimeout(deleteTimeoutRef.current);
+      }
+      if (highlightTimeoutRef.current) {
+        clearTimeout(highlightTimeoutRef.current);
       }
     };
   }, []);
@@ -150,6 +155,14 @@ function App() {
 
     setGifts((prev) => [...prev, newGift]);
     setSelectedYear(year);
+    setHighlightedGiftId(newGift.id);
+    if (highlightTimeoutRef.current) {
+      clearTimeout(highlightTimeoutRef.current);
+    }
+    highlightTimeoutRef.current = setTimeout(() => {
+      setHighlightedGiftId(null);
+      highlightTimeoutRef.current = null;
+    }, 2500);
   };
 
   const isQuickValid =
@@ -366,6 +379,7 @@ function App() {
         gifts={giftsForActiveYear}
         selectedYear={selectedYear}
         onDeleteGift={handleGiftDelete}
+        highlightedGiftId={highlightedGiftId}
       />
      </div>
      

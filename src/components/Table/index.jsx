@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { formatCurrency } from '../../utils/formatCurrency';
 import './style.css';
 
-const Table = ({ gifts, selectedYear, onDeleteGift }) => {
+const Table = ({ gifts, selectedYear, onDeleteGift, highlightedGiftId }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [baseHeight, setBaseHeight] = useState(null);
   const [hoveredName, setHoveredName] = useState(null);
@@ -104,7 +104,9 @@ const Table = ({ gifts, selectedYear, onDeleteGift }) => {
                       {items.map((gift, index) => (
                         <tr
                           key={gift.id}
-                          className={`table-row${index === 0 ? ' table-row--group-start' : ''}`}
+                          className={`table-row${index === 0 ? ' table-row--group-start' : ''}${
+                            gift.id === highlightedGiftId ? ' table-row--highlight' : ''
+                          }`}
                           onMouseEnter={() => setHoveredName(name)}
                           onMouseLeave={() => setHoveredName(null)}
                         >
@@ -167,6 +169,7 @@ Table.propTypes = {
   ).isRequired,
   selectedYear: PropTypes.number.isRequired,
   onDeleteGift: PropTypes.func.isRequired,
+  highlightedGiftId: PropTypes.string,
 };
 
 export default Table;

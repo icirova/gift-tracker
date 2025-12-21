@@ -123,6 +123,16 @@
   background: rgba(244, 63, 94, 0.1);
 }
 
+.table-row--highlight td:not(.table-name) {
+  background: rgba(250, 204, 21, 0.12);
+  transition: background 0.6s ease;
+}
+
+.table-row--highlight .table-name {
+  background: rgba(250, 204, 21, 0.08);
+  transition: background 0.6s ease;
+}
+
 .table-name {
   font-weight: 600;
   color: var(--text);
