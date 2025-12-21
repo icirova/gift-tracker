@@ -34,58 +34,63 @@ const Table = ({ gifts, selectedYear, onDeleteGift }) => {
       <h2 className='subtitle'>Seznam dárků {selectedYear}</h2>
       <div className="table-container">
         {hasGifts ? (
-          <table className='table'>
-            <thead>
-              <tr>
-                <th>Pro koho</th>
-                <th>Co</th>
-                <th>Za kolik</th>
-                <th aria-label="Akce" />
-              </tr>
-            </thead>
-            <tbody>
-              {groupedGifts.map(({ name, items, total }) => {
-                const fillPercent = maxTotal
-                  ? Math.max((total / maxTotal) * 100, 8)
-                  : 0;
+          <div className="table-scroll">
+            <table className='table'>
+              <thead>
+                <tr>
+                  <th>Pro koho</th>
+                  <th>Co</th>
+                  <th>Za kolik</th>
+                  <th aria-label="Akce" />
+                </tr>
+              </thead>
+              <tbody>
+                {groupedGifts.map(({ name, items, total }) => {
+                  const fillPercent = maxTotal
+                    ? Math.max((total / maxTotal) * 100, 8)
+                    : 0;
 
-                return (
-                  <Fragment key={name}>
-                    {items.map((gift, index) => (
-                      <tr key={gift.id}>
-                        {index === 0 && (
-                          <td className="table-name" rowSpan={items.length}>
-                            <div className="table-name__label">{name}</div>
-                            <div className="table-mini">
-                              <span className="table-mini__value">{formatCurrency(total)}</span>
-                              <div className="table-mini__bar" aria-hidden="true">
-                                <span
-                                  className="table-mini__fill"
-                                  style={{ width: `${Math.min(fillPercent, 100)}%` }}
-                                />
+                  return (
+                    <Fragment key={name}>
+                      {items.map((gift, index) => (
+                        <tr
+                          key={gift.id}
+                          className={`table-row${index === 0 ? ' table-row--group-start' : ''}`}
+                        >
+                          {index === 0 && (
+                            <td className="table-name" rowSpan={items.length}>
+                              <div className="table-name__label">{name}</div>
+                              <div className="table-mini">
+                                <span className="table-mini__value">{formatCurrency(total)}</span>
+                                <div className="table-mini__bar" aria-hidden="true">
+                                  <span
+                                    className="table-mini__fill"
+                                    style={{ width: `${Math.min(fillPercent, 100)}%` }}
+                                  />
+                                </div>
                               </div>
-                            </div>
+                            </td>
+                          )}
+                          <td>{gift.gift}</td>
+                          <td>{formatCurrency(gift.price)}</td>
+                          <td className="table-action">
+                            <button
+                              type="button"
+                              className="table-delete"
+                              aria-label={`Smazat dárek ${gift.gift} pro ${gift.name}`}
+                              onClick={() => onDeleteGift(gift.id)}
+                            >
+                              &times;
+                            </button>
                           </td>
-                        )}
-                        <td>{gift.gift}</td>
-                        <td>{formatCurrency(gift.price)}</td>
-                        <td className="table-action">
-                          <button
-                            type="button"
-                            className="table-delete"
-                            aria-label={`Smazat dárek ${gift.gift} pro ${gift.name}`}
-                            onClick={() => onDeleteGift(gift.id)}
-                          >
-                            &times;
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </Fragment>
-                );
-              })}
-            </tbody>
-          </table>
+                        </tr>
+                      ))}
+                    </Fragment>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
         ) : (
           <p className='table-empty'>Pro vybraný rok zatím nejsou žádné záznamy.</p>
         )}

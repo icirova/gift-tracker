@@ -8,6 +8,11 @@
   overflow: hidden;
 }
 
+.table-scroll {
+  max-height: 520px;
+  overflow: auto;
+}
+
 .table-container::after {
   content: '';
   position: absolute;
@@ -31,6 +36,14 @@
   color: #fff;
 }
 
+.table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: linear-gradient(120deg, var(--primary), var(--accent));
+  box-shadow: 0 10px 20px rgba(15, 23, 42, 0.15);
+}
+
 .table th,
 .table td {
   padding: 16px 20px;
@@ -50,8 +63,16 @@
   border-bottom: none;
 }
 
-.table tbody tr:hover {
-  background: rgba(244, 63, 94, 0.05);
+.table-row--group-start td {
+  border-top: 2px solid rgba(244, 63, 94, 0.22);
+}
+
+.table-row:hover td:not(.table-name) {
+  background: rgba(244, 63, 94, 0.1);
+}
+
+.table-row:hover .table-name {
+  background: rgba(244, 63, 94, 0.06);
 }
 
 .table-name {
