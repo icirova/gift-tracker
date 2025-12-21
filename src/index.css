@@ -299,6 +299,10 @@ body {
   color: rgba(248, 250, 252, 0.8);
 }
 
+.hero__lead-break {
+  display: block;
+}
+
 .hero-stats {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -362,6 +366,13 @@ body {
   letter-spacing: 0.04em;
   cursor: pointer;
   transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.hero__year--new {
+  border-style: dashed;
+  border-color: rgba(248, 250, 252, 0.35);
+  background: rgba(248, 250, 252, 0.02);
+  font-weight: 500;
 }
 
 .hero__year:hover {
@@ -463,14 +474,6 @@ body {
   transform: translateY(-1px);
 }
 
-.hero-quick__secondary {
-  background: linear-gradient(120deg, var(--primary), var(--accent));
-  color: #fff;
-  border: none;
-  box-shadow: none;
-  grid-column: 1 / -1;
-  justify-self: start;
-}
 
 @media (max-width: 900px) {
   .hero-quick {

@@ -3,20 +3,40 @@ import SummaryItem from '../SummaryItem';
 import { formatCurrency } from '../../utils/formatCurrency';
 import './style.css';
 
-const Summary = ({ totalItems, totalPrice, year }) => {
+const formatDelta = (value) => {
+  if (value === null) {
+    return '—';
+  }
+  if (value === 0) {
+    return formatCurrency(0);
+  }
+  const sign = value > 0 ? '+' : '-';
+  return `${sign}${formatCurrency(Math.abs(value))}`;
+};
+
+const Summary = ({ year, mostExpensiveGift, yearChange }) => {
   return (
     <div className='summary'>
-      <SummaryItem label="Aktuální rok" value={year} variant="year" />
-      <SummaryItem label="Počet dárků" value={totalItems} variant="gifts" />
-      <SummaryItem label="Celkem utraceno" value={formatCurrency(totalPrice)} variant="budget" />
+      <SummaryItem label="Rok" value={year} variant="year" />
+      <SummaryItem
+        label="Nejdražší dárek"
+        value={mostExpensiveGift === null ? '—' : formatCurrency(mostExpensiveGift)}
+        variant="budget"
+      />
+      <SummaryItem label="Meziroční změna" value={formatDelta(yearChange)} variant="budget" />
     </div>
   );
 };
 
 Summary.propTypes = {
-  totalItems: PropTypes.number.isRequired,
-  totalPrice: PropTypes.number.isRequired,
   year: PropTypes.number.isRequired,
+  mostExpensiveGift: PropTypes.number,
+  yearChange: PropTypes.number,
+};
+
+Summary.defaultProps = {
+  mostExpensiveGift: null,
+  yearChange: null,
 };
 
 export default Summary;

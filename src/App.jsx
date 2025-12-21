@@ -7,6 +7,7 @@ import DEFAULT_GIFTS from './data/defaultGifts';
 import ALLOWED_NAMES from './data/allowedNames';
 
 const STORAGE_KEY = 'gift-tracker:gifts';
+const YEARS_KEY = 'gift-tracker:extra-years';
 
 const normalizeGifts = (entries) =>
   entries.filter((gift) => ALLOWED_NAMES.includes(gift.name));
@@ -32,12 +33,33 @@ const loadStoredGifts = () => {
   return normalizeGifts(DEFAULT_GIFTS);
 };
 
+const loadStoredYears = () => {
+  if (typeof window === 'undefined') {
+    return [];
+  }
+
+  try {
+    const rawValue = window.localStorage.getItem(YEARS_KEY);
+    if (rawValue) {
+      const parsedValue = JSON.parse(rawValue);
+      if (Array.isArray(parsedValue)) {
+        return parsedValue.filter((year) => Number.isFinite(year)).map(Number);
+      }
+    }
+  } catch (error) {
+    console.warn('Nepodařilo se načíst roky z localStorage.', error);
+  }
+
+  return [];
+};
+
 function App() {
   const [gifts, setGifts] = useState(normalizeGifts(DEFAULT_GIFTS));
   const [selectedYear, setSelectedYear] = useState(DEFAULT_GIFTS[0]?.year ?? new Date().getFullYear());
   const [isInitialized, setIsInitialized] = useState(false);
   const [pendingDelete, setPendingDelete] = useState(null);
   const [highlightedGiftId, setHighlightedGiftId] = useState(null);
+  const [extraYears, setExtraYears] = useState(loadStoredYears);
   const deleteTimeoutRef = useRef(null);
   const highlightTimeoutRef = useRef(null);
   const [quickGift, setQuickGift] = useState({
@@ -49,11 +71,13 @@ function App() {
   useEffect(() => {
     const storedGifts = loadStoredGifts();
     setGifts(storedGifts);
-    if (storedGifts.length) {
-      const newestYear = Math.max(...storedGifts.map((gift) => gift.year));
-      setSelectedYear(newestYear);
-    }
+    const currentYear = new Date().getFullYear();
+    setSelectedYear(currentYear);
     setIsInitialized(true);
+  }, []);
+
+  useEffect(() => {
+    setExtraYears((prev) => prev.filter((year) => year !== 2026 && year !== 2027));
   }, []);
 
   useEffect(() => {
@@ -63,6 +87,14 @@ function App() {
 
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(gifts));
   }, [gifts, isInitialized]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    window.localStorage.setItem(YEARS_KEY, JSON.stringify(extraYears));
+  }, [extraYears]);
 
   useEffect(() => {
     return () => {
@@ -75,10 +107,11 @@ function App() {
     };
   }, []);
 
-  const availableYears = useMemo(
-    () => [...new Set(gifts.map((gift) => gift.year))].sort((a, b) => b - a),
-    [gifts],
-  );
+  const availableYears = useMemo(() => {
+    const currentYear = new Date().getFullYear();
+    const years = new Set([...gifts.map((gift) => gift.year), ...extraYears, currentYear]);
+    return [...years].sort((a, b) => b - a);
+  }, [gifts, extraYears]);
 
   useEffect(() => {
     if (!availableYears.length) {
@@ -90,6 +123,19 @@ function App() {
     }
   }, [availableYears, selectedYear]);
 
+  const handleAddYear = () => {
+    if (typeof window !== 'undefined') {
+      const confirmed = window.confirm('Přidat nový rok do timeline?');
+      if (!confirmed) {
+        return;
+      }
+    }
+    const currentMax = Math.max(...availableYears, new Date().getFullYear());
+    const nextYear = currentMax + 1;
+    setExtraYears((prev) => (prev.includes(nextYear) ? prev : [...prev, nextYear]));
+    setSelectedYear(nextYear);
+  };
+
   const giftsForActiveYear = useMemo(
     () => gifts.filter((gift) => gift.year === selectedYear),
     [gifts, selectedYear],
@@ -100,6 +146,25 @@ function App() {
     const totalPrice = giftsForActiveYear.reduce((sum, gift) => sum + gift.price, 0);
     return { totalItems, totalPrice };
   }, [giftsForActiveYear]);
+
+  const mostExpensiveGift = useMemo(() => {
+    if (!giftsForActiveYear.length) {
+      return null;
+    }
+    return Math.max(...giftsForActiveYear.map((gift) => gift.price));
+  }, [giftsForActiveYear]);
+
+  const previousYearTotal = useMemo(() => {
+    const previousYear = selectedYear - 1;
+    return gifts
+      .filter((gift) => gift.year === previousYear)
+      .reduce((sum, gift) => sum + gift.price, 0);
+  }, [gifts, selectedYear]);
+
+  const hasPreviousYear = useMemo(
+    () => gifts.some((gift) => gift.year === selectedYear - 1),
+    [gifts, selectedYear],
+  );
 
   const yearlyTotals = useMemo(() => {
     const annualTotals = gifts.reduce((acc, gift) => {
@@ -134,6 +199,16 @@ function App() {
   };
 
   const formatDaysVerb = (days) => (days >= 2 && days <= 4 ? 'zbývají' : 'zbývá');
+
+  const formatGiftLabel = (count) => {
+    if (count === 1) {
+      return 'dárek';
+    }
+    if (count >= 2 && count <= 4) {
+      return 'dárky';
+    }
+    return 'dárků';
+  };
 
   const handleGiftAdd = (giftInput) => {
     const trimmedName = giftInput.name.trim();
@@ -196,16 +271,6 @@ function App() {
           table.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
       });
-    }
-  };
-
-  const handleScrollToForm = () => {
-    if (typeof document === 'undefined') {
-      return;
-    }
-    const form = document.getElementById('gift-form');
-    if (form) {
-      form.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   };
 
@@ -276,22 +341,26 @@ function App() {
         <div className='hero__ribbon'>
           {daysToChristmasEve === 0
             ? 'Štědrý den je dnes'
-            : `Do Štědrého dne ${formatDaysVerb(daysToChristmasEve)} ${daysToChristmasEve} ${formatDaysLabel(
+            : `Do Vánoc ${formatDaysVerb(daysToChristmasEve)} ${daysToChristmasEve} ${formatDaysLabel(
                 daysToChristmasEve,
               )}`}
         </div>
         <h1 className='hero__title'>Christmas <span className='hero__title-accent'>Gift</span> Tracker</h1>
         <p className='hero__lead'>
-          Sleduj rozpočet, dárky i radost v rodině. Všechny roky na jednom místě s okamžitými grafy.
+          Dárky bez chaosu. Rozpočet pod dohledem.
+          <em className="hero__lead-break">Realita může překvapit… nebo vyděsit.</em>
         </p>
         <div className="hero-stats">
           <div className="hero-stat">
-            <span className="hero-stat__label">Vybraný rok</span>
+            <span className="hero-stat__label">ROK</span>
             <span className="hero-stat__value">{selectedYear}</span>
           </div>
           <div className="hero-stat">
-            <span className="hero-stat__label">Položek celkem</span>
-            <span className="hero-stat__value">{summary.totalItems}</span>
+            <span className="hero-stat__label">Celkový počet</span>
+            <span className="hero-stat__value">
+              {summary.totalItems}
+              {summary.totalItems === 0 ? '' : ` ${formatGiftLabel(summary.totalItems)}`}
+            </span>
           </div>
           <div className="hero-stat">
             <span className="hero-stat__label">Celková suma</span>
@@ -314,6 +383,9 @@ function App() {
               </button>
             );
           })}
+          <button type="button" className="hero__year hero__year--new" onClick={handleAddYear}>
+            + Nový rok
+          </button>
         </div>
         <form className="hero-quick" onSubmit={handleQuickSubmit}>
           <label className="hero-quick__field">
@@ -350,9 +422,6 @@ function App() {
           <button type="submit" disabled={!isQuickValid}>
             Přidat dárek
           </button>
-          <button type="button" className="hero-quick__secondary" onClick={handleScrollToForm}>
-            Přejít na formulář
-          </button>
         </form>
         
       </div>
@@ -360,7 +429,11 @@ function App() {
 
 
       <div className='section'>
-        <Summary totalItems={summary.totalItems} totalPrice={summary.totalPrice} year={selectedYear} />
+        <Summary
+          year={selectedYear}
+          mostExpensiveGift={mostExpensiveGift}
+          yearChange={hasPreviousYear ? summary.totalPrice - previousYearTotal : null}
+        />
       </div>
 
       <div className='section'>
