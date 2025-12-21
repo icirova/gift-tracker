@@ -1,15 +1,33 @@
-import { Fragment, useMemo } from 'react';
+import { Fragment, useMemo, useState, useLayoutEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { formatCurrency } from '../../utils/formatCurrency';
 import './style.css';
 
 const Table = ({ gifts, selectedYear, onDeleteGift }) => {
+  const [searchQuery, setSearchQuery] = useState('');
+  const [baseHeight, setBaseHeight] = useState(null);
+  const containerRef = useRef(null);
+  const normalizedQuery = searchQuery.trim().toLowerCase();
+  const hasFilter = normalizedQuery.length > 0;
+
   const { groupedGifts, maxTotal } = useMemo(() => {
     if (!gifts.length) {
       return { groupedGifts: [], maxTotal: 0 };
     }
 
-    const groupedMap = gifts.reduce((acc, gift) => {
+    const filteredGifts = normalizedQuery
+      ? gifts.filter((gift) =>
+          [gift.name, gift.gift]
+            .filter(Boolean)
+            .some((value) => value.toLowerCase().includes(normalizedQuery)),
+        )
+      : gifts;
+
+    if (!filteredGifts.length) {
+      return { groupedGifts: [], maxTotal: 0 };
+    }
+
+    const groupedMap = filteredGifts.reduce((acc, gift) => {
       if (!acc[gift.name]) {
         acc[gift.name] = { name: gift.name, items: [], total: 0 };
       }
@@ -25,14 +43,50 @@ const Table = ({ gifts, selectedYear, onDeleteGift }) => {
     const max = groupedList.reduce((maxValue, group) => Math.max(maxValue, group.total), 0);
 
     return { groupedGifts: groupedList, maxTotal: max };
-  }, [gifts]);
+  }, [gifts, normalizedQuery]);
 
   const hasGifts = groupedGifts.length > 0;
+  const emptyMessage = hasFilter
+    ? 'Žádné výsledky pro zadané hledání.'
+    : 'Pro vybraný rok zatím nejsou žádné záznamy.';
+
+  useLayoutEffect(() => {
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    if (!containerRef.current || hasFilter) {
+      return;
+    }
+
+    const height = containerRef.current.getBoundingClientRect().height;
+    setBaseHeight((prev) => {
+      if (!prev || height > prev) {
+        return height;
+      }
+      return prev;
+    });
+  }, [groupedGifts, hasFilter]);
 
   return (
     <div>
       <h2 className='subtitle'>Seznam dárků {selectedYear}</h2>
-      <div className="table-container">
+      <div className="table-toolbar">
+        <label className="table-search">
+          <span>Filtrování</span>
+          <input
+            type="text"
+            placeholder="Hledat podle jména nebo dárku"
+            value={searchQuery}
+            onChange={(event) => setSearchQuery(event.target.value)}
+          />
+        </label>
+      </div>
+      <div
+        className="table-container"
+        ref={containerRef}
+        style={baseHeight ? { minHeight: `${baseHeight}px` } : undefined}
+      >
         {hasGifts ? (
           <div className="table-scroll">
             <table className='table'>
@@ -91,7 +145,7 @@ const Table = ({ gifts, selectedYear, onDeleteGift }) => {
             </table>
           </div>
         ) : (
-          <p className='table-empty'>Pro vybraný rok zatím nejsou žádné záznamy.</p>
+          <p className='table-empty'>{emptyMessage}</p>
         )}
       </div>
     </div>
