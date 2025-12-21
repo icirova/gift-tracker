@@ -4,20 +4,27 @@ import { formatCurrency } from '../../utils/formatCurrency';
 import './style.css';
 
 const Table = ({ gifts, selectedYear, onDeleteGift }) => {
-  const groupedGifts = useMemo(() => {
+  const { groupedGifts, maxTotal } = useMemo(() => {
     if (!gifts.length) {
-      return [];
+      return { groupedGifts: [], maxTotal: 0 };
     }
 
-    const groups = gifts.reduce((acc, gift) => {
-      acc[gift.name] = acc[gift.name] ?? [];
-      acc[gift.name].push(gift);
+    const groupedMap = gifts.reduce((acc, gift) => {
+      if (!acc[gift.name]) {
+        acc[gift.name] = { name: gift.name, items: [], total: 0 };
+      }
+      acc[gift.name].items.push(gift);
+      acc[gift.name].total += gift.price;
       return acc;
     }, {});
 
-    return Object.keys(groups)
-      .sort((a, b) => a.localeCompare(b, 'cs', { sensitivity: 'base' }))
-      .map((name) => ({ name, items: groups[name] }));
+    const groupedList = Object.values(groupedMap).sort((a, b) =>
+      a.name.localeCompare(b.name, 'cs', { sensitivity: 'base' }),
+    );
+
+    const max = groupedList.reduce((maxValue, group) => Math.max(maxValue, group.total), 0);
+
+    return { groupedGifts: groupedList, maxTotal: max };
   }, [gifts]);
 
   const hasGifts = groupedGifts.length > 0;
@@ -37,31 +44,46 @@ const Table = ({ gifts, selectedYear, onDeleteGift }) => {
               </tr>
             </thead>
             <tbody>
-              {groupedGifts.map(({ name, items }) => (
-                <Fragment key={name}>
-                  {items.map((gift, index) => (
-                    <tr key={gift.id}>
-                      {index === 0 && (
-                        <td className="table-name" rowSpan={items.length}>
-                          {name}
+              {groupedGifts.map(({ name, items, total }) => {
+                const fillPercent = maxTotal
+                  ? Math.max((total / maxTotal) * 100, 8)
+                  : 0;
+
+                return (
+                  <Fragment key={name}>
+                    {items.map((gift, index) => (
+                      <tr key={gift.id}>
+                        {index === 0 && (
+                          <td className="table-name" rowSpan={items.length}>
+                            <div className="table-name__label">{name}</div>
+                            <div className="table-mini">
+                              <span className="table-mini__value">{formatCurrency(total)}</span>
+                              <div className="table-mini__bar" aria-hidden="true">
+                                <span
+                                  className="table-mini__fill"
+                                  style={{ width: `${Math.min(fillPercent, 100)}%` }}
+                                />
+                              </div>
+                            </div>
+                          </td>
+                        )}
+                        <td>{gift.gift}</td>
+                        <td>{formatCurrency(gift.price)}</td>
+                        <td className="table-action">
+                          <button
+                            type="button"
+                            className="table-delete"
+                            aria-label={`Smazat dárek ${gift.gift} pro ${gift.name}`}
+                            onClick={() => onDeleteGift(gift.id)}
+                          >
+                            &times;
+                          </button>
                         </td>
-                      )}
-                      <td>{gift.gift}</td>
-                      <td>{formatCurrency(gift.price)}</td>
-                      <td className="table-action">
-                        <button
-                          type="button"
-                          className="table-delete"
-                          aria-label={`Smazat dárek ${gift.gift} pro ${gift.name}`}
-                          onClick={() => onDeleteGift(gift.id)}
-                        >
-                          &times;
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </Fragment>
-              ))}
+                      </tr>
+                    ))}
+                  </Fragment>
+                );
+              })}
             </tbody>
           </table>
         ) : (
