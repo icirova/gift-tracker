@@ -41,7 +41,6 @@ const Table = ({ gifts, selectedYear, onDeleteGift }) => {
                   <th>Pro koho</th>
                   <th>Co</th>
                   <th>Za kolik</th>
-                  <th aria-label="Akce" />
                 </tr>
               </thead>
               <tbody>
