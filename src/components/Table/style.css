@@ -65,6 +65,7 @@
 .table {
   width: 100%;
   border-collapse: collapse;
+  table-layout: fixed;
 }
 
 .table thead {
@@ -88,6 +89,21 @@
   font-size: 16px;
 }
 
+.table-col-name,
+.table-name {
+  width: 34%;
+}
+
+.table-col-gift,
+.table-gift {
+  width: 46%;
+}
+
+.table-col-price,
+.table-price {
+  width: 20%;
+}
+
 .table th {
   font-weight: 600;
   letter-spacing: 0.15em;
@@ -107,10 +123,6 @@
   background: rgba(244, 63, 94, 0.1);
 }
 
-.table-row:hover .table-name {
-  background: rgba(244, 63, 94, 0.06);
-}
-
 .table-name {
   font-weight: 600;
   color: var(--text);
@@ -119,10 +131,15 @@
   border-right: 1px solid rgba(15, 23, 42, 0.04);
 }
 
+.table-name.table-name--hovered {
+  background: rgba(244, 63, 94, 0.06);
+}
+
 .table-name__label {
   font-size: 16px;
   margin-bottom: 10px;
 }
+
 
 .table-mini {
   display: flex;
@@ -154,33 +171,14 @@
   box-shadow: 0 6px 14px rgba(244, 63, 94, 0.2);
 }
 
-.table-action {
-  width: 56px;
-  text-align: center;
-  padding-left: 0;
-  padding-right: 16px;
+.table-price {
+  text-align: right;
 }
 
-.table-delete {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  border: none;
-  background: transparent;
-  color: var(--text-muted);
-  font-size: 21px;
-  cursor: pointer;
-  transition: background 0.2s ease, color 0.2s ease;
+.table-price__value {
+  font-variant-numeric: tabular-nums;
 }
 
-.table-delete:hover,
-.table-delete:focus-visible {
-  background: rgba(244, 63, 94, 0.12);
-  color: var(--accent);
-}
 
 .table-empty {
   margin: 28px;

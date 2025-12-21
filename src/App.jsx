@@ -118,10 +118,6 @@ function App() {
     setSelectedYear(year);
   };
 
-  const handleGiftDelete = (giftId) => {
-    setGifts((prev) => prev.filter((gift) => gift.id !== giftId));
-  };
-
   return <div className='wrapper'>
 
     <div className='hero'>
@@ -185,7 +181,6 @@ function App() {
       <Table
         gifts={giftsForActiveYear}
         selectedYear={selectedYear}
-        onDeleteGift={handleGiftDelete}
       />
      </div>
      

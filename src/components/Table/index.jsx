@@ -3,9 +3,10 @@ import PropTypes from 'prop-types';
 import { formatCurrency } from '../../utils/formatCurrency';
 import './style.css';
 
-const Table = ({ gifts, selectedYear, onDeleteGift }) => {
+const Table = ({ gifts, selectedYear }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [baseHeight, setBaseHeight] = useState(null);
+  const [hoveredName, setHoveredName] = useState(null);
   const containerRef = useRef(null);
   const normalizedQuery = searchQuery.trim().toLowerCase();
   const hasFilter = normalizedQuery.length > 0;
@@ -51,21 +52,16 @@ const Table = ({ gifts, selectedYear, onDeleteGift }) => {
     : 'Pro vybraný rok zatím nejsou žádné záznamy.';
 
   useLayoutEffect(() => {
-    if (typeof window === 'undefined') {
+    if (typeof window === 'undefined' || hasFilter) {
       return;
     }
 
-    if (!containerRef.current || hasFilter) {
+    if (!containerRef.current) {
       return;
     }
 
-    const height = containerRef.current.getBoundingClientRect().height;
-    setBaseHeight((prev) => {
-      if (!prev || height > prev) {
-        return height;
-      }
-      return prev;
-    });
+    const height = containerRef.current.scrollHeight;
+    setBaseHeight(height);
   }, [groupedGifts, hasFilter]);
 
   return (
@@ -92,9 +88,9 @@ const Table = ({ gifts, selectedYear, onDeleteGift }) => {
             <table className='table'>
               <thead>
                 <tr>
-                  <th>Pro koho</th>
-                  <th>Co</th>
-                  <th>Za kolik</th>
+                  <th className="table-col-name">Pro koho</th>
+                  <th className="table-col-gift">Co</th>
+                  <th className="table-col-price">Za kolik</th>
                 </tr>
               </thead>
               <tbody>
@@ -109,9 +105,14 @@ const Table = ({ gifts, selectedYear, onDeleteGift }) => {
                         <tr
                           key={gift.id}
                           className={`table-row${index === 0 ? ' table-row--group-start' : ''}`}
+                          onMouseEnter={() => setHoveredName(name)}
+                          onMouseLeave={() => setHoveredName(null)}
                         >
                           {index === 0 && (
-                            <td className="table-name" rowSpan={items.length}>
+                            <td
+                              className={`table-name${hoveredName === name ? ' table-name--hovered' : ''}`}
+                              rowSpan={items.length}
+                            >
                               <div className="table-name__label">{name}</div>
                               <div className="table-mini">
                                 <span className="table-mini__value">{formatCurrency(total)}</span>
@@ -124,17 +125,9 @@ const Table = ({ gifts, selectedYear, onDeleteGift }) => {
                               </div>
                             </td>
                           )}
-                          <td>{gift.gift}</td>
-                          <td>{formatCurrency(gift.price)}</td>
-                          <td className="table-action">
-                            <button
-                              type="button"
-                              className="table-delete"
-                              aria-label={`Smazat dárek ${gift.gift} pro ${gift.name}`}
-                              onClick={() => onDeleteGift(gift.id)}
-                            >
-                              &times;
-                            </button>
+                          <td className="table-gift">{gift.gift}</td>
+                          <td className="table-price">
+                            <span className="table-price__value">{formatCurrency(gift.price)}</span>
                           </td>
                         </tr>
                       ))}
@@ -163,7 +156,6 @@ Table.propTypes = {
     })
   ).isRequired,
   selectedYear: PropTypes.number.isRequired,
-  onDeleteGift: PropTypes.func.isRequired,
 };
 
 export default Table;
