@@ -175,6 +175,15 @@ function App() {
       year: selectedYear,
     });
     setQuickGift((prev) => ({ ...prev, gift: '', price: '' }));
+
+    if (typeof document !== 'undefined') {
+      requestAnimationFrame(() => {
+        const table = document.getElementById('gift-table');
+        if (table) {
+          table.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+    }
   };
 
   const handleScrollToForm = () => {
@@ -288,7 +297,6 @@ function App() {
                 className={`hero__year${isActive ? ' is-active' : ''}`}
                 onClick={() => setSelectedYear(year)}
               >
-                <span className="hero__year-dot" aria-hidden="true" />
                 <span>{year}</span>
               </button>
             );
@@ -318,22 +326,20 @@ function App() {
           <label className="hero-quick__field">
             <span>Cena (Kč)</span>
             <input
-              type="number"
-              min="1"
+              type="text"
+              inputMode="numeric"
               name="price"
               value={quickGift.price}
               onChange={handleQuickChange}
               placeholder="Např. 1200"
             />
           </label>
-          <div className="hero-quick__actions">
-            <button type="submit" disabled={!isQuickValid}>
-              Přidat dárek
-            </button>
-            <button type="button" className="hero-quick__secondary" onClick={handleScrollToForm}>
-              Přejít na formulář
-            </button>
-          </div>
+          <button type="submit" disabled={!isQuickValid}>
+            Přidat dárek
+          </button>
+          <button type="button" className="hero-quick__secondary" onClick={handleScrollToForm}>
+            Přejít na formulář
+          </button>
         </form>
         
       </div>

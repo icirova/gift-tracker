@@ -65,7 +65,7 @@ const Table = ({ gifts, selectedYear, onDeleteGift }) => {
   }, [groupedGifts, hasFilter]);
 
   return (
-    <div>
+    <div id="gift-table">
       <h2 className='subtitle'>Seznam dárků {selectedYear}</h2>
       <div className="table-toolbar">
         <label className="table-search">

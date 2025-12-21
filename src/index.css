@@ -307,13 +307,18 @@ body {
 }
 
 .hero-stat {
-  padding: 14px 16px;
-  border-radius: 16px;
-  background: rgba(248, 250, 252, 0.12);
-  border: 1px solid rgba(248, 250, 252, 0.25);
+  padding: 10px 0;
+  border-radius: 0;
+  background: transparent;
+  border: none;
   display: flex;
   flex-direction: column;
   gap: 6px;
+}
+
+.hero-stat + .hero-stat {
+  padding-left: 16px;
+  border-left: 1px solid rgba(248, 250, 252, 0.18);
 }
 
 .hero-stat__label {
@@ -340,30 +345,23 @@ body {
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
-  margin: -14px 0 24px;
+  margin: 20px 0 34px;
 }
 
 .hero__year {
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  padding: 10px 16px;
+  padding: 12px 20px;
   border-radius: 999px;
-  border: 1px solid rgba(248, 250, 252, 0.35);
-  background: rgba(248, 250, 252, 0.08);
+  border: 1px solid transparent;
+  background: rgba(248, 250, 252, 0.04);
   color: inherit;
   font-weight: 600;
+  font-size: 15px;
   letter-spacing: 0.04em;
   cursor: pointer;
   transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
-}
-
-.hero__year-dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: rgba(248, 250, 252, 0.6);
-  box-shadow: 0 0 0 4px rgba(248, 250, 252, 0.15);
 }
 
 .hero__year:hover {
@@ -372,21 +370,17 @@ body {
 }
 
 .hero__year.is-active {
-  background: rgba(248, 250, 252, 0.18);
-  border-color: rgba(248, 250, 252, 0.7);
+  background: rgba(248, 250, 252, 0.14);
+  border-color: rgba(248, 250, 252, 0.45);
 }
 
-.hero__year.is-active .hero__year-dot {
-  background: #fff;
-  box-shadow: 0 0 0 5px rgba(248, 250, 252, 0.25);
-}
 
 .hero-quick {
   display: grid;
-  grid-template-columns: 160px minmax(180px, 1.2fr) 120px auto;
-  gap: 12px;
+  grid-template-columns: 160px minmax(180px, 1.2fr) 120px max-content;
+  gap: 14px;
   align-items: end;
-  margin-top: 10px;
+  margin-top: 14px;
 }
 
 .hero-quick__field {
@@ -404,12 +398,21 @@ body {
   border-radius: 14px;
   border: 1px solid rgba(15, 23, 42, 0.1);
   padding: 10px 12px;
+  height: 44px;
   font-size: 15px;
   font-family: inherit;
   background: #fff;
-  color: var(--text);
+  color: #111827;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
   transition: border 0.2s ease, box-shadow 0.2s ease;
+}
+
+.hero-quick input::placeholder {
+  color: #6b7280;
+}
+
+.hero-quick input {
+  caret-color: #111827;
 }
 
 .hero-quick input:focus,
@@ -437,7 +440,8 @@ body {
 }
 
 .hero-quick button {
-  padding: 12px 20px;
+  padding: 12px 28px;
+  height: 44px;
   border: none;
   border-radius: 999px;
   background: linear-gradient(120deg, var(--primary), var(--accent));
@@ -446,6 +450,8 @@ body {
   letter-spacing: 0.06em;
   cursor: pointer;
   transition: transform 0.2s ease, opacity 0.2s ease;
+  justify-self: start;
+  white-space: nowrap;
 }
 
 .hero-quick button:disabled {
@@ -457,19 +463,13 @@ body {
   transform: translateY(-1px);
 }
 
-.hero-quick__actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  justify-content: flex-start;
-  grid-column: 1 / -1;
-}
-
 .hero-quick__secondary {
-  background: #fff;
-  color: var(--text);
-  border: 1px solid rgba(15, 23, 42, 0.1);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  background: linear-gradient(120deg, var(--primary), var(--accent));
+  color: #fff;
+  border: none;
+  box-shadow: none;
+  grid-column: 1 / -1;
+  justify-self: start;
 }
 
 @media (max-width: 900px) {
@@ -477,7 +477,7 @@ body {
     grid-template-columns: 1fr 1fr;
   }
 
-  .hero-quick__actions {
+  .hero-quick button {
     grid-column: 1 / -1;
     justify-self: start;
   }

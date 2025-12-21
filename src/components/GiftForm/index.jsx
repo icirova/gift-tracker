@@ -103,7 +103,7 @@ const GiftForm = ({ onAddGift, defaultYear, allowedNames }) => {
       </div>
       {error && <p className="gift-form__error">{error}</p>}
       <button type="submit" disabled={!isValid}>
-        Uložit dárek
+        Přidat dárek
       </button>
     </form>
   );
