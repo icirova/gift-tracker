@@ -88,9 +88,9 @@ const Table = ({ gifts, selectedYear, onDeleteGift }) => {
             <table className='table'>
               <thead>
                 <tr>
-                  <th className="table-col-name">Pro koho</th>
-                  <th className="table-col-gift">Co</th>
-                  <th className="table-col-price">Za kolik</th>
+                  <th className="table-col-name">Jméno</th>
+                  <th className="table-col-gift">Dárek</th>
+                  <th className="table-col-price">Cena</th>
                 </tr>
               </thead>
               <tbody>
