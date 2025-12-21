@@ -54,6 +54,32 @@
   background: rgba(244, 63, 94, 0.05);
 }
 
+.table-action {
+  width: 56px;
+  text-align: center;
+}
+
+.table-delete {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 21px;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.table-delete:hover,
+.table-delete:focus-visible {
+  background: rgba(244, 63, 94, 0.12);
+  color: var(--accent);
+}
+
 .table-empty {
   margin: 28px;
   text-align: center;

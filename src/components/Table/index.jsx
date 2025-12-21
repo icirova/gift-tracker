@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import { formatCurrency } from '../../utils/formatCurrency';
 import './style.css';
 
-const Table = ({ gifts, selectedYear }) => {
+const Table = ({ gifts, selectedYear, onDeleteGift }) => {
   const hasGifts = gifts.length > 0;
 
   return (
@@ -16,6 +16,7 @@ const Table = ({ gifts, selectedYear }) => {
                 <th>Pro koho</th>
                 <th>Co</th>
                 <th>Za kolik</th>
+                <th aria-label="Akce" />
               </tr>
             </thead>
             <tbody>
@@ -24,6 +25,16 @@ const Table = ({ gifts, selectedYear }) => {
                   <td>{gift.name}</td>
                   <td>{gift.gift}</td>
                   <td>{formatCurrency(gift.price)}</td>
+                  <td className="table-action">
+                    <button
+                      type="button"
+                      className="table-delete"
+                      aria-label={`Smazat dárek ${gift.gift} pro ${gift.name}`}
+                      onClick={() => onDeleteGift(gift.id)}
+                    >
+                      &times;
+                    </button>
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -47,6 +58,7 @@ Table.propTypes = {
     })
   ).isRequired,
   selectedYear: PropTypes.number.isRequired,
+  onDeleteGift: PropTypes.func.isRequired,
 };
 
 export default Table;
