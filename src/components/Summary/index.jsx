@@ -14,10 +14,10 @@ const formatDelta = (value) => {
   return `${sign}${formatCurrency(Math.abs(value))}`;
 };
 
-const Summary = ({ year, mostExpensiveGift, yearChange }) => {
+const Summary = ({ mostExpensiveGift, yearChange, budgetDelta }) => {
   return (
     <div className='summary'>
-      <SummaryItem label="Rok" value={year} variant="year" />
+      <SummaryItem label="Rozpočet" value={formatDelta(budgetDelta)} variant="budget" />
       <SummaryItem
         label="Nejdražší dárek"
         value={mostExpensiveGift === null ? '—' : formatCurrency(mostExpensiveGift)}
@@ -29,14 +29,15 @@ const Summary = ({ year, mostExpensiveGift, yearChange }) => {
 };
 
 Summary.propTypes = {
-  year: PropTypes.number.isRequired,
   mostExpensiveGift: PropTypes.number,
   yearChange: PropTypes.number,
+  budgetDelta: PropTypes.number,
 };
 
 Summary.defaultProps = {
   mostExpensiveGift: null,
   yearChange: null,
+  budgetDelta: null,
 };
 
 export default Summary;

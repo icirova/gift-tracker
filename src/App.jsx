@@ -8,6 +8,7 @@ import ALLOWED_NAMES from './data/allowedNames';
 
 const STORAGE_KEY = 'gift-tracker:gifts';
 const YEARS_KEY = 'gift-tracker:extra-years';
+const BUDGETS_KEY = 'gift-tracker:budgets';
 
 const normalizeGifts = (entries) =>
   entries.filter((gift) => ALLOWED_NAMES.includes(gift.name));
@@ -53,6 +54,33 @@ const loadStoredYears = () => {
   return [];
 };
 
+const loadStoredBudgets = () => {
+  if (typeof window === 'undefined') {
+    return {};
+  }
+
+  try {
+    const rawValue = window.localStorage.getItem(BUDGETS_KEY);
+    if (rawValue) {
+      const parsedValue = JSON.parse(rawValue);
+      if (parsedValue && typeof parsedValue === 'object') {
+        return Object.entries(parsedValue).reduce((acc, [year, value]) => {
+          const numericYear = Number(year);
+          const numericValue = Number(value);
+          if (Number.isFinite(numericYear) && Number.isFinite(numericValue)) {
+            acc[numericYear] = numericValue;
+          }
+          return acc;
+        }, {});
+      }
+    }
+  } catch (error) {
+    console.warn('Nepodařilo se načíst rozpočty z localStorage.', error);
+  }
+
+  return {};
+};
+
 function App() {
   const [gifts, setGifts] = useState(normalizeGifts(DEFAULT_GIFTS));
   const [selectedYear, setSelectedYear] = useState(DEFAULT_GIFTS[0]?.year ?? new Date().getFullYear());
@@ -60,6 +88,9 @@ function App() {
   const [pendingDelete, setPendingDelete] = useState(null);
   const [highlightedGiftId, setHighlightedGiftId] = useState(null);
   const [extraYears, setExtraYears] = useState(loadStoredYears);
+  const [budgets, setBudgets] = useState(loadStoredBudgets);
+  const [budgetEditingYear, setBudgetEditingYear] = useState(null);
+  const [budgetDraft, setBudgetDraft] = useState('');
   const deleteTimeoutRef = useRef(null);
   const highlightTimeoutRef = useRef(null);
   const [quickGift, setQuickGift] = useState({
@@ -95,6 +126,14 @@ function App() {
 
     window.localStorage.setItem(YEARS_KEY, JSON.stringify(extraYears));
   }, [extraYears]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    window.localStorage.setItem(BUDGETS_KEY, JSON.stringify(budgets));
+  }, [budgets]);
 
   useEffect(() => {
     return () => {
@@ -176,6 +215,19 @@ function App() {
       .map(([year, total]) => ({ year: Number(year), total }))
       .sort((a, b) => a.year - b.year);
   }, [gifts]);
+
+  const currentBudget = budgets[selectedYear] ?? null;
+  const budgetDelta = currentBudget === null ? null : currentBudget - summary.totalPrice;
+  const budgetUsage =
+    currentBudget && currentBudget > 0
+      ? Math.min((summary.totalPrice / currentBudget) * 100, 100)
+      : 0;
+  const isOverBudget = currentBudget !== null && budgetDelta < 0;
+
+  useEffect(() => {
+    setBudgetDraft(currentBudget === null ? '' : String(currentBudget));
+    setBudgetEditingYear(null);
+  }, [selectedYear, currentBudget]);
 
   const daysToChristmasEve = useMemo(() => {
     const now = new Date();
@@ -272,6 +324,30 @@ function App() {
         }
       });
     }
+  };
+
+  const handleBudgetDraftChange = (event) => {
+    setBudgetDraft(event.target.value);
+  };
+
+  const handleBudgetEdit = () => {
+    setBudgetEditingYear(selectedYear);
+  };
+
+  const handleBudgetSave = () => {
+    setBudgets((prev) => {
+      if (!budgetDraft.trim()) {
+        const next = { ...prev };
+        delete next[selectedYear];
+        return next;
+      }
+      const numericValue = Number(budgetDraft);
+      if (!Number.isFinite(numericValue) || numericValue < 0) {
+        return prev;
+      }
+      return { ...prev, [selectedYear]: numericValue };
+    });
+    setBudgetEditingYear(null);
   };
 
   const handleGiftDelete = (giftId) => {
@@ -423,16 +499,67 @@ function App() {
             Přidat dárek
           </button>
         </form>
-        
+        <div className="hero-budget">
+          <div className="hero-budget__field">
+            <span>Plánovaný rozpočet</span>
+            {budgetEditingYear === selectedYear ? (
+              <input
+                type="text"
+                inputMode="numeric"
+                value={budgetDraft}
+                onChange={handleBudgetDraftChange}
+                onKeyDown={(event) => {
+                  if (event.key === 'Enter') {
+                    event.preventDefault();
+                    handleBudgetSave();
+                  }
+                }}
+                placeholder="Např. 15000"
+              />
+            ) : (
+              <>
+                <button
+                  type="button"
+                  className="hero-budget__value-button"
+                  onClick={handleBudgetEdit}
+                  aria-label={currentBudget === null ? 'Nastavit rozpočet' : 'Upravit rozpočet'}
+                  title={currentBudget === null ? 'Nastavit' : 'Upravit'}
+                >
+                  <span className="hero-budget__amount">
+                    {currentBudget === null
+                      ? 'Rozpočet není nastaven.'
+                      : `${currentBudget.toLocaleString('cs-CZ')} Kč`}
+                  </span>
+                  <span className="hero-budget__pencil" aria-hidden="true">
+                    ✎
+                  </span>
+                </button>
+                {currentBudget !== null &&
+                  (isOverBudget ? (
+                    <div className="hero-budget__over">Rozpočet byl překročen... zase.</div>
+                  ) : (
+                    <div className="hero-budget__bar" aria-hidden="true">
+                      <span className="hero-budget__fill" style={{ width: `${budgetUsage}%` }} />
+                    </div>
+                  ))}
+              </>
+            )}
+          </div>
+          {budgetEditingYear === selectedYear ? (
+            <button type="button" className="hero-budget__button" onClick={handleBudgetSave}>
+              Uložit
+            </button>
+          ) : null}
+        </div>
       </div>
     </div>
 
 
       <div className='section'>
         <Summary
-          year={selectedYear}
           mostExpensiveGift={mostExpensiveGift}
           yearChange={hasPreviousYear ? summary.totalPrice - previousYearTotal : null}
+          budgetDelta={budgetDelta}
         />
       </div>
 
