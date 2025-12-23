@@ -317,25 +317,35 @@ function App() {
     }
   };
 
-  const handleGiftDelete = (giftId) => {
-    setGifts((prev) => {
-      const index = prev.findIndex((gift) => gift.id === giftId);
-      if (index === -1) {
-        return prev;
+  const handleGiftDelete = async (giftId) => {
+    if (USE_API) {
+      try {
+        await api.deleteGift(giftId);
+        // Znovu načti všechna data z API
+        await loadGifts();
+      } catch (error) {
+        console.error('Failed to delete gift:', error);
       }
+    } else {
+      setGifts((prev) => {
+        const index = prev.findIndex((gift) => gift.id === giftId);
+        if (index === -1) {
+          return prev;
+        }
 
-      const removedGift = prev[index];
-      if (deleteTimeoutRef.current) {
-        clearTimeout(deleteTimeoutRef.current);
-      }
-      setPendingDelete({ gift: removedGift, index });
-      deleteTimeoutRef.current = setTimeout(() => {
-        setPendingDelete(null);
-        deleteTimeoutRef.current = null;
-      }, 5000);
+        const removedGift = prev[index];
+        if (deleteTimeoutRef.current) {
+          clearTimeout(deleteTimeoutRef.current);
+        }
+        setPendingDelete({ gift: removedGift, index });
+        deleteTimeoutRef.current = setTimeout(() => {
+          setPendingDelete(null);
+          deleteTimeoutRef.current = null;
+        }, 5000);
 
-      return prev.filter((gift) => gift.id !== giftId);
-    });
+        return prev.filter((gift) => gift.id !== giftId);
+      });
+    }
   };
 
   const handleUndoDelete = () => {
@@ -509,7 +519,7 @@ function App() {
       />
      </div>
      
-     {pendingDelete && (
+     {pendingDelete && !USE_API && (
        <div className="undo-toast" role="status">
          <span>Dárek byl smazán.</span>
          <button type="button" className="undo-toast__button" onClick={handleUndoDelete}>
