@@ -1,10 +1,11 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState, useCallback } from 'react';
 import Table from './components/Table';
 import Summary from './components/Summary';
 import GiftCharts from './components/GiftCharts';
 import GiftForm from './components/GiftForm';
 import DEFAULT_GIFTS from './data/defaultGifts';
 import ALLOWED_NAMES from './data/allowedNames';
+import { api, USE_API } from './services/api';
 
 const STORAGE_KEY = 'gift-tracker:gifts';
 const YEARS_KEY = 'gift-tracker:extra-years';
@@ -57,6 +58,7 @@ function App() {
   const [gifts, setGifts] = useState(normalizeGifts(DEFAULT_GIFTS));
   const [selectedYear, setSelectedYear] = useState(DEFAULT_GIFTS[0]?.year ?? new Date().getFullYear());
   const [isInitialized, setIsInitialized] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [pendingDelete, setPendingDelete] = useState(null);
   const [highlightedGiftId, setHighlightedGiftId] = useState(null);
   const [extraYears, setExtraYears] = useState(loadStoredYears);
@@ -68,20 +70,43 @@ function App() {
     price: '',
   });
 
-  useEffect(() => {
-    const storedGifts = loadStoredGifts();
-    setGifts(storedGifts);
-    const currentYear = new Date().getFullYear();
-    setSelectedYear(currentYear);
+  const loadGifts = useCallback(async () => {
+    if (USE_API) {
+      setIsLoading(true);
+      try {
+        const data = await api.getGifts();
+        setGifts(normalizeGifts(data));
+        if (data.length) {
+          const newestYear = Math.max(...data.map((gift) => gift.year));
+          setSelectedYear(newestYear);
+        }
+      } catch (error) {
+        console.error('Failed to load gifts from API:', error);
+        setGifts(normalizeGifts(DEFAULT_GIFTS));
+      } finally {
+        setIsLoading(false);
+      }
+    } else {
+      const storedGifts = loadStoredGifts();
+      setGifts(storedGifts);
+      if (storedGifts.length) {
+        const newestYear = Math.max(...storedGifts.map((gift) => gift.year));
+        setSelectedYear(newestYear);
+      }
+    }
     setIsInitialized(true);
   }, []);
+
+  useEffect(() => {
+    loadGifts();
+  }, [loadGifts]);
 
   useEffect(() => {
     setExtraYears((prev) => prev.filter((year) => year !== 2026 && year !== 2027));
   }, []);
 
   useEffect(() => {
-    if (!isInitialized || typeof window === 'undefined') {
+    if (!isInitialized || typeof window === 'undefined' || USE_API) {
       return;
     }
 
@@ -210,7 +235,7 @@ function App() {
     return 'dárků';
   };
 
-  const handleGiftAdd = (giftInput) => {
+  const handleGiftAdd = async (giftInput) => {
     const trimmedName = giftInput.name.trim();
     const trimmedGift = giftInput.gift.trim();
     const year = Number(giftInput.year) || selectedYear;
@@ -228,16 +253,34 @@ function App() {
       price,
     };
 
-    setGifts((prev) => [...prev, newGift]);
-    setSelectedYear(year);
-    setHighlightedGiftId(newGift.id);
-    if (highlightTimeoutRef.current) {
-      clearTimeout(highlightTimeoutRef.current);
+    if (USE_API) {
+      try {
+        // Backend očekává objekt bez ID (CreateGiftRequest)
+        const giftRequest = {
+          year,
+          name: trimmedName,
+          gift: trimmedGift,
+          price,
+        };
+        await api.createGift(giftRequest);
+        // Znovu načti všechna data z API místo přidání do stavu
+        await loadGifts();
+        setSelectedYear(year);
+      } catch (error) {
+        console.error('Failed to create gift:', error);
+      }
+    } else {
+      setGifts((prev) => [...prev, newGift]);
+      setSelectedYear(year);
+      setHighlightedGiftId(newGift.id);
+      if (highlightTimeoutRef.current) {
+        clearTimeout(highlightTimeoutRef.current);
+      }
+      highlightTimeoutRef.current = setTimeout(() => {
+        setHighlightedGiftId(null);
+        highlightTimeoutRef.current = null;
+      }, 2500);
     }
-    highlightTimeoutRef.current = setTimeout(() => {
-      setHighlightedGiftId(null);
-      highlightTimeoutRef.current = null;
-    }, 2500);
   };
 
   const isQuickValid =
@@ -319,6 +362,10 @@ function App() {
     setPendingDelete(null);
   };
 
+  if (isLoading) {
+    return <div className='wrapper'><p>Načítám data...</p></div>;
+  }
+
   return <div className='wrapper'>
 
     <div className='hero'>
@@ -366,6 +413,12 @@ function App() {
             <span className="hero-stat__label">Celková suma</span>
             <span className="hero-stat__value">{summary.totalPrice.toLocaleString('cs-CZ')} Kč</span>
           </div>
+          {USE_API && (
+            <div className="hero-stat">
+              <span className="hero-stat__label">Režim</span>
+              <span className="hero-stat__value">🌐 API</span>
+            </div>
+          )}
         </div>
         <div className="hero__timeline" role="tablist" aria-label="Roky">
           {availableYears.slice(0, 6).map((year) => {
