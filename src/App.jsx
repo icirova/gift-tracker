@@ -426,23 +426,6 @@ function App() {
           Dárky bez chaosu. Rozpočet pod dohledem.
           <em className="hero__lead-break">Realita může překvapit… nebo vyděsit.</em>
         </p>
-        <div className="hero-stats">
-          <div className="hero-stat">
-            <span className="hero-stat__label">ROK</span>
-            <span className="hero-stat__value">{selectedYear}</span>
-          </div>
-          <div className="hero-stat">
-            <span className="hero-stat__label">Celkový počet</span>
-            <span className="hero-stat__value">
-              {summary.totalItems}
-              {summary.totalItems === 0 ? '' : ` ${formatGiftLabel(summary.totalItems)}`}
-            </span>
-          </div>
-          <div className="hero-stat">
-            <span className="hero-stat__label">Celková suma</span>
-            <span className="hero-stat__value">{summary.totalPrice.toLocaleString('cs-CZ')} Kč</span>
-          </div>
-        </div>
         <div className="hero__timeline" role="tablist" aria-label="Roky">
           {availableYears.slice(0, 6).map((year) => {
             const isActive = year === selectedYear;
@@ -460,45 +443,26 @@ function App() {
             );
           })}
           <button type="button" className="hero__year hero__year--new" onClick={handleAddYear}>
-            + Nový rok
+            + Následující rok
           </button>
         </div>
-        <form className="hero-quick" onSubmit={handleQuickSubmit}>
-          <label className="hero-quick__field">
-            <span>Jméno</span>
-            <select name="name" value={quickGift.name} onChange={handleQuickChange}>
-              {ALLOWED_NAMES.map((name) => (
-                <option key={name} value={name}>
-                  {name}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label className="hero-quick__field">
-            <span>Dárek</span>
-            <input
-              type="text"
-              name="gift"
-              value={quickGift.gift}
-              onChange={handleQuickChange}
-              placeholder="Co se kupuje"
-            />
-          </label>
-          <label className="hero-quick__field">
-            <span>Cena (Kč)</span>
-            <input
-              type="text"
-              inputMode="numeric"
-              name="price"
-              value={quickGift.price}
-              onChange={handleQuickChange}
-              placeholder="Např. 1200"
-            />
-          </label>
-          <button type="submit" disabled={!isQuickValid}>
-            Přidat dárek
-          </button>
-        </form>
+        <div className="hero-stats">
+          <div className="hero-stat">
+            <span className="hero-stat__label">ROK</span>
+            <span className="hero-stat__value">{selectedYear}</span>
+          </div>
+          <div className="hero-stat">
+            <span className="hero-stat__label">Celkový počet</span>
+            <span className="hero-stat__value">
+              {summary.totalItems}
+              {summary.totalItems === 0 ? '' : ` ${formatGiftLabel(summary.totalItems)}`}
+            </span>
+          </div>
+          <div className="hero-stat">
+            <span className="hero-stat__label">Celková suma</span>
+            <span className="hero-stat__value">{summary.totalPrice.toLocaleString('cs-CZ')} Kč</span>
+          </div>
+        </div>
         <div className="hero-budget">
           <div className="hero-budget__field">
             <span>Plánovaný rozpočet</span>
@@ -551,6 +515,42 @@ function App() {
             </button>
           ) : null}
         </div>
+        <form className="hero-quick" onSubmit={handleQuickSubmit}>
+          <label className="hero-quick__field">
+            <span>Jméno</span>
+            <select name="name" value={quickGift.name} onChange={handleQuickChange}>
+              {ALLOWED_NAMES.map((name) => (
+                <option key={name} value={name}>
+                  {name}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="hero-quick__field">
+            <span>Dárek</span>
+            <input
+              type="text"
+              name="gift"
+              value={quickGift.gift}
+              onChange={handleQuickChange}
+              placeholder="Co se kupuje"
+            />
+          </label>
+          <label className="hero-quick__field">
+            <span>Cena (Kč)</span>
+            <input
+              type="text"
+              inputMode="numeric"
+              name="price"
+              value={quickGift.price}
+              onChange={handleQuickChange}
+              placeholder="Např. 1200"
+            />
+          </label>
+          <button type="submit" disabled={!isQuickValid}>
+            Přidat dárek
+          </button>
+        </form>
       </div>
     </div>
 
