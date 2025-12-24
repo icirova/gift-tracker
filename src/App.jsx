@@ -442,9 +442,9 @@ function App() {
               </button>
             );
           })}
-          <button type="button" className="hero__year hero__year--new" onClick={handleAddYear}>
+          {/* <button type="button" className="hero__year hero__year--new" onClick={handleAddYear}>
             + Následující rok
-          </button>
+          </button> */}
         </div>
         <div className="hero-stats">
           <div className="hero-stat">

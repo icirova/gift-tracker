@@ -269,6 +269,8 @@ body {
   align-items: center;
   gap: 8px;
   padding: 8px 18px;
+  align-self: flex-start;
+  width: fit-content;
   border-radius: 999px;
   font-size: 13px;
   letter-spacing: 0.35em;
