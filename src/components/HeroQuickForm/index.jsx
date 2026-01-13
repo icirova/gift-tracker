@@ -1,4 +1,5 @@
 import PropTypes from 'prop-types';
+import './style.css';
 
 const HeroQuickForm = ({ quickGift, allowedNames, statusOptions, onChange, onSubmit, isValid }) => (
   <form className="hero-quick" onSubmit={onSubmit}>

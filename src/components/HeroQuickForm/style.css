@@ -1,0 +1,104 @@
+.hero-quick {
+  display: grid;
+  grid-template-columns: 140px 120px minmax(180px, 1.2fr) 120px max-content;
+  gap: 14px;
+  align-items: end;
+  margin: 0;
+}
+
+.hero-quick__field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(248, 250, 252, 0.75);
+}
+
+.hero-quick input,
+.hero-quick select {
+  border-radius: 14px;
+  border: 1px solid rgba(15, 23, 42, 0.1);
+  padding: 10px 12px;
+  height: 44px;
+  font-size: 15px;
+  font-family: inherit;
+  background: #fff;
+  color: #111827;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  transition: border 0.2s ease, box-shadow 0.2s ease;
+  cursor: pointer;
+}
+
+.hero-quick input::placeholder {
+  color: #6b7280;
+}
+
+.hero-quick input {
+  caret-color: #111827;
+}
+
+.hero-quick input:hover,
+.hero-quick select:hover {
+  cursor: pointer;
+}
+
+.hero-quick input:focus,
+.hero-quick select:focus {
+  outline: none;
+  border-color: rgba(244, 63, 94, 0.6);
+  box-shadow: 0 0 0 3px rgba(244, 63, 94, 0.1);
+}
+
+.hero-quick select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='7' viewBox='0 0 12 7'%3E%3Cpath fill='%23000' fill-opacity='0.5' d='M6 7 0 0h12z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: calc(100% - 12px) 50%;
+  background-size: 12px;
+  padding-right: 32px;
+  color: #111827;
+  background-color: #fff;
+  -webkit-text-fill-color: #111827;
+}
+
+.hero-quick select option {
+  color: #111827;
+  background-color: #fff;
+}
+
+.hero-quick button {
+  padding: 12px 28px;
+  height: 44px;
+  border: none;
+  border-radius: 999px;
+  background: linear-gradient(120deg, var(--primary), var(--accent));
+  color: #fff;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+  justify-self: start;
+  white-space: nowrap;
+}
+
+.hero-quick button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.hero-quick button:not(:disabled):hover {
+  transform: translateY(-1px);
+}
+
+@media (max-width: 900px) {
+  .hero-quick {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .hero-quick button {
+    grid-column: 1 / -1;
+    justify-self: start;
+  }
+}
