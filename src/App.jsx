@@ -3,7 +3,6 @@ import Table from './components/Table';
 import Summary from './components/Summary';
 import GiftCharts from './components/GiftCharts';
 import GiftForm from './components/GiftForm';
-import HeroQuickForm from './components/HeroQuickForm';
 import DEFAULT_GIFTS from './data/defaultGifts';
 import ALLOWED_NAMES from './data/allowedNames';
 
@@ -115,13 +114,6 @@ function App() {
   const [showAllYears, setShowAllYears] = useState(false);
   const deleteTimeoutRef = useRef(null);
   const highlightTimeoutRef = useRef(null);
-  const [quickGift, setQuickGift] = useState({
-    name: ALLOWED_NAMES[0] ?? '',
-    gift: '',
-    price: '',
-    status: GIFT_STATUS.bought,
-  });
-
   useEffect(() => {
     const storedGifts = loadStoredGifts();
     setGifts(storedGifts);
@@ -347,52 +339,6 @@ function App() {
     }, 2500);
   };
 
-  const isQuickValid = (() => {
-    if (!ALLOWED_NAMES.includes(quickGift.name) || quickGift.gift.trim().length <= 1) {
-      return false;
-    }
-
-    const priceText = quickGift.price.trim();
-    const priceValue = Number(priceText);
-    const hasValidPrice = Number.isFinite(priceValue) && priceValue > 0;
-
-    if (quickGift.status === GIFT_STATUS.bought) {
-      return hasValidPrice;
-    }
-
-    return priceText === '' || hasValidPrice;
-  })();
-
-  const handleQuickChange = (event) => {
-    const { name, value } = event.target;
-    setQuickGift((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleQuickSubmit = (event) => {
-    event.preventDefault();
-    if (!isQuickValid) {
-      return;
-    }
-
-    handleGiftAdd({
-      name: quickGift.name,
-      gift: quickGift.gift,
-      price: quickGift.price.trim() === '' ? null : Number(quickGift.price),
-      year: selectedYear,
-      status: quickGift.status,
-    });
-    setQuickGift((prev) => ({ ...prev, gift: '', price: '', status: GIFT_STATUS.bought }));
-
-    if (typeof document !== 'undefined') {
-      requestAnimationFrame(() => {
-        const table = document.getElementById('gift-table');
-        if (table) {
-          table.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-      });
-    }
-  };
-
   const handleBudgetDraftChange = (event) => {
     setBudgetDraft(event.target.value);
   };
@@ -607,17 +553,34 @@ function App() {
             )}
           </div>
         </div>
-        <HeroQuickForm
-          quickGift={quickGift}
-          allowedNames={ALLOWED_NAMES}
-          statusOptions={STATUS_OPTIONS}
-          onChange={handleQuickChange}
-          onSubmit={handleQuickSubmit}
-          isValid={isQuickValid}
-        />
       </div>
     </div>
 
+
+      <div className='section'>
+        <h2 className="subtitle">Přidat dárek do seznamu</h2>
+        <GiftForm
+          onAddGift={handleGiftAdd}
+          defaultYear={selectedYear}
+          allowedNames={ALLOWED_NAMES}
+          statusOptions={STATUS_OPTIONS}
+          defaultStatus={GIFT_STATUS.bought}
+        />
+      </div>
+
+      <div className='section'>
+        <Table
+          gifts={giftsForActiveYear}
+          selectedYear={selectedYear}
+          onDeleteGift={handleGiftDelete}
+          highlightedGiftId={highlightedGiftId}
+          onUpdateGift={handleGiftUpdate}
+        />
+      </div>
+
+      <div className='section'>
+        <GiftCharts gifts={giftsForActiveYear} yearlyTotals={yearlyTotals} />
+      </div>
 
       <div className='section'>
         <Summary
@@ -626,29 +589,6 @@ function App() {
           budgetDelta={budgetDelta}
         />
       </div>
-
-      <div className='section'>
-
-      
-        <GiftCharts gifts={giftsForActiveYear} yearlyTotals={yearlyTotals}/>
-        </div>
-     
-     <div className='section'>
-        <GiftForm
-          onAddGift={handleGiftAdd}
-          defaultYear={selectedYear}
-          allowedNames={ALLOWED_NAMES}
-          statusOptions={STATUS_OPTIONS}
-          defaultStatus={GIFT_STATUS.bought}
-        />
-        <Table
-          gifts={giftsForActiveYear}
-          selectedYear={selectedYear}
-          onDeleteGift={handleGiftDelete}
-          highlightedGiftId={highlightedGiftId}
-          onUpdateGift={handleGiftUpdate}
-        />
-     </div>
      
      {pendingDelete && (
        <div className="undo-toast" role="status">

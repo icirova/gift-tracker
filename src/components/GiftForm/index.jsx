@@ -84,7 +84,6 @@ const GiftForm = ({ onAddGift, defaultYear, allowedNames, statusOptions, default
 
   return (
     <form className="gift-form" id="gift-form" onSubmit={handleSubmit}>
-      <h3>Přidej nový dárek</h3>
       <div className="gift-form__grid">
         <label>
           <span>Jméno</span>

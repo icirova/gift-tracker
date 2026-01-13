@@ -41,7 +41,7 @@ const HeroQuickForm = ({ quickGift, allowedNames, statusOptions, onChange, onSub
         name="price"
         value={quickGift.price}
         onChange={onChange}
-        placeholder="Např. 1200"
+        placeholder="Např. 1200 (volitelné)"
       />
     </label>
     <button type="submit" disabled={!isValid}>
