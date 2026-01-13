@@ -9,6 +9,7 @@ import ALLOWED_NAMES from './data/allowedNames';
 const STORAGE_KEY = 'gift-tracker:gifts';
 const YEARS_KEY = 'gift-tracker:extra-years';
 const BUDGETS_KEY = 'gift-tracker:budgets';
+const DEFAULT_EXTRA_YEARS = [2022, 2021];
 const GIFT_STATUS = {
   bought: 'bought',
   idea: 'idea',
@@ -54,7 +55,7 @@ const loadStoredGifts = () => {
 
 const loadStoredYears = () => {
   if (typeof window === 'undefined') {
-    return [];
+    return DEFAULT_EXTRA_YEARS;
   }
 
   try {
@@ -62,14 +63,15 @@ const loadStoredYears = () => {
     if (rawValue) {
       const parsedValue = JSON.parse(rawValue);
       if (Array.isArray(parsedValue)) {
-        return parsedValue.filter((year) => Number.isFinite(year)).map(Number);
+        const storedYears = parsedValue.filter((year) => Number.isFinite(year)).map(Number);
+        return Array.from(new Set([...DEFAULT_EXTRA_YEARS, ...storedYears]));
       }
     }
   } catch (error) {
     console.warn('Nepodařilo se načíst roky z localStorage.', error);
   }
 
-  return [];
+  return DEFAULT_EXTRA_YEARS;
 };
 
 const loadStoredBudgets = () => {
@@ -109,6 +111,7 @@ function App() {
   const [budgets, setBudgets] = useState(loadStoredBudgets);
   const [budgetEditingYear, setBudgetEditingYear] = useState(null);
   const [budgetDraft, setBudgetDraft] = useState('');
+  const [showAllYears, setShowAllYears] = useState(false);
   const deleteTimeoutRef = useRef(null);
   const highlightTimeoutRef = useRef(null);
   const [quickGift, setQuickGift] = useState({
@@ -170,6 +173,19 @@ function App() {
     const years = new Set([...gifts.map((gift) => gift.year), ...extraYears, currentYear]);
     return [...years].sort((a, b) => b - a);
   }, [gifts, extraYears]);
+
+  useEffect(() => {
+    if (availableYears.length <= 4 && showAllYears) {
+      setShowAllYears(false);
+    }
+    if (
+      !showAllYears &&
+      availableYears.length > 4 &&
+      !availableYears.slice(0, 4).includes(selectedYear)
+    ) {
+      setShowAllYears(true);
+    }
+  }, [availableYears, selectedYear, showAllYears]);
 
   useEffect(() => {
     if (!availableYears.length) {
@@ -478,7 +494,7 @@ function App() {
           <em className="hero__lead-break">Realita může překvapit… nebo vyděsit.</em>
         </p>
         <div className="hero__timeline" role="tablist" aria-label="Roky">
-          {availableYears.slice(0, 6).map((year) => {
+          {(showAllYears ? availableYears : availableYears.slice(0, 4)).map((year) => {
             const isActive = year === selectedYear;
             return (
               <button
@@ -493,6 +509,16 @@ function App() {
               </button>
             );
           })}
+          {availableYears.length > 4 ? (
+            <button
+              type="button"
+              className="hero__year hero__year--ellipsis"
+              onClick={() => setShowAllYears((prev) => !prev)}
+              aria-label={showAllYears ? 'Skrýt starší roky' : 'Zobrazit všechny roky'}
+            >
+              <span>{showAllYears ? 'MÉNĚ' : 'VÍCE'}</span>
+            </button>
+          ) : null}
           {/* <button type="button" className="hero__year hero__year--new" onClick={handleAddYear}>
             + Následující rok
           </button> */}
