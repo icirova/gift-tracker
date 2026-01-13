@@ -3,6 +3,7 @@ import Table from './components/Table';
 import Summary from './components/Summary';
 import GiftCharts from './components/GiftCharts';
 import GiftForm from './components/GiftForm';
+import HeroQuickForm from './components/HeroQuickForm';
 import DEFAULT_GIFTS from './data/defaultGifts';
 import ALLOWED_NAMES from './data/allowedNames';
 
@@ -178,14 +179,19 @@ function App() {
     if (availableYears.length <= 4 && showAllYears) {
       setShowAllYears(false);
     }
-    if (
-      !showAllYears &&
-      availableYears.length > 4 &&
-      !availableYears.slice(0, 4).includes(selectedYear)
-    ) {
-      setShowAllYears(true);
-    }
   }, [availableYears, selectedYear, showAllYears]);
+
+  const handleYearsToggle = () => {
+    if (showAllYears) {
+      const visibleYears = availableYears.slice(0, 4);
+      if (visibleYears.length && !visibleYears.includes(selectedYear)) {
+        setSelectedYear(visibleYears[0]);
+      }
+      setShowAllYears(false);
+      return;
+    }
+    setShowAllYears(true);
+  };
 
   useEffect(() => {
     if (!availableYears.length) {
@@ -513,7 +519,7 @@ function App() {
             <button
               type="button"
               className="hero__year hero__year--ellipsis"
-              onClick={() => setShowAllYears((prev) => !prev)}
+              onClick={handleYearsToggle}
               aria-label={showAllYears ? 'Skrýt starší roky' : 'Zobrazit všechny roky'}
             >
               <span>{showAllYears ? 'MÉNĚ' : 'VÍCE'}</span>
@@ -541,24 +547,24 @@ function App() {
           </div>
         </div>
         <div className="hero-budget">
-          <div className="hero-budget__field">
-            <span>Plánovaný rozpočet</span>
-            {budgetEditingYear === selectedYear ? (
-              <input
-                type="text"
-                inputMode="numeric"
-                value={budgetDraft}
-                onChange={handleBudgetDraftChange}
-                onKeyDown={(event) => {
-                  if (event.key === 'Enter') {
-                    event.preventDefault();
-                    handleBudgetSave();
-                  }
-                }}
-                placeholder="Např. 15000"
-              />
-            ) : (
-              <>
+          <div className="hero-budget__row">
+            <div className="hero-budget__field">
+              <span>Plánovaný rozpočet</span>
+              {budgetEditingYear === selectedYear ? (
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  value={budgetDraft}
+                  onChange={handleBudgetDraftChange}
+                  onKeyDown={(event) => {
+                    if (event.key === 'Enter') {
+                      event.preventDefault();
+                      handleBudgetSave();
+                    }
+                  }}
+                  placeholder="Např. 15000"
+                />
+              ) : (
                 <button
                   type="button"
                   className="hero-budget__value-button"
@@ -577,69 +583,38 @@ function App() {
                     </svg>
                   </span>
                 </button>
-                {currentBudget !== null &&
-                  (isOverBudget ? (
-                    <div className="hero-budget__over">Rozpočet byl překročen... zase.</div>
-                  ) : (
-                    <div className="hero-budget__bar" aria-hidden="true">
-                      <span className="hero-budget__fill" style={{ width: `${budgetUsage}%` }} />
-                    </div>
-                  ))}
-              </>
+              )}
+            </div>
+            {budgetEditingYear === selectedYear ? (
+              <button type="button" className="hero-budget__button" onClick={handleBudgetSave}>
+                Uložit
+              </button>
+            ) : null}
+          </div>
+          <div className="hero-budget__row hero-budget__row--meta">
+            {budgetEditingYear === selectedYear ? (
+              <span className="hero-budget__placeholder" aria-hidden="true" />
+            ) : currentBudget !== null ? (
+              isOverBudget ? (
+                <div className="hero-budget__over">Rozpočet byl překročen... zase.</div>
+              ) : (
+                <div className="hero-budget__bar" aria-hidden="true">
+                  <span className="hero-budget__fill" style={{ width: `${budgetUsage}%` }} />
+                </div>
+              )
+            ) : (
+              <span className="hero-budget__placeholder" aria-hidden="true" />
             )}
           </div>
-          {budgetEditingYear === selectedYear ? (
-            <button type="button" className="hero-budget__button" onClick={handleBudgetSave}>
-              Uložit
-            </button>
-          ) : null}
         </div>
-        <form className="hero-quick" onSubmit={handleQuickSubmit}>
-          <label className="hero-quick__field">
-            <span>Jméno</span>
-            <select name="name" value={quickGift.name} onChange={handleQuickChange}>
-              {ALLOWED_NAMES.map((name) => (
-                <option key={name} value={name}>
-                  {name}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label className="hero-quick__field">
-            <span>Stav</span>
-            <select name="status" value={quickGift.status} onChange={handleQuickChange}>
-              {STATUS_OPTIONS.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label className="hero-quick__field">
-            <span>Dárek</span>
-            <input
-              type="text"
-              name="gift"
-              value={quickGift.gift}
-              onChange={handleQuickChange}
-              placeholder="Co se kupuje"
-            />
-          </label>
-          <label className="hero-quick__field">
-            <span>Cena (Kč)</span>
-            <input
-              type="text"
-              inputMode="numeric"
-              name="price"
-              value={quickGift.price}
-              onChange={handleQuickChange}
-              placeholder="Např. 1200 (volitelné)"
-            />
-          </label>
-          <button type="submit" disabled={!isQuickValid}>
-            Přidat dárek
-          </button>
-        </form>
+        <HeroQuickForm
+          quickGift={quickGift}
+          allowedNames={ALLOWED_NAMES}
+          statusOptions={STATUS_OPTIONS}
+          onChange={handleQuickChange}
+          onSubmit={handleQuickSubmit}
+          isValid={isQuickValid}
+        />
       </div>
     </div>
 
