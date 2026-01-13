@@ -7,6 +7,12 @@
   margin: 0;
 }
 
+.hero-budget__panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
 .hero-budget__row {
   display: flex;
   flex-wrap: nowrap;
@@ -26,7 +32,7 @@
   font-size: 12px;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: rgba(248, 250, 252, 0.75);
+  color: var(--text-muted);
   width: min(100%, var(--budget-field-width));
 }
 
@@ -34,9 +40,9 @@
   width: 100%;
   border-radius: 14px;
   border: 1px solid rgba(15, 23, 42, 0.1);
-  padding: 12px 16px;
-  height: 48px;
-  font-size: 15px;
+  padding: 12px 14px;
+  height: 44px;
+  font-size: 16px;
   font-family: inherit;
   background: #fff;
   color: #111827;
@@ -64,21 +70,21 @@
   justify-content: space-between;
   width: 100%;
   font-size: 17px;
-  color: #fff;
+  color: var(--text);
   text-transform: none;
   letter-spacing: normal;
   padding: 12px 22px;
-  border-radius: 999px;
-  border: none;
-  background: rgba(248, 250, 252, 0.08);
-  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.16);
+  min-height: 44px;
+  border-radius: 14px;
+  border: 1px solid rgba(15, 23, 42, 0.1);
+  background: #fff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
   cursor: pointer;
-  transition: transform 0.2s ease, background 0.2s ease;
+  transition: background 0.2s ease;
 }
 
 .hero-budget__value-button:hover {
-  transform: translateY(-1px);
-  background: rgba(248, 250, 252, 0.08);
+  background: #fff;
 }
 
 .hero-budget__pencil {
@@ -103,11 +109,27 @@
 }
 
 .hero-budget__bar {
-  width: min(100%, var(--budget-field-width));
+  position: relative;
+  width: 100%;
   height: 8px;
   border-radius: 999px;
-  background: rgba(248, 250, 252, 0.26);
+  background: rgba(15, 23, 42, 0.08);
   overflow: hidden;
+}
+
+.hero-budget__segment {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+}
+
+.hero-budget__segment--bought {
+  background: rgba(244, 63, 94, 0.7);
+}
+
+.hero-budget__segment--idea {
+  background: rgba(34, 197, 94, 0.7);
 }
 
 .hero-budget__placeholder {
@@ -116,19 +138,77 @@
   height: 8px;
 }
 
-.hero-budget__fill {
-  display: block;
-  height: 100%;
-  background: linear-gradient(120deg, var(--primary), var(--accent));
-  border-radius: inherit;
+
+.hero-budget__summary {
+  display: grid;
+  gap: 16px;
 }
 
-.hero-budget__over {
-  font-size: 13px;
-  color: var(--primary);
-  font-style: italic;
-  text-transform: none;
-  letter-spacing: normal;
+.hero-budget__summary-item {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 18px;
+  border-radius: 22px;
+  background: var(--surface);
+  border: 1px solid var(--stroke);
+  box-shadow: 0 18px 36px rgba(15, 23, 42, 0.08);
+}
+
+.hero-budget__summary-item::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(135deg, rgba(20, 184, 166, 0.4), rgba(244, 63, 94, 0.4));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+          mask-composite: exclude;
+  pointer-events: none;
+}
+
+.hero-budget__summary-label {
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.hero-budget__summary-value {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.hero-budget__summary-value--bought {
+  color: rgba(244, 63, 94, 0.9);
+}
+
+.hero-budget__summary-value--idea {
+  color: rgba(34, 197, 94, 0.9);
+}
+
+.hero-budget__summary-value--delta {
+  color: var(--text);
+}
+
+.hero-budget__summary-grid {
+  display: grid;
+  gap: 18px;
+}
+
+.hero-budget__bar-row {
+  width: 100%;
+}
+
+@media (min-width: 900px) {
+  .hero-budget__summary-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 18px;
+  }
 }
 
 .hero-budget__button {
@@ -141,11 +221,11 @@
   font-weight: 700;
   letter-spacing: 0.06em;
   cursor: pointer;
-  transition: transform 0.2s ease, opacity 0.2s ease;
+  transition: opacity 0.2s ease, background 0.2s ease;
 }
 
 .hero-budget__button:hover {
-  transform: translateY(-1px);
+  background: linear-gradient(120deg, var(--primary-dark), #0f766e);
 }
 
 @media (max-width: 720px) {

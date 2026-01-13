@@ -389,7 +389,8 @@ body {
 }
 
 .hero__year:hover {
-  transform: translateY(-1px);
+  background: rgba(248, 250, 252, 0.14);
+  border-color: rgba(248, 250, 252, 0.45);
   box-shadow: 0 10px 20px rgba(15, 23, 42, 0.2);
 }
 
@@ -478,6 +479,14 @@ body {
   background: var(--surface-muted);
   border: 1px solid var(--stroke);
   backdrop-filter: blur(16px);
+}
+
+.budget-panel {
+  background: #fff;
+  border-radius: 22px;
+  padding: 22px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  box-shadow: 0 16px 32px rgba(15, 23, 42, 0.06);
 }
 
 .undo-toast {

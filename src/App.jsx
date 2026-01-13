@@ -4,6 +4,7 @@ import Summary from './components/Summary';
 import GiftCharts from './components/GiftCharts';
 import GiftForm from './components/GiftForm';
 import HeroBudget from './components/HeroBudget';
+import HeroBudgetSummary from './components/HeroBudgetSummary';
 import DEFAULT_GIFTS from './data/defaultGifts';
 import ALLOWED_NAMES from './data/allowedNames';
 
@@ -214,6 +215,31 @@ function App() {
     [gifts, selectedYear],
   );
 
+  const { boughtTotal, ideaTotal, ideaMissingCount } = useMemo(
+    () =>
+      giftsForActiveYear.reduce(
+        (acc, gift) => {
+          const priceValue = Number(gift.price);
+          const hasValidPrice = Number.isFinite(priceValue) && priceValue > 0;
+          if (gift.status === GIFT_STATUS.bought && hasValidPrice) {
+            acc.boughtTotal += priceValue;
+          }
+          if (gift.status === GIFT_STATUS.idea) {
+            if (hasValidPrice) {
+              acc.ideaTotal += priceValue;
+            } else {
+              acc.ideaMissingCount += 1;
+            }
+          }
+          return acc;
+        },
+        { boughtTotal: 0, ideaTotal: 0, ideaMissingCount: 0 },
+      ),
+    [giftsForActiveYear],
+  );
+
+  const planTotal = boughtTotal + ideaTotal;
+
   const summary = useMemo(() => {
     const totalItems = giftsForActiveYear.length;
     const totalPrice = giftsForActiveYear.reduce((sum, gift) => sum + (gift.price ?? 0), 0);
@@ -255,11 +281,21 @@ function App() {
 
   const currentBudget = budgets[selectedYear] ?? null;
   const budgetDelta = currentBudget === null ? null : currentBudget - summary.totalPrice;
-  const budgetUsage =
-    currentBudget && currentBudget > 0
-      ? Math.min((summary.totalPrice / currentBudget) * 100, 100)
-      : 0;
-  const isOverBudget = currentBudget !== null && budgetDelta < 0;
+  const planDelta = currentBudget === null ? null : currentBudget - planTotal;
+  const isPlanOverBudget = currentBudget !== null && planDelta < 0;
+  const budgetPercents = useMemo(() => {
+    if (!currentBudget || currentBudget <= 0) {
+      return { bought: 0, idea: 0 };
+    }
+    const boughtPercent = Math.min((boughtTotal / currentBudget) * 100, 100);
+    const totalPercent = Math.min((planTotal / currentBudget) * 100, 100);
+    const ideaPercent = Math.max(totalPercent - boughtPercent, 0);
+    return { bought: boughtPercent, idea: ideaPercent };
+  }, [boughtTotal, currentBudget, planTotal]);
+
+  const budgetTotalPercent = currentBudget && currentBudget > 0
+    ? Math.min((planTotal / currentBudget) * 100, 100)
+    : 0;
 
   useEffect(() => {
     setBudgetDraft(currentBudget === null ? '' : String(currentBudget));
@@ -506,23 +542,38 @@ function App() {
             <span className="hero-stat__value">{summary.totalPrice.toLocaleString('cs-CZ')} Kč</span>
           </div>
         </div>
-        <HeroBudget
-          selectedYear={selectedYear}
+        <HeroBudgetSummary
           currentBudget={currentBudget}
-          budgetEditingYear={budgetEditingYear}
-          budgetDraft={budgetDraft}
-          budgetUsage={budgetUsage}
-          isOverBudget={isOverBudget}
-          budgetDelta={budgetDelta}
-          isDirty={isBudgetDirty}
-          onDraftChange={handleBudgetDraftChange}
-          onEdit={handleBudgetEdit}
-          onSave={handleBudgetSave}
-          onCancel={handleBudgetCancel}
+          totalPercent={budgetTotalPercent}
         />
       </div>
     </div>
 
+
+      <div className='section'>
+        <h2 className="subtitle">Plán rozpočtu</h2>
+        <div className="budget-panel">
+          <HeroBudget
+            selectedYear={selectedYear}
+            currentBudget={currentBudget}
+            budgetEditingYear={budgetEditingYear}
+            budgetDraft={budgetDraft}
+            boughtTotal={boughtTotal}
+            ideaTotal={ideaTotal}
+            ideaMissingCount={ideaMissingCount}
+            planTotal={planTotal}
+            planDelta={planDelta}
+            isPlanOverBudget={isPlanOverBudget}
+            boughtPercent={budgetPercents.bought}
+            ideaPercent={budgetPercents.idea}
+            isDirty={isBudgetDirty}
+            onDraftChange={handleBudgetDraftChange}
+            onEdit={handleBudgetEdit}
+            onSave={handleBudgetSave}
+            onCancel={handleBudgetCancel}
+          />
+        </div>
+      </div>
 
       <div className='section'>
         <h2 className="subtitle">Přidat dárek do seznamu</h2>

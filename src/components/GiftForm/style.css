@@ -93,7 +93,11 @@
   font-weight: 600;
   letter-spacing: 0.05em;
   cursor: pointer;
-  transition: opacity 0.2s ease;
+  transition: opacity 0.2s ease, background 0.2s ease;
+}
+
+.gift-form button:not(:disabled):hover {
+  background: linear-gradient(120deg, var(--primary-dark), #0f766e);
 }
 
 .gift-form button:disabled {
