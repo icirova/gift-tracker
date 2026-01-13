@@ -3,6 +3,7 @@ import Table from './components/Table';
 import Summary from './components/Summary';
 import GiftCharts from './components/GiftCharts';
 import GiftForm from './components/GiftForm';
+import HeroBudget from './components/HeroBudget';
 import DEFAULT_GIFTS from './data/defaultGifts';
 import ALLOWED_NAMES from './data/allowedNames';
 
@@ -347,6 +348,11 @@ function App() {
     setBudgetEditingYear(selectedYear);
   };
 
+  const handleBudgetCancel = () => {
+    setBudgetDraft(currentBudget === null ? '' : String(currentBudget));
+    setBudgetEditingYear(null);
+  };
+
   const handleBudgetSave = () => {
     setBudgets((prev) => {
       if (!budgetDraft.trim()) {
@@ -389,6 +395,14 @@ function App() {
       prev.map((gift) => (gift.id === giftId ? { ...gift, ...updates } : gift)),
     );
   };
+
+  const isBudgetDirty = (() => {
+    const trimmed = budgetDraft.trim();
+    if (currentBudget === null) {
+      return trimmed !== '';
+    }
+    return trimmed !== String(currentBudget);
+  })();
 
   const handleUndoDelete = () => {
     if (!pendingDelete) {
@@ -492,67 +506,20 @@ function App() {
             <span className="hero-stat__value">{summary.totalPrice.toLocaleString('cs-CZ')} Kč</span>
           </div>
         </div>
-        <div className="hero-budget">
-          <div className="hero-budget__row">
-            <div className="hero-budget__field">
-              <span>Plánovaný rozpočet</span>
-              {budgetEditingYear === selectedYear ? (
-                <input
-                  type="text"
-                  inputMode="numeric"
-                  value={budgetDraft}
-                  onChange={handleBudgetDraftChange}
-                  onKeyDown={(event) => {
-                    if (event.key === 'Enter') {
-                      event.preventDefault();
-                      handleBudgetSave();
-                    }
-                  }}
-                  placeholder="Např. 15000"
-                />
-              ) : (
-                <button
-                  type="button"
-                  className="hero-budget__value-button"
-                  onClick={handleBudgetEdit}
-                  aria-label={currentBudget === null ? 'Nastavit rozpočet' : 'Upravit rozpočet'}
-                  title={currentBudget === null ? 'Nastavit' : 'Upravit'}
-                >
-                  <span className="hero-budget__amount">
-                    {currentBudget === null
-                      ? 'Nastavit rozpočet'
-                      : `${currentBudget.toLocaleString('cs-CZ')} Kč`}
-                  </span>
-                  <span className="hero-budget__pencil" aria-hidden="true">
-                    <svg viewBox="0 0 24 24" role="presentation">
-                      <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zm2.92 2.33H5v-.92l8.81-8.81.92.92-8.81 8.81zM20.71 7.04a1 1 0 0 0 0-1.41L18.37 3.3a1 1 0 0 0-1.41 0l-1.69 1.69 3.75 3.75 1.69-1.7z" />
-                    </svg>
-                  </span>
-                </button>
-              )}
-            </div>
-            {budgetEditingYear === selectedYear ? (
-              <button type="button" className="hero-budget__button" onClick={handleBudgetSave}>
-                Uložit
-              </button>
-            ) : null}
-          </div>
-          <div className="hero-budget__row hero-budget__row--meta">
-            {budgetEditingYear === selectedYear ? (
-              <span className="hero-budget__placeholder" aria-hidden="true" />
-            ) : currentBudget !== null ? (
-              isOverBudget ? (
-                <div className="hero-budget__over">Rozpočet byl překročen... zase.</div>
-              ) : (
-                <div className="hero-budget__bar" aria-hidden="true">
-                  <span className="hero-budget__fill" style={{ width: `${budgetUsage}%` }} />
-                </div>
-              )
-            ) : (
-              <span className="hero-budget__placeholder" aria-hidden="true" />
-            )}
-          </div>
-        </div>
+        <HeroBudget
+          selectedYear={selectedYear}
+          currentBudget={currentBudget}
+          budgetEditingYear={budgetEditingYear}
+          budgetDraft={budgetDraft}
+          budgetUsage={budgetUsage}
+          isOverBudget={isOverBudget}
+          budgetDelta={budgetDelta}
+          isDirty={isBudgetDirty}
+          onDraftChange={handleBudgetDraftChange}
+          onEdit={handleBudgetEdit}
+          onSave={handleBudgetSave}
+          onCancel={handleBudgetCancel}
+        />
       </div>
     </div>
 
@@ -598,6 +565,10 @@ function App() {
          </button>
        </div>
      )}
+     <footer className="app-footer">
+       <span>Gift Tracker · {new Date().getFullYear()} · Iveta Círová</span>
+       <span className="app-footer__note">Rodinný přehled dárků</span>
+     </footer>
     </div>
 }
 

@@ -1,0 +1,155 @@
+.hero-budget {
+  --budget-field-width: 220px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  align-items: stretch;
+  margin: 0;
+}
+
+.hero-budget__row {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 20px;
+  align-items: end;
+}
+
+.hero-budget__row--meta {
+  width: 100%;
+}
+
+.hero-budget__field {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 8px 0 0;
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(248, 250, 252, 0.75);
+  width: min(100%, var(--budget-field-width));
+}
+
+.hero-budget input {
+  width: 100%;
+  border-radius: 14px;
+  border: 1px solid rgba(15, 23, 42, 0.1);
+  padding: 12px 16px;
+  height: 48px;
+  font-size: 15px;
+  font-family: inherit;
+  background: #fff;
+  color: #111827;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  transition: border 0.2s ease, box-shadow 0.2s ease;
+  text-transform: none;
+  letter-spacing: normal;
+  cursor: pointer;
+}
+
+.hero-budget input:focus {
+  outline: none;
+  border-color: rgba(244, 63, 94, 0.6);
+  box-shadow: 0 0 0 3px rgba(244, 63, 94, 0.1);
+}
+
+.hero-budget input::placeholder {
+  color: #6b7280;
+}
+
+.hero-budget__value-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 16px;
+  justify-content: space-between;
+  width: 100%;
+  font-size: 17px;
+  color: #fff;
+  text-transform: none;
+  letter-spacing: normal;
+  padding: 12px 22px;
+  border-radius: 999px;
+  border: none;
+  background: rgba(248, 250, 252, 0.08);
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.16);
+  cursor: pointer;
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.hero-budget__value-button:hover {
+  transform: translateY(-1px);
+  background: rgba(248, 250, 252, 0.08);
+}
+
+.hero-budget__pencil {
+  display: inline-flex;
+  width: 16px;
+  height: 16px;
+  opacity: 0.8;
+}
+
+.hero-budget__pencil svg {
+  width: 100%;
+  height: 100%;
+  fill: currentColor;
+}
+
+.hero-budget__amount {
+  font-weight: 700;
+}
+
+.hero-budget__amount--placeholder {
+  font-weight: 500;
+}
+
+.hero-budget__bar {
+  width: min(100%, var(--budget-field-width));
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(248, 250, 252, 0.26);
+  overflow: hidden;
+}
+
+.hero-budget__placeholder {
+  display: block;
+  width: 100%;
+  height: 8px;
+}
+
+.hero-budget__fill {
+  display: block;
+  height: 100%;
+  background: linear-gradient(120deg, var(--primary), var(--accent));
+  border-radius: inherit;
+}
+
+.hero-budget__over {
+  font-size: 13px;
+  color: var(--primary);
+  font-style: italic;
+  text-transform: none;
+  letter-spacing: normal;
+}
+
+.hero-budget__button {
+  padding: 12px 28px;
+  height: 44px;
+  border: none;
+  border-radius: 999px;
+  background: linear-gradient(120deg, var(--primary), var(--accent));
+  color: #fff;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.hero-budget__button:hover {
+  transform: translateY(-1px);
+}
+
+@media (max-width: 720px) {
+  .hero-budget__row {
+    flex-wrap: wrap;
+  }
+}
