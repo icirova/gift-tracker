@@ -19,7 +19,7 @@ const GiftCharts = ({ gifts, yearlyTotals }) => {
         }
 
         acc.counts[index] += 1;
-        acc.totals[index] += gift.price;
+        acc.totals[index] += gift.price ?? 0;
         return acc;
       },
       {
@@ -80,7 +80,8 @@ GiftCharts.propTypes = {
       year: PropTypes.number.isRequired,
       name: PropTypes.string.isRequired,
       gift: PropTypes.string.isRequired,
-      price: PropTypes.number.isRequired,
+      price: PropTypes.number,
+      status: PropTypes.oneOf(['bought', 'idea']).isRequired,
     })
   ).isRequired,
   yearlyTotals: PropTypes.arrayOf(

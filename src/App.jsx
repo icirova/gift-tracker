@@ -9,9 +9,27 @@ import ALLOWED_NAMES from './data/allowedNames';
 const STORAGE_KEY = 'gift-tracker:gifts';
 const YEARS_KEY = 'gift-tracker:extra-years';
 const BUDGETS_KEY = 'gift-tracker:budgets';
+const GIFT_STATUS = {
+  bought: 'bought',
+  idea: 'idea',
+};
+const STATUS_OPTIONS = [
+  { value: GIFT_STATUS.bought, label: 'Koupeno' },
+  { value: GIFT_STATUS.idea, label: 'Nápad' },
+];
+const STATUS_VALUES = new Set(Object.values(GIFT_STATUS));
 
 const normalizeGifts = (entries) =>
-  entries.filter((gift) => ALLOWED_NAMES.includes(gift.name));
+  entries
+    .filter((gift) => ALLOWED_NAMES.includes(gift.name))
+    .map((gift) => {
+      const priceValue = Number(gift.price);
+      return {
+        ...gift,
+        price: Number.isFinite(priceValue) && priceValue > 0 ? priceValue : null,
+        status: STATUS_VALUES.has(gift.status) ? gift.status : GIFT_STATUS.bought,
+      };
+    });
 
 const loadStoredGifts = () => {
   if (typeof window === 'undefined') {
@@ -97,6 +115,7 @@ function App() {
     name: ALLOWED_NAMES[0] ?? '',
     gift: '',
     price: '',
+    status: GIFT_STATUS.bought,
   });
 
   useEffect(() => {
@@ -182,22 +201,25 @@ function App() {
 
   const summary = useMemo(() => {
     const totalItems = giftsForActiveYear.length;
-    const totalPrice = giftsForActiveYear.reduce((sum, gift) => sum + gift.price, 0);
+    const totalPrice = giftsForActiveYear.reduce((sum, gift) => sum + (gift.price ?? 0), 0);
     return { totalItems, totalPrice };
   }, [giftsForActiveYear]);
 
   const mostExpensiveGift = useMemo(() => {
-    if (!giftsForActiveYear.length) {
+    const prices = giftsForActiveYear
+      .map((gift) => gift.price)
+      .filter((price) => Number.isFinite(price) && price > 0);
+    if (!prices.length) {
       return null;
     }
-    return Math.max(...giftsForActiveYear.map((gift) => gift.price));
+    return Math.max(...prices);
   }, [giftsForActiveYear]);
 
   const previousYearTotal = useMemo(() => {
     const previousYear = selectedYear - 1;
     return gifts
       .filter((gift) => gift.year === previousYear)
-      .reduce((sum, gift) => sum + gift.price, 0);
+      .reduce((sum, gift) => sum + (gift.price ?? 0), 0);
   }, [gifts, selectedYear]);
 
   const hasPreviousYear = useMemo(
@@ -207,7 +229,7 @@ function App() {
 
   const yearlyTotals = useMemo(() => {
     const annualTotals = gifts.reduce((acc, gift) => {
-      acc[gift.year] = (acc[gift.year] ?? 0) + gift.price;
+      acc[gift.year] = (acc[gift.year] ?? 0) + (gift.price ?? 0);
       return acc;
     }, {});
 
@@ -266,9 +288,19 @@ function App() {
     const trimmedName = giftInput.name.trim();
     const trimmedGift = giftInput.gift.trim();
     const year = Number(giftInput.year) || selectedYear;
-    const price = Number(giftInput.price);
+    const status = STATUS_VALUES.has(giftInput.status) ? giftInput.status : GIFT_STATUS.bought;
+    const priceValue = giftInput.price === '' || giftInput.price === null ? null : Number(giftInput.price);
+    const hasValidPrice = Number.isFinite(priceValue) && priceValue > 0;
 
-    if (!trimmedName || !trimmedGift || !price || !ALLOWED_NAMES.includes(trimmedName)) {
+    if (!trimmedName || !trimmedGift || !ALLOWED_NAMES.includes(trimmedName)) {
+      return;
+    }
+
+    if (status === GIFT_STATUS.bought && !hasValidPrice) {
+      return;
+    }
+
+    if (status === GIFT_STATUS.idea && priceValue !== null && !hasValidPrice) {
       return;
     }
 
@@ -277,7 +309,8 @@ function App() {
       year,
       name: trimmedName,
       gift: trimmedGift,
-      price,
+      price: hasValidPrice ? priceValue : null,
+      status,
     };
 
     setGifts((prev) => [...prev, newGift]);
@@ -292,10 +325,21 @@ function App() {
     }, 2500);
   };
 
-  const isQuickValid =
-    ALLOWED_NAMES.includes(quickGift.name) &&
-    quickGift.gift.trim().length > 1 &&
-    Number(quickGift.price) > 0;
+  const isQuickValid = (() => {
+    if (!ALLOWED_NAMES.includes(quickGift.name) || quickGift.gift.trim().length <= 1) {
+      return false;
+    }
+
+    const priceText = quickGift.price.trim();
+    const priceValue = Number(priceText);
+    const hasValidPrice = Number.isFinite(priceValue) && priceValue > 0;
+
+    if (quickGift.status === GIFT_STATUS.bought) {
+      return hasValidPrice;
+    }
+
+    return priceText === '' || hasValidPrice;
+  })();
 
   const handleQuickChange = (event) => {
     const { name, value } = event.target;
@@ -311,10 +355,11 @@ function App() {
     handleGiftAdd({
       name: quickGift.name,
       gift: quickGift.gift,
-      price: Number(quickGift.price),
+      price: quickGift.price.trim() === '' ? null : Number(quickGift.price),
       year: selectedYear,
+      status: quickGift.status,
     });
-    setQuickGift((prev) => ({ ...prev, gift: '', price: '' }));
+    setQuickGift((prev) => ({ ...prev, gift: '', price: '', status: GIFT_STATUS.bought }));
 
     if (typeof document !== 'undefined') {
       requestAnimationFrame(() => {
@@ -369,6 +414,12 @@ function App() {
 
       return prev.filter((gift) => gift.id !== giftId);
     });
+  };
+
+  const handleGiftUpdate = (giftId, updates) => {
+    setGifts((prev) =>
+      prev.map((gift) => (gift.id === giftId ? { ...gift, ...updates } : gift)),
+    );
   };
 
   const handleUndoDelete = () => {
@@ -491,11 +542,13 @@ function App() {
                 >
                   <span className="hero-budget__amount">
                     {currentBudget === null
-                      ? 'Rozpočet není nastaven.'
+                      ? 'Nastavit rozpočet'
                       : `${currentBudget.toLocaleString('cs-CZ')} Kč`}
                   </span>
                   <span className="hero-budget__pencil" aria-hidden="true">
-                    ✎
+                    <svg viewBox="0 0 24 24" role="presentation">
+                      <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zm2.92 2.33H5v-.92l8.81-8.81.92.92-8.81 8.81zM20.71 7.04a1 1 0 0 0 0-1.41L18.37 3.3a1 1 0 0 0-1.41 0l-1.69 1.69 3.75 3.75 1.69-1.7z" />
+                    </svg>
                   </span>
                 </button>
                 {currentBudget !== null &&
@@ -527,6 +580,16 @@ function App() {
             </select>
           </label>
           <label className="hero-quick__field">
+            <span>Stav</span>
+            <select name="status" value={quickGift.status} onChange={handleQuickChange}>
+              {STATUS_OPTIONS.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="hero-quick__field">
             <span>Dárek</span>
             <input
               type="text"
@@ -544,7 +607,7 @@ function App() {
               name="price"
               value={quickGift.price}
               onChange={handleQuickChange}
-              placeholder="Např. 1200"
+              placeholder="Např. 1200 (volitelné)"
             />
           </label>
           <button type="submit" disabled={!isQuickValid}>
@@ -570,17 +633,20 @@ function App() {
         </div>
      
      <div className='section'>
-      <GiftForm
-        onAddGift={handleGiftAdd}
-        defaultYear={selectedYear}
-        allowedNames={ALLOWED_NAMES}
-      />
-      <Table
-        gifts={giftsForActiveYear}
-        selectedYear={selectedYear}
-        onDeleteGift={handleGiftDelete}
-        highlightedGiftId={highlightedGiftId}
-      />
+        <GiftForm
+          onAddGift={handleGiftAdd}
+          defaultYear={selectedYear}
+          allowedNames={ALLOWED_NAMES}
+          statusOptions={STATUS_OPTIONS}
+          defaultStatus={GIFT_STATUS.bought}
+        />
+        <Table
+          gifts={giftsForActiveYear}
+          selectedYear={selectedYear}
+          onDeleteGift={handleGiftDelete}
+          highlightedGiftId={highlightedGiftId}
+          onUpdateGift={handleGiftUpdate}
+        />
      </div>
      
      {pendingDelete && (

@@ -15,6 +15,14 @@
   box-sizing: border-box;
 }
 
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: rgba(244, 63, 94, 0.6);
+  box-shadow: 0 0 0 3px rgba(244, 63, 94, 0.1);
+}
+
 body {
   margin: 0;
   min-height: 100vh;
@@ -393,7 +401,7 @@ body {
 
 .hero-quick {
   display: grid;
-  grid-template-columns: 160px minmax(180px, 1.2fr) 120px max-content;
+  grid-template-columns: 140px 120px minmax(180px, 1.2fr) 120px max-content;
   gap: 14px;
   align-items: end;
   margin: 0;
@@ -500,8 +508,16 @@ body {
 
 
 .hero-budget__pencil {
-  font-size: 16px;
+  display: inline-flex;
+  width: 16px;
+  height: 16px;
   opacity: 0.8;
+}
+
+.hero-budget__pencil svg {
+  width: 100%;
+  height: 100%;
+  fill: currentColor;
 }
 
 .hero-budget__amount {

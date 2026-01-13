@@ -101,6 +101,14 @@
   font-size: 14px;
 }
 
+.gift-form__hint {
+  margin: 0;
+  font-size: 12px;
+  letter-spacing: 0.02em;
+  text-transform: none;
+  color: var(--text-muted);
+}
+
 @media (max-width: 640px) {
   .gift-form {
     padding: 16px;

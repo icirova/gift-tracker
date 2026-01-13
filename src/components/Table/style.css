@@ -38,8 +38,8 @@
 
 .table-search input:focus {
   outline: none;
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(244, 63, 94, 0.15);
+  border-color: rgba(244, 63, 94, 0.6);
+  box-shadow: 0 0 0 3px rgba(244, 63, 94, 0.1);
 }
 
 .table-scroll {
@@ -91,17 +91,22 @@
 
 .table-col-name,
 .table-name {
-  width: 34%;
+  width: 25%;
 }
 
 .table-col-gift,
 .table-gift {
-  width: 46%;
+  width: 25%;
+}
+
+.table-col-status,
+.table-status {
+  width: 25%;
 }
 
 .table-col-price,
 .table-price {
-  width: 20%;
+  width: 25%;
 }
 
 .table th {
@@ -120,7 +125,7 @@
 }
 
 .table-row:hover td:not(.table-name) {
-  background: rgba(244, 63, 94, 0.1);
+  background: rgba(244, 63, 94, 0.06);
 }
 
 .table-row--highlight td:not(.table-name) {
@@ -182,19 +187,200 @@
 }
 
 .table-price {
-  text-align: right;
+  text-align: left;
+}
+
+.table-status {
+  text-align: left;
+}
+
+.table-status__control {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+}
+
+.table-status__badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 96px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border: 1px solid transparent;
+}
+
+.table-status__confirm {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.table-status__confirm-text {
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.table-status__confirm-button {
+  border: 1px solid rgba(15, 23, 42, 0.2);
+  background: #fff;
+  color: var(--text);
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: border 0.2s ease, box-shadow 0.2s ease;
+}
+
+.table-status__confirm-button:hover {
+  border-color: rgba(20, 184, 166, 0.35);
+  background: rgba(20, 184, 166, 0.12);
+}
+
+.table-status__confirm-button:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(244, 63, 94, 0.1);
+}
+
+.table-status__toggle {
+  border: 1px solid transparent;
+  background: transparent;
+  cursor: pointer;
+  transition: filter 0.2s ease;
+  padding: 6px 12px;
+}
+
+.table-status__toggle:hover {
+  filter: brightness(0.98);
+}
+
+.table-status__toggle:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(244, 63, 94, 0.1);
+}
+
+.table-status__badge--bought {
+  background: rgba(20, 184, 166, 0.12);
+  border-color: rgba(20, 184, 166, 0.3);
+  color: #0f766e;
+}
+
+.table-status__badge--idea {
+  background: rgba(251, 191, 36, 0.16);
+  border-color: rgba(251, 191, 36, 0.55);
+  color: #92400e;
+}
+
+.table-price__input {
+  border-radius: 12px;
+  border: 1px solid rgba(15, 23, 42, 0.1);
+  padding: 8px 10px;
+  font-size: 14px;
+  width: 120px;
 }
 
 .table-price__cell {
   display: flex;
   align-items: center;
-  gap: 12px;
+  justify-content: flex-start;
   width: 100%;
+}
+
+.table-price__edit-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  margin-left: 0;
+}
+
+.table-price__edit-group:hover .table-price__clickable,
+.table-price__edit-group:hover .table-price__icon {
+  color: var(--primary);
+}
+
+.table-price__edit {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 2px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  background: transparent;
+  cursor: pointer;
+  transition: border 0.2s ease, background 0.2s ease;
+}
+
+.table-price__edit.is-empty {
+  background: transparent;
+  border-color: transparent;
+}
+
+.table-price__edit:hover,
+.table-price__edit:focus-visible {
+  background: transparent;
+}
+
+.table-price__edit:focus-visible {
+  border-color: rgba(244, 63, 94, 0.6);
+  background: transparent;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(244, 63, 94, 0.1);
+}
+
+.table-price__action {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+}
+
+.table-price__icon {
+  display: inline-flex;
+  width: 16px;
+  height: 16px;
+  color: var(--text-muted);
+}
+
+.table-price__icon svg {
+  width: 100%;
+  height: 100%;
+  fill: currentColor;
 }
 
 .table-price__value {
   font-variant-numeric: tabular-nums;
-  margin-right: auto;
+}
+
+.table-price__value--empty {
+  color: var(--text-muted);
+}
+
+.table-price__clickable {
+  border: none;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+}
+
+.table-price__clickable:focus-visible {
+  outline: none;
+  text-decoration: underline;
 }
 
 .table-delete {
@@ -210,6 +396,7 @@
   color: var(--text-muted);
   font-size: 18px;
   cursor: pointer;
+  margin-left: auto;
   transition: background 0.2s ease, color 0.2s ease;
 }
 
