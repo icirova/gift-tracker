@@ -21,9 +21,9 @@ const Summary = ({ mostExpensiveGift, yearChange, budgetDelta }) => {
       <SummaryItem
         label="Nejdražší dárek"
         value={mostExpensiveGift === null ? '—' : formatCurrency(mostExpensiveGift)}
-        variant="budget"
+        variant="expensive"
       />
-      <SummaryItem label="Meziroční změna" value={formatDelta(yearChange)} variant="budget" />
+      <SummaryItem label="Meziroční změna" value={formatDelta(yearChange)} variant="trend" />
     </div>
   );
 };

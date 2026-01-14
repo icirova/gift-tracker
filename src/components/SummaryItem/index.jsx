@@ -26,11 +26,36 @@ const ICONS = {
   ),
   budget: (
     <svg viewBox="0 0 24 24" aria-hidden="true">
+      <rect
+        x="6"
+        y="6"
+        width="12"
+        height="12"
+        rx="2"
+        strokeWidth="1.6"
+        fill="none"
+      />
+    </svg>
+  ),
+  expensive: (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
       <path
-        d="M12 3v18M8 6h4.5a3.5 3.5 0 0 1 0 7h-1A3.5 3.5 0 0 0 8 16.5 3.5 3.5 0 0 0 11.5 20H16"
-        strokeWidth="1.5"
+        d="M12 17V7M8 11l4-4 4 4"
+        strokeWidth="1.8"
         strokeLinecap="round"
         strokeLinejoin="round"
+        fill="none"
+      />
+    </svg>
+  ),
+  trend: (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path
+        d="M4 12h16M7 9l-3 3 3 3M17 9l3 3-3 3"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        fill="none"
       />
     </svg>
   ),
@@ -55,7 +80,7 @@ const SummaryItem = ({ label, value, variant }) => {
 SummaryItem.propTypes = {
   label: PropTypes.string.isRequired,
   value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
-  variant: PropTypes.oneOf(['year', 'gifts', 'budget']),
+  variant: PropTypes.oneOf(['year', 'gifts', 'budget', 'expensive', 'trend']),
 };
 
 SummaryItem.defaultProps = {

@@ -80,36 +80,96 @@ const HeroBudget = ({
         ) : null}
       </div>
     </div>
-    <div className="hero-budget__summary-grid">
-      <div className="hero-budget__summary-item">
-        <span className="hero-budget__summary-label">Koupeno</span>
-        <span className="hero-budget__summary-value hero-budget__summary-value--bought">
-          {currentBudget === null ? '—' : `${boughtTotal.toLocaleString('cs-CZ')} Kč`}
-        </span>
+      <div className="hero-budget__summary-grid">
+        <div className="hero-budget__summary-item">
+          <span className="hero-budget__summary-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" role="presentation">
+              <path
+                d="M7.5 12.5l3 3 6-7"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </span>
+          <div className="hero-budget__summary-content">
+            <span className="hero-budget__summary-label">Koupeno</span>
+            <span className="hero-budget__summary-value hero-budget__summary-value--bought">
+              {currentBudget === null ? '—' : `${boughtTotal.toLocaleString('cs-CZ')} Kč`}
+            </span>
+          </div>
+        </div>
+        <div className="hero-budget__summary-item">
+          <span className="hero-budget__summary-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" role="presentation">
+              <path
+                d="M12 4.5l2.2 4.5 5 .7-3.6 3.5.8 5-4.4-2.3-4.4 2.3.8-5-3.6-3.5 5-.7L12 4.5z"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.6"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </span>
+          <div className="hero-budget__summary-content">
+            <span className="hero-budget__summary-label">Nápady</span>
+            <span className="hero-budget__summary-value hero-budget__summary-value--idea">
+              {currentBudget === null ? '—' : `${ideaTotal.toLocaleString('cs-CZ')} Kč`}
+            </span>
+            <span className="hero-budget__summary-note">
+              {ideaMissingCount > 0 ? `+ ${ideaMissingCount} bez ceny` : '\u00a0'}
+            </span>
+          </div>
+        </div>
+        <div className="hero-budget__summary-item">
+          <span className="hero-budget__summary-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" role="presentation">
+              <text
+                x="12"
+                y="16"
+                textAnchor="middle"
+                fontSize="16"
+                fontFamily="inherit"
+                fill="currentColor"
+              >
+                Σ
+              </text>
+            </svg>
+          </span>
+          <div className="hero-budget__summary-content">
+            <span className="hero-budget__summary-label">Celkem</span>
+            <span className="hero-budget__summary-value">
+              {currentBudget === null ? '—' : `${planTotal.toLocaleString('cs-CZ')} Kč`}
+            </span>
+          </div>
+        </div>
+        <div className="hero-budget__summary-item">
+          <span className="hero-budget__summary-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" role="presentation">
+              <path
+                d="M5 12h11M12 8l4 4-4 4M20 6v12"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.8"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </span>
+          <div className="hero-budget__summary-content">
+            <span className="hero-budget__summary-label">Zbývá</span>
+            <span className="hero-budget__summary-value hero-budget__summary-value--delta">
+              {currentBudget === null
+                ? '—'
+                : isPlanOverBudget
+                  ? `-${Math.abs(planDelta ?? 0).toLocaleString('cs-CZ')} Kč`
+                  : `${Math.max(planDelta ?? 0, 0).toLocaleString('cs-CZ')} Kč`}
+            </span>
+          </div>
+        </div>
       </div>
-      <div className="hero-budget__summary-item">
-        <span className="hero-budget__summary-label">Nápady</span>
-        <span className="hero-budget__summary-value hero-budget__summary-value--idea">
-          {currentBudget === null ? '—' : `${ideaTotal.toLocaleString('cs-CZ')} Kč`}
-        </span>
-      </div>
-      <div className="hero-budget__summary-item">
-        <span className="hero-budget__summary-label">Celkem</span>
-        <span className="hero-budget__summary-value">
-          {currentBudget === null ? '—' : `${planTotal.toLocaleString('cs-CZ')} Kč`}
-        </span>
-      </div>
-      <div className="hero-budget__summary-item">
-        <span className="hero-budget__summary-label">Zbývá</span>
-        <span className="hero-budget__summary-value hero-budget__summary-value--delta">
-          {currentBudget === null
-            ? '—'
-            : isPlanOverBudget
-              ? `-${Math.abs(planDelta ?? 0).toLocaleString('cs-CZ')} Kč`
-              : `${Math.max(planDelta ?? 0, 0).toLocaleString('cs-CZ')} Kč`}
-        </span>
-      </div>
-    </div>
     <div className="hero-budget__bar-row">
       {budgetEditingYear === selectedYear ? (
         <span className="hero-budget__placeholder" aria-hidden="true" />

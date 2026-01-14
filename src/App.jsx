@@ -108,6 +108,7 @@ function App() {
   const [selectedYear, setSelectedYear] = useState(DEFAULT_GIFTS[0]?.year ?? new Date().getFullYear());
   const [isInitialized, setIsInitialized] = useState(false);
   const [pendingDelete, setPendingDelete] = useState(null);
+  const [pendingAdd, setPendingAdd] = useState(null);
   const [highlightedGiftId, setHighlightedGiftId] = useState(null);
   const [extraYears, setExtraYears] = useState(loadStoredYears);
   const [budgets, setBudgets] = useState(loadStoredBudgets);
@@ -116,6 +117,7 @@ function App() {
   const [showAllYears, setShowAllYears] = useState(false);
   const deleteTimeoutRef = useRef(null);
   const highlightTimeoutRef = useRef(null);
+  const addToastTimeoutRef = useRef(null);
   useEffect(() => {
     const storedGifts = loadStoredGifts();
     setGifts(storedGifts);
@@ -156,6 +158,9 @@ function App() {
     return () => {
       if (deleteTimeoutRef.current) {
         clearTimeout(deleteTimeoutRef.current);
+      }
+      if (addToastTimeoutRef.current) {
+        clearTimeout(addToastTimeoutRef.current);
       }
       if (highlightTimeoutRef.current) {
         clearTimeout(highlightTimeoutRef.current);
@@ -382,6 +387,7 @@ function App() {
     setGifts((prev) => [...prev, newGift]);
     setSelectedYear(year);
     setHighlightedGiftId(newGift.id);
+    setPendingAdd({ gift: newGift });
     if (highlightTimeoutRef.current) {
       clearTimeout(highlightTimeoutRef.current);
     }
@@ -389,6 +395,13 @@ function App() {
       setHighlightedGiftId(null);
       highlightTimeoutRef.current = null;
     }, 2500);
+    if (addToastTimeoutRef.current) {
+      clearTimeout(addToastTimeoutRef.current);
+    }
+    addToastTimeoutRef.current = setTimeout(() => {
+      setPendingAdd(null);
+      addToastTimeoutRef.current = null;
+    }, 3000);
   };
 
   const handleBudgetDraftChange = (event) => {
@@ -627,12 +640,18 @@ function App() {
         />
       </div>
      
-     {pendingDelete && (
+     {(pendingDelete || pendingAdd) && (
        <div className="undo-toast" role="status">
-         <span>Dárek byl smazán.</span>
-         <button type="button" className="undo-toast__button" onClick={handleUndoDelete}>
-           Vrátit zpět
-         </button>
+         {pendingAdd ? (
+           <span>Dárek byl přidán.</span>
+         ) : (
+           <>
+             <span>Dárek byl smazán.</span>
+             <button type="button" className="undo-toast__button" onClick={handleUndoDelete}>
+               Vrátit zpět
+             </button>
+           </>
+         )}
        </div>
      )}
      <footer className="app-footer">
