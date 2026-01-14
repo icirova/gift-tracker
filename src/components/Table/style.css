@@ -278,9 +278,9 @@
 }
 
 .table-status__badge--idea {
-  background: rgba(251, 191, 36, 0.16);
-  border-color: rgba(251, 191, 36, 0.55);
-  color: #92400e;
+  background: rgba(177, 99, 116, 0.16);
+  border-color: rgba(177, 99, 116, 0.55);
+  color: #7b3d4c;
 }
 
 .table-price__input {

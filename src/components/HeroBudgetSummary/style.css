@@ -5,11 +5,25 @@
   min-width: 220px;
 }
 
+.hero-budget-summary__value-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
 .hero-budget-summary__value {
   font-size: 14px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: rgba(248, 250, 252, 0.8);
+}
+
+.hero-budget-summary__over {
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  color: rgba(248, 250, 252, 0.9);
+  white-space: nowrap;
 }
 
 .hero-budget-summary__bar {
@@ -27,4 +41,8 @@
   bottom: 0;
   left: 0;
   background: linear-gradient(120deg, var(--primary), var(--accent));
+}
+
+.hero-budget-summary__fill--over {
+  background: rgba(244, 63, 94, 0.9);
 }

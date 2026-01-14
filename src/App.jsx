@@ -284,18 +284,33 @@ function App() {
   const planDelta = currentBudget === null ? null : currentBudget - planTotal;
   const isPlanOverBudget = currentBudget !== null && planDelta < 0;
   const budgetPercents = useMemo(() => {
-    if (!currentBudget || currentBudget <= 0) {
-      return { bought: 0, idea: 0 };
+    if (!currentBudget || currentBudget <= 0 || planTotal <= 0) {
+      return { bought: 0, idea: 0, over: 0, total: 0 };
     }
-    const boughtPercent = Math.min((boughtTotal / currentBudget) * 100, 100);
-    const totalPercent = Math.min((planTotal / currentBudget) * 100, 100);
-    const ideaPercent = Math.max(totalPercent - boughtPercent, 0);
-    return { bought: boughtPercent, idea: ideaPercent };
-  }, [boughtTotal, currentBudget, planTotal]);
 
-  const budgetTotalPercent = currentBudget && currentBudget > 0
-    ? Math.min((planTotal / currentBudget) * 100, 100)
-    : 0;
+    if (planTotal > currentBudget) {
+      const withinPercent = (currentBudget / planTotal) * 100;
+      const boughtShare = (boughtTotal / planTotal) * withinPercent;
+      const ideaShare = (ideaTotal / planTotal) * withinPercent;
+      const overShare = 100 - withinPercent;
+      return {
+        bought: boughtShare,
+        idea: ideaShare,
+        over: overShare,
+        total: 100,
+      };
+    }
+
+    const boughtPercent = (boughtTotal / currentBudget) * 100;
+    const ideaPercent = (ideaTotal / currentBudget) * 100;
+    const totalPercent = Math.min((planTotal / currentBudget) * 100, 100);
+    return {
+      bought: boughtPercent,
+      idea: ideaPercent,
+      over: 0,
+      total: totalPercent,
+    };
+  }, [boughtTotal, currentBudget, ideaTotal, planTotal]);
 
   useEffect(() => {
     setBudgetDraft(currentBudget === null ? '' : String(currentBudget));
@@ -544,7 +559,8 @@ function App() {
         </div>
         <HeroBudgetSummary
           currentBudget={currentBudget}
-          totalPercent={budgetTotalPercent}
+          totalPercent={budgetPercents.total}
+          overAmount={planDelta !== null && planDelta < 0 ? planDelta : null}
         />
       </div>
     </div>
@@ -561,11 +577,12 @@ function App() {
             boughtTotal={boughtTotal}
             ideaTotal={ideaTotal}
             ideaMissingCount={ideaMissingCount}
-            planTotal={planTotal}
-            planDelta={planDelta}
-            isPlanOverBudget={isPlanOverBudget}
-            boughtPercent={budgetPercents.bought}
-            ideaPercent={budgetPercents.idea}
+          planTotal={planTotal}
+          planDelta={planDelta}
+          isPlanOverBudget={isPlanOverBudget}
+          boughtPercent={budgetPercents.bought}
+          ideaPercent={budgetPercents.idea}
+          overPercent={budgetPercents.over}
             isDirty={isBudgetDirty}
             onDraftChange={handleBudgetDraftChange}
             onEdit={handleBudgetEdit}

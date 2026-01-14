@@ -14,6 +14,7 @@ const HeroBudget = ({
   isPlanOverBudget,
   boughtPercent,
   ideaPercent,
+  overPercent,
   isDirty,
   onDraftChange,
   onEdit,
@@ -57,7 +58,7 @@ const HeroBudget = ({
                 }`}
               >
                 {currentBudget === null
-                  ? 'Nastavit rozpočet'
+                  ? 'Nastavit'
                   : `${currentBudget.toLocaleString('cs-CZ')} Kč`}
               </span>
               <span className="hero-budget__pencil" aria-hidden="true">
@@ -79,52 +80,67 @@ const HeroBudget = ({
         ) : null}
       </div>
     </div>
-    {currentBudget !== null ? (
-      <div className="hero-budget__summary-grid">
-        <div className="hero-budget__summary-item">
-          <span className="hero-budget__summary-label">Koupeno</span>
-          <span className="hero-budget__summary-value hero-budget__summary-value--bought">
-            {boughtTotal.toLocaleString('cs-CZ')} Kč
-          </span>
-        </div>
-        <div className="hero-budget__summary-item">
-          <span className="hero-budget__summary-label">Nápady</span>
-          <span className="hero-budget__summary-value hero-budget__summary-value--idea">
-            {ideaTotal.toLocaleString('cs-CZ')} Kč
-          </span>
-        </div>
-        <div className="hero-budget__summary-item">
-          <span className="hero-budget__summary-label">Celkem</span>
-          <span className="hero-budget__summary-value">
-            {planTotal.toLocaleString('cs-CZ')} Kč
-          </span>
-        </div>
-        <div className="hero-budget__summary-item">
-          <span className="hero-budget__summary-label">Zbývá</span>
-          <span className="hero-budget__summary-value hero-budget__summary-value--delta">
-            {isPlanOverBudget
+    <div className="hero-budget__summary-grid">
+      <div className="hero-budget__summary-item">
+        <span className="hero-budget__summary-label">Koupeno</span>
+        <span className="hero-budget__summary-value hero-budget__summary-value--bought">
+          {currentBudget === null ? '—' : `${boughtTotal.toLocaleString('cs-CZ')} Kč`}
+        </span>
+      </div>
+      <div className="hero-budget__summary-item">
+        <span className="hero-budget__summary-label">Nápady</span>
+        <span className="hero-budget__summary-value hero-budget__summary-value--idea">
+          {currentBudget === null ? '—' : `${ideaTotal.toLocaleString('cs-CZ')} Kč`}
+        </span>
+      </div>
+      <div className="hero-budget__summary-item">
+        <span className="hero-budget__summary-label">Celkem</span>
+        <span className="hero-budget__summary-value">
+          {currentBudget === null ? '—' : `${planTotal.toLocaleString('cs-CZ')} Kč`}
+        </span>
+      </div>
+      <div className="hero-budget__summary-item">
+        <span className="hero-budget__summary-label">Zbývá</span>
+        <span className="hero-budget__summary-value hero-budget__summary-value--delta">
+          {currentBudget === null
+            ? '—'
+            : isPlanOverBudget
               ? `-${Math.abs(planDelta ?? 0).toLocaleString('cs-CZ')} Kč`
               : `${Math.max(planDelta ?? 0, 0).toLocaleString('cs-CZ')} Kč`}
-          </span>
-        </div>
+        </span>
       </div>
-    ) : null}
+    </div>
     <div className="hero-budget__bar-row">
       {budgetEditingYear === selectedYear ? (
         <span className="hero-budget__placeholder" aria-hidden="true" />
-      ) : currentBudget !== null ? (
-        <div className="hero-budget__bar" aria-hidden="true">
-          <span
-            className="hero-budget__segment hero-budget__segment--bought"
-            style={{ width: `${boughtPercent}%` }}
-          />
-          <span
-            className="hero-budget__segment hero-budget__segment--idea"
-            style={{ width: `${ideaPercent}%`, left: `${boughtPercent}%` }}
-          />
-        </div>
       ) : (
-        <span className="hero-budget__placeholder" aria-hidden="true" />
+        <div className="hero-budget__bar" aria-hidden="true">
+          {currentBudget !== null ? (
+            <>
+              <span
+                className="hero-budget__segment hero-budget__segment--bought"
+                style={{ width: `${boughtPercent}%` }}
+              />
+              <span
+                className="hero-budget__segment hero-budget__segment--idea"
+                style={{ width: `${ideaPercent}%`, left: `${boughtPercent}%` }}
+              />
+              {overPercent > 0 ? (
+                <>
+                  <span
+                    className="hero-budget__segment hero-budget__segment--over"
+                    style={{ width: `${overPercent}%`, left: `${boughtPercent + ideaPercent}%` }}
+                  />
+                  <span
+                    className="hero-budget__over-divider"
+                    style={{ left: `${boughtPercent + ideaPercent}%` }}
+                    aria-hidden="true"
+                  />
+                </>
+              ) : null}
+            </>
+          ) : null}
+        </div>
       )}
     </div>
   </div>
@@ -143,6 +159,7 @@ HeroBudget.propTypes = {
   isPlanOverBudget: PropTypes.bool.isRequired,
   boughtPercent: PropTypes.number.isRequired,
   ideaPercent: PropTypes.number.isRequired,
+  overPercent: PropTypes.number.isRequired,
   isDirty: PropTypes.bool.isRequired,
   onDraftChange: PropTypes.func.isRequired,
   onEdit: PropTypes.func.isRequired,
