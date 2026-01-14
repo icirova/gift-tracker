@@ -610,6 +610,8 @@ function App() {
           onDeleteGift={handleGiftDelete}
           highlightedGiftId={highlightedGiftId}
           onUpdateGift={handleGiftUpdate}
+          availableYears={availableYears}
+          onYearChange={setSelectedYear}
         />
       </div>
 

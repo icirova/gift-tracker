@@ -3,7 +3,15 @@ import PropTypes from 'prop-types';
 import { formatCurrency } from '../../utils/formatCurrency';
 import './style.css';
 
-const Table = ({ gifts, selectedYear, onDeleteGift, highlightedGiftId, onUpdateGift }) => {
+const Table = ({
+  gifts,
+  selectedYear,
+  onDeleteGift,
+  highlightedGiftId,
+  onUpdateGift,
+  availableYears,
+  onYearChange,
+}) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [baseHeight, setBaseHeight] = useState(null);
   const [hoveredName, setHoveredName] = useState(null);
@@ -165,6 +173,19 @@ const Table = ({ gifts, selectedYear, onDeleteGift, highlightedGiftId, onUpdateG
             value={searchQuery}
             onChange={(event) => setSearchQuery(event.target.value)}
           />
+        </label>
+        <label className="table-year">
+          <span>Rok</span>
+          <select
+            value={selectedYear}
+            onChange={(event) => onYearChange(Number(event.target.value))}
+          >
+            {availableYears.map((year) => (
+              <option key={year} value={year}>
+                {year}
+              </option>
+            ))}
+          </select>
         </label>
       </div>
       <div
@@ -371,6 +392,8 @@ Table.propTypes = {
   onDeleteGift: PropTypes.func.isRequired,
   highlightedGiftId: PropTypes.string,
   onUpdateGift: PropTypes.func.isRequired,
+  availableYears: PropTypes.arrayOf(PropTypes.number).isRequired,
+  onYearChange: PropTypes.func.isRequired,
 };
 
 export default Table;

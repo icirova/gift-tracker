@@ -13,9 +13,21 @@
   margin-top: 20px;
   display: flex;
   justify-content: flex-end;
+  gap: 16px;
+  flex-wrap: wrap;
 }
 
 .table-search {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.table-year {
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -36,6 +48,28 @@
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
+.table-year select {
+  min-width: 140px;
+  border-radius: 999px;
+  border: 1px solid var(--stroke);
+  padding: 10px 16px;
+  background: rgba(15, 23, 42, 0.02);
+  color: var(--text);
+  font-size: 15px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='7' viewBox='0 0 12 7'%3E%3Cpath fill='%23000' fill-opacity='0.5' d='M6 7 0 0h12z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: calc(100% - 12px) 50%;
+  background-size: 12px;
+  padding-right: 32px;
+}
+
+.table-year select:focus {
+  outline: none;
+  border-color: rgba(244, 63, 94, 0.6);
+  box-shadow: 0 0 0 3px rgba(244, 63, 94, 0.1);
+}
 .table-search input:focus {
   outline: none;
   border-color: rgba(244, 63, 94, 0.6);
