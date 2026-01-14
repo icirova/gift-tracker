@@ -17,6 +17,7 @@ const Table = ({
   const [hoveredName, setHoveredName] = useState(null);
   const [editingPriceId, setEditingPriceId] = useState(null);
   const [editingPriceValue, setEditingPriceValue] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
   const [pendingStatusId, setPendingStatusId] = useState(null);
   const containerRef = useRef(null);
   const priceInputRef = useRef(null);
@@ -28,13 +29,20 @@ const Table = ({
       return { groupedGifts: [], maxTotal: 0 };
     }
 
+    const statusFilteredGifts =
+      statusFilter === 'idea'
+        ? gifts.filter((gift) => gift.status === 'idea')
+        : statusFilter === 'bought'
+          ? gifts.filter((gift) => gift.status === 'bought')
+          : gifts;
+
     const filteredGifts = normalizedQuery
-      ? gifts.filter((gift) =>
+      ? statusFilteredGifts.filter((gift) =>
           [gift.name, gift.gift, gift.status]
             .filter(Boolean)
             .some((value) => value.toLowerCase().includes(normalizedQuery)),
         )
-      : gifts;
+      : statusFilteredGifts;
 
     if (!filteredGifts.length) {
       return { groupedGifts: [], maxTotal: 0 };
@@ -56,7 +64,7 @@ const Table = ({
     const max = groupedList.reduce((maxValue, group) => Math.max(maxValue, group.total), 0);
 
     return { groupedGifts: groupedList, maxTotal: max };
-  }, [gifts, normalizedQuery]);
+  }, [gifts, normalizedQuery, statusFilter]);
 
   const hasGifts = groupedGifts.length > 0;
   const emptyMessage = hasFilter
@@ -173,6 +181,17 @@ const Table = ({
             value={searchQuery}
             onChange={(event) => setSearchQuery(event.target.value)}
           />
+        </label>
+        <label className="table-filter">
+          <span>Stav</span>
+          <select
+            value={statusFilter}
+            onChange={(event) => setStatusFilter(event.target.value)}
+          >
+            <option value="all">Vše</option>
+            <option value="idea">Nápady</option>
+            <option value="bought">Koupeno</option>
+          </select>
         </label>
         <label className="table-year">
           <span>Rok</span>
