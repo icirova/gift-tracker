@@ -79,6 +79,7 @@
   font-size: 14px;
   font-weight: 600;
   color: var(--text);
+  position: relative;
 }
 
 .people-manager__remove {
@@ -94,15 +95,39 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: auto;
+  z-index: 5;
+  min-width: 0;
+  max-width: 100%;
+  flex-wrap: wrap;
+}
+
+.people-manager__confirm.table-status__confirm {
+  left: auto;
+  right: 0;
 }
 
 .people-manager__confirm .table-status__confirm-text {
-  font-size: 10px;
+  white-space: normal;
+}
+
+.people-manager__confirm .table-status__confirm-text {
+  max-width: 140px;
+}
+
+.people-manager__confirm .table-status__confirm-text {
+  color: #0f172a;
+  font-weight: 700;
 }
 
 .people-manager__confirm .table-status__confirm-button {
-  padding: 4px 8px;
+  color: #000;
+  font-weight: 700;
 }
+
 
 .people-manager__empty {
   margin: 0;

@@ -1,6 +1,7 @@
 import { Fragment, useMemo, useState, useLayoutEffect, useRef, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { formatCurrency } from '../../utils/formatCurrency';
+import Confirm from '../Confirm';
 import './style.css';
 
 const Table = ({
@@ -20,6 +21,7 @@ const Table = ({
   const [editingPriceValue, setEditingPriceValue] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [pendingStatusId, setPendingStatusId] = useState(null);
+  const [pendingDeleteId, setPendingDeleteId] = useState(null);
   const containerRef = useRef(null);
   const priceInputRef = useRef(null);
   const normalizedQuery = searchQuery.trim().toLowerCase();
@@ -117,6 +119,40 @@ const Table = ({
     }
   }, [pendingStatusId, gifts]);
 
+  useEffect(() => {
+    if (!pendingDeleteId) {
+      return;
+    }
+
+    const handleEscape = (event) => {
+      if (event.key === 'Escape') {
+        setPendingDeleteId(null);
+      }
+    };
+
+    document.addEventListener('keydown', handleEscape);
+    return () => {
+      document.removeEventListener('keydown', handleEscape);
+    };
+  }, [pendingDeleteId]);
+
+  useEffect(() => {
+    if (!pendingStatusId) {
+      return;
+    }
+
+    const handleEscape = (event) => {
+      if (event.key === 'Escape') {
+        setPendingStatusId(null);
+      }
+    };
+
+    document.addEventListener('keydown', handleEscape);
+    return () => {
+      document.removeEventListener('keydown', handleEscape);
+    };
+  }, [pendingStatusId]);
+
   useLayoutEffect(() => {
     if (editingPriceId && priceInputRef.current) {
       priceInputRef.current.focus();
@@ -176,6 +212,7 @@ const Table = ({
     }
     onUpdateGift(gift.id, { status: 'bought' });
     setPendingStatusId(null);
+    setPendingDeleteId(null);
     if (editingPriceId === gift.id) {
       stopPriceEdit();
     }
@@ -183,6 +220,11 @@ const Table = ({
 
   const cancelStatusConfirm = () => {
     setPendingStatusId(null);
+  };
+
+  const beginDeleteConfirm = (giftId) => {
+    setPendingStatusId(null);
+    setPendingDeleteId((prev) => (prev === giftId ? null : giftId));
   };
 
   return (
@@ -356,27 +398,11 @@ const Table = ({
                             <div className="table-status__control">
                               {gift.status === 'idea' ? (
                                 pendingStatusId === gift.id ? (
-                                  <div className="table-status__confirm">
-                                    <span className="table-status__confirm-text">
-                                      Koupeno? (zamkne úpravy)
-                                    </span>
-                                    <button
-                                      type="button"
-                                      className="table-status__confirm-button"
-                                      onClick={() => confirmStatusBought(gift)}
-                                      aria-label={`Potvrdit koupeno pro ${gift.gift}`}
-                                    >
-                                      Ano
-                                    </button>
-                                    <button
-                                      type="button"
-                                      className="table-status__confirm-button"
-                                      onClick={cancelStatusConfirm}
-                                      aria-label={`Zrušit změnu stavu pro ${gift.gift}`}
-                                    >
-                                      Ne
-                                    </button>
-                                  </div>
+                                  <Confirm
+                                    message="Koupeno? Zamkne úpravy."
+                                    onConfirm={() => confirmStatusBought(gift)}
+                                    onCancel={cancelStatusConfirm}
+                                  />
                                 ) : isEditable ? (
                                   <button
                                     type="button"
@@ -399,14 +425,25 @@ const Table = ({
                                 </span>
                               )}
                               {isEditable ? (
-                                <button
-                                  type="button"
-                                  className="table-delete"
-                                  aria-label={`Smazat dárek ${gift.gift} pro ${gift.name}`}
-                                  onClick={() => onDeleteGift(gift.id)}
-                                >
-                                  &times;
-                                </button>
+                                pendingDeleteId === gift.id ? (
+                                  <Confirm
+                                    message="Smazat? Odstraní dárek."
+                                    onConfirm={() => {
+                                      onDeleteGift(gift.id);
+                                      setPendingDeleteId(null);
+                                    }}
+                                    onCancel={() => setPendingDeleteId(null)}
+                                  />
+                                ) : (
+                                  <button
+                                    type="button"
+                                    className="table-delete"
+                                    aria-label={`Smazat dárek ${gift.gift} pro ${gift.name}`}
+                                    onClick={() => beginDeleteConfirm(gift.id)}
+                                  >
+                                    &times;
+                                  </button>
+                                )
                               ) : null}
                             </div>
                           </td>

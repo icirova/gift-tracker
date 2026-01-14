@@ -7,6 +7,7 @@ import HeroBudget from './components/HeroBudget';
 import HeroBudgetSummary from './components/HeroBudgetSummary';
 import PersonHistory from './components/PersonHistory';
 import PeopleManager from './components/PeopleManager';
+import Confirm from './components/Confirm';
 import DEFAULT_GIFTS from './data/defaultGifts';
 import ALLOWED_NAMES from './data/allowedNames';
 
@@ -14,7 +15,7 @@ const STORAGE_KEY = 'gift-tracker:gifts';
 const YEARS_KEY = 'gift-tracker:extra-years';
 const BUDGETS_KEY = 'gift-tracker:budgets';
 const NAMES_KEY = 'gift-tracker:names';
-const DEFAULT_EXTRA_YEARS = [2022, 2021];
+const DEFAULT_EXTRA_YEARS = [];
 const GIFT_STATUS = {
   bought: 'bought',
   idea: 'idea',
@@ -70,7 +71,9 @@ const loadStoredYears = () => {
       const parsedValue = JSON.parse(rawValue);
       if (Array.isArray(parsedValue)) {
         const storedYears = parsedValue.filter((year) => Number.isFinite(year)).map(Number);
-        return Array.from(new Set([...DEFAULT_EXTRA_YEARS, ...storedYears]));
+        return Array.from(new Set([...DEFAULT_EXTRA_YEARS, ...storedYears])).filter(
+          (year) => year !== 2021 && year !== 2022 && year !== 2027,
+        );
       }
     }
   } catch (error) {
@@ -172,6 +175,7 @@ function App() {
   const [namesByYear, setNamesByYear] = useState(initialNamesByYear);
   const [gifts, setGifts] = useState(() => initialGifts);
   const currentYear = new Date().getFullYear();
+  const nextYear = currentYear + 1;
   const [selectedYear, setSelectedYear] = useState(currentYear);
   const [unlockedPastYears, setUnlockedPastYears] = useState({});
   const [isInitialized, setIsInitialized] = useState(false);
@@ -185,16 +189,15 @@ function App() {
   const [budgetEditingYear, setBudgetEditingYear] = useState(null);
   const [budgetDraft, setBudgetDraft] = useState('');
   const [showAllYears, setShowAllYears] = useState(false);
+  const [addYearConfirmOpen, setAddYearConfirmOpen] = useState(false);
   const deleteTimeoutRef = useRef(null);
   const highlightTimeoutRef = useRef(null);
   const addToastTimeoutRef = useRef(null);
   const nameDeleteTimeoutRef = useRef(null);
+  const yearsMenuRef = useRef(null);
+  const yearsToggleRef = useRef(null);
   useEffect(() => {
     setIsInitialized(true);
-  }, []);
-
-  useEffect(() => {
-    setExtraYears((prev) => prev.filter((year) => year !== 2026 && year !== 2027));
   }, []);
 
   const allowedNames = useMemo(
@@ -284,9 +287,14 @@ function App() {
     const years = new Set([...gifts.map((gift) => gift.year), ...extraYears, currentYear]);
     return [...years].sort((a, b) => b - a);
   }, [gifts, extraYears]);
+  const canAddNextYear = !availableYears.includes(nextYear);
 
   useEffect(() => {
-    if (availableYears.length <= 4 && showAllYears) {
+    setExtraYears((prev) => prev.filter((year) => year !== currentYear));
+  }, [currentYear]);
+
+  useEffect(() => {
+    if (availableYears.length <= 3 && showAllYears) {
       setShowAllYears(false);
     }
   }, [availableYears, selectedYear, showAllYears]);
@@ -295,16 +303,68 @@ function App() {
     setUnlockConfirmOpen(false);
   }, [selectedYear]);
 
-  const handleYearsToggle = () => {
-    if (showAllYears) {
-      const visibleYears = availableYears.slice(0, 4);
-      if (visibleYears.length && !visibleYears.includes(selectedYear)) {
-        setSelectedYear(visibleYears[0]);
-      }
-      setShowAllYears(false);
+  useEffect(() => {
+    setAddYearConfirmOpen(false);
+  }, [selectedYear]);
+
+  useEffect(() => {
+    if (!showAllYears) {
       return;
     }
-    setShowAllYears(true);
+
+    const handleOutsideClick = (event) => {
+      const menuNode = yearsMenuRef.current;
+      const toggleNode = yearsToggleRef.current;
+      if (menuNode && menuNode.contains(event.target)) {
+        return;
+      }
+      if (toggleNode && toggleNode.contains(event.target)) {
+        return;
+      }
+      setShowAllYears(false);
+    };
+
+    const handleEscape = (event) => {
+      if (event.key === 'Escape') {
+        setShowAllYears(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleOutsideClick);
+    document.addEventListener('keydown', handleEscape);
+    return () => {
+      document.removeEventListener('mousedown', handleOutsideClick);
+      document.removeEventListener('keydown', handleEscape);
+    };
+  }, [showAllYears]);
+
+  useEffect(() => {
+    if (!unlockConfirmOpen && !addYearConfirmOpen) {
+      return;
+    }
+
+    const handleEscape = (event) => {
+      if (event.key !== 'Escape') {
+        return;
+      }
+      setUnlockConfirmOpen(false);
+      setAddYearConfirmOpen(false);
+    };
+
+    document.addEventListener('keydown', handleEscape);
+    return () => {
+      document.removeEventListener('keydown', handleEscape);
+    };
+  }, [unlockConfirmOpen, addYearConfirmOpen]);
+
+  useEffect(() => {
+    if (!canAddNextYear) {
+      setAddYearConfirmOpen(false);
+    }
+  }, [canAddNextYear]);
+
+  const handleYearsToggle = () => {
+    setShowAllYears((prev) => !prev);
   };
 
   useEffect(() => {
@@ -318,16 +378,13 @@ function App() {
   }, [availableYears, selectedYear]);
 
   const handleAddYear = () => {
-    if (typeof window !== 'undefined') {
-      const confirmed = window.confirm('Přidat nový rok do timeline?');
-      if (!confirmed) {
-        return;
-      }
+    if (!canAddNextYear) {
+      setAddYearConfirmOpen(false);
+      return;
     }
-    const currentMax = Math.max(...availableYears, new Date().getFullYear());
-    const nextYear = currentMax + 1;
     setExtraYears((prev) => (prev.includes(nextYear) ? prev : [...prev, nextYear]));
     setSelectedYear(nextYear);
+    setAddYearConfirmOpen(false);
   };
 
   const giftsForActiveYear = useMemo(
@@ -716,7 +773,34 @@ function App() {
           <em className="hero__lead-break">Realita může překvapit… nebo vyděsit.</em>
         </p>
         <div className="hero__timeline" role="tablist" aria-label="Roky">
-          {(showAllYears ? availableYears : availableYears.slice(0, 4)).map((year) => {
+          {canAddNextYear ? (
+            <div className="hero__year-add">
+              <button
+                type="button"
+                className="hero__year hero__year--new"
+                onClick={() => setAddYearConfirmOpen(true)}
+              >
+                + {nextYear}
+              </button>
+              {addYearConfirmOpen ? (
+                <Confirm
+                  className="hero__year-confirm"
+                  message={`Přidat ${nextYear}?`}
+                  onConfirm={handleAddYear}
+                  onCancel={() => setAddYearConfirmOpen(false)}
+                />
+              ) : null}
+            </div>
+          ) : null}
+          {(() => {
+            const baseYears = availableYears.slice(0, 3);
+            if (selectedYear && !baseYears.includes(selectedYear)) {
+              const nextYears = [...baseYears];
+              nextYears[nextYears.length - 1] = selectedYear;
+              return nextYears;
+            }
+            return baseYears;
+          })().map((year) => {
             const isActive = year === selectedYear;
             return (
               <button
@@ -731,19 +815,42 @@ function App() {
               </button>
             );
           })}
-          {availableYears.length > 4 ? (
+          {availableYears.length > 3 ? (
             <button
               type="button"
               className="hero__year hero__year--ellipsis"
               onClick={handleYearsToggle}
+              ref={yearsToggleRef}
               aria-label={showAllYears ? 'Skrýt starší roky' : 'Zobrazit všechny roky'}
             >
               <span>{showAllYears ? 'MÉNĚ' : 'VÍCE'}</span>
             </button>
           ) : null}
-          <button type="button" className="hero__year hero__year--new" onClick={handleAddYear}>
-            + Následující rok
-          </button>
+          {showAllYears ? (
+            <div className="hero__year-menu" ref={yearsMenuRef}>
+              {availableYears
+                .filter((year) => {
+                  const baseYears = availableYears.slice(0, 3);
+                  const visibleYears = baseYears.includes(selectedYear)
+                    ? baseYears
+                    : [...baseYears.slice(0, 2), selectedYear];
+                  return !visibleYears.includes(year);
+                })
+                .map((year) => (
+                  <button
+                    key={year}
+                    type="button"
+                    className="hero__year hero__year--menu"
+                    onClick={() => {
+                      setSelectedYear(year);
+                      setShowAllYears(false);
+                    }}
+                  >
+                    {year}
+                  </button>
+                ))}
+            </div>
+          ) : null}
         </div>
         <div className="hero-stats">
           <div className="hero-stat">
@@ -786,31 +893,18 @@ function App() {
                     Zamknout úpravy
                   </button>
                 ) : unlockConfirmOpen ? (
-                  <div className="table-status__confirm year-lock__confirm">
-                    <span className="table-status__confirm-text">Odemknout úpravy?</span>
-                    <div className="table-status__confirm-actions">
-                      <button
-                        type="button"
-                        className="table-status__confirm-button"
-                        onClick={() => {
-                          setUnlockedPastYears((prev) => ({
-                            ...prev,
-                            [selectedYear]: true,
-                          }));
-                          setUnlockConfirmOpen(false);
-                        }}
-                      >
-                        Ano
-                      </button>
-                      <button
-                        type="button"
-                        className="table-status__confirm-button"
-                        onClick={() => setUnlockConfirmOpen(false)}
-                      >
-                        Ne
-                      </button>
-                    </div>
-                  </div>
+                  <Confirm
+                    className="year-lock__confirm"
+                    message="Odemknout? Umožní úpravy."
+                    onConfirm={() => {
+                      setUnlockedPastYears((prev) => ({
+                        ...prev,
+                        [selectedYear]: true,
+                      }));
+                      setUnlockConfirmOpen(false);
+                    }}
+                    onCancel={() => setUnlockConfirmOpen(false)}
+                  />
                 ) : (
                   <button
                     type="button"

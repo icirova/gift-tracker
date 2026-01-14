@@ -265,6 +265,7 @@
   flex-direction: row;
   align-items: center;
   gap: 10px;
+  position: relative;
 }
 
 .table-status__badge {
@@ -282,42 +283,12 @@
 }
 
 .table-status__confirm {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-}
-
-.table-status__confirm-text {
-  font-size: 11px;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--text-muted);
-}
-
-.table-status__confirm-button {
-  border: 1px solid rgba(15, 23, 42, 0.2);
-  background: #fff;
-  color: var(--text);
-  border-radius: 999px;
-  padding: 4px 10px;
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  cursor: pointer;
-  transition: border 0.2s ease, box-shadow 0.2s ease;
-}
-
-.table-status__confirm-button:hover {
-  border-color: rgba(20, 184, 166, 0.35);
-  background: rgba(20, 184, 166, 0.12);
-}
-
-.table-status__confirm-button:focus-visible {
-  outline: none;
-  box-shadow: 0 0 0 3px rgba(244, 63, 94, 0.1);
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  right: 0;
+  left: auto;
+  z-index: 5;
 }
 
 .table-status__toggle {

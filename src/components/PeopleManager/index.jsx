@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
+import Confirm from '../Confirm';
 import './style.css';
 
 const PeopleManager = ({ names, onAddName, onRemoveName, canEdit }) => {
@@ -38,6 +39,23 @@ const PeopleManager = ({ names, onAddName, onRemoveName, canEdit }) => {
     setConfirmName(null);
   };
 
+  useEffect(() => {
+    if (!confirmName) {
+      return;
+    }
+
+    const handleEscape = (event) => {
+      if (event.key === 'Escape') {
+        setConfirmName(null);
+      }
+    };
+
+    document.addEventListener('keydown', handleEscape);
+    return () => {
+      document.removeEventListener('keydown', handleEscape);
+    };
+  }, [confirmName]);
+
   return (
     <div className="people-manager">
       {canEdit ? (
@@ -64,29 +82,12 @@ const PeopleManager = ({ names, onAddName, onRemoveName, canEdit }) => {
               <span>{name}</span>
               {canEdit ? (
                 confirmName === name ? (
-                  <div className="people-manager__confirm">
-                    <span className="table-status__confirm-text">
-                      Odebrat? Smaže i dárky v tomto roce.
-                    </span>
-                    <div className="table-status__confirm-actions">
-                      <button
-                        type="button"
-                        className="table-status__confirm-button"
-                        onClick={handleConfirmRemove}
-                        aria-label={`Potvrdit odebrání osoby ${name}`}
-                      >
-                        Ano
-                      </button>
-                      <button
-                        type="button"
-                        className="table-status__confirm-button"
-                        onClick={handleCancelRemove}
-                        aria-label={`Zrušit odebrání osoby ${name}`}
-                      >
-                        Ne
-                      </button>
-                    </div>
-                  </div>
+                  <Confirm
+                    className="people-manager__confirm"
+                    message="Odebrat? Smaže dárky v tabulce."
+                    onConfirm={handleConfirmRemove}
+                    onCancel={handleCancelRemove}
+                  />
                 ) : (
                   <button
                     type="button"
