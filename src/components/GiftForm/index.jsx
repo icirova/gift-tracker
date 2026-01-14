@@ -10,8 +10,16 @@ const buildInitialState = (defaultYear, defaultName, defaultStatus) => ({
   status: defaultStatus ?? 'bought',
 });
 
-const GiftForm = ({ onAddGift, defaultYear, allowedNames, statusOptions, defaultStatus }) => {
-  const defaultName = allowedNames[0] ?? '';
+const GiftForm = ({
+  onAddGift,
+  defaultYear,
+  namesByYear,
+  statusOptions,
+  defaultStatus,
+  isEditable,
+}) => {
+  const namesForYear = namesByYear[defaultYear] ?? [];
+  const defaultName = namesForYear[0] ?? '';
   const [formData, setFormData] = useState(
     buildInitialState(defaultYear, defaultName, defaultStatus),
   );
@@ -20,10 +28,15 @@ const GiftForm = ({ onAddGift, defaultYear, allowedNames, statusOptions, default
     () => statusOptions.map((option) => option.value),
     [statusOptions],
   );
+  const namesForSelectedYear = useMemo(
+    () => namesByYear[formData.year] ?? [],
+    [formData.year, namesByYear],
+  );
 
   const isValid = useMemo(() => {
     if (
-      !allowedNames.includes(formData.name) ||
+      namesForSelectedYear.length === 0 ||
+      !namesForSelectedYear.includes(formData.name) ||
       formData.gift.trim().length <= 1 ||
       Number(formData.year) <= 0 ||
       !allowedStatuses.includes(formData.status)
@@ -40,17 +53,17 @@ const GiftForm = ({ onAddGift, defaultYear, allowedNames, statusOptions, default
     }
 
     return priceText === '' || hasValidPrice;
-  }, [allowedNames, allowedStatuses, formData]);
+  }, [allowedStatuses, formData, namesForSelectedYear]);
 
   useEffect(() => {
     setFormData((prev) => ({ ...prev, year: defaultYear }));
   }, [defaultYear]);
 
   useEffect(() => {
-    if (allowedNames.length && !allowedNames.includes(formData.name)) {
-      setFormData((prev) => ({ ...prev, name: allowedNames[0] }));
+    if (namesForSelectedYear.length && !namesForSelectedYear.includes(formData.name)) {
+      setFormData((prev) => ({ ...prev, name: namesForSelectedYear[0] }));
     }
-  }, [allowedNames, formData.name]);
+  }, [formData.name, namesForSelectedYear]);
 
   useEffect(() => {
     if (allowedStatuses.length && !allowedStatuses.includes(formData.status)) {
@@ -65,6 +78,9 @@ const GiftForm = ({ onAddGift, defaultYear, allowedNames, statusOptions, default
 
   const handleSubmit = (event) => {
     event.preventDefault();
+    if (!isEditable) {
+      return;
+    }
     if (!isValid) {
       setError('Vyplň všechna pole; u koupených dárků zadej cenu jako kladné číslo.');
       return;
@@ -79,7 +95,7 @@ const GiftForm = ({ onAddGift, defaultYear, allowedNames, statusOptions, default
       price: priceValue,
       year: Number(formData.year),
     });
-    setFormData(buildInitialState(defaultYear, allowedNames[0], defaultStatus));
+    setFormData(buildInitialState(defaultYear, namesByYear[defaultYear]?.[0], defaultStatus));
   };
 
   return (
@@ -87,12 +103,21 @@ const GiftForm = ({ onAddGift, defaultYear, allowedNames, statusOptions, default
       <div className="gift-form__grid">
         <label>
           <span>Jméno</span>
-          <select name="name" value={formData.name} onChange={handleChange}>
-            {allowedNames.map((name) => (
-              <option key={name} value={name}>
-                {name}
-              </option>
-            ))}
+          <select
+            name="name"
+            value={formData.name}
+            onChange={handleChange}
+            disabled={!isEditable || namesForSelectedYear.length === 0}
+          >
+            {namesForSelectedYear.length === 0 ? (
+              <option value="">Nejdřív přidej osobu</option>
+            ) : (
+              namesForSelectedYear.map((name) => (
+                <option key={name} value={name}>
+                  {name}
+                </option>
+              ))
+            )}
           </select>
         </label>
 
@@ -115,6 +140,7 @@ const GiftForm = ({ onAddGift, defaultYear, allowedNames, statusOptions, default
             value={formData.gift}
             onChange={handleChange}
             placeholder="Co se kupuje"
+            disabled={!isEditable}
           />
         </label>
         <label>
@@ -126,6 +152,7 @@ const GiftForm = ({ onAddGift, defaultYear, allowedNames, statusOptions, default
             value={formData.price}
             onChange={handleChange}
             placeholder="Např. 1200"
+            disabled={!isEditable}
           />
           {formData.status === 'idea' && (
             <small className="gift-form__hint">Cenu lze později editovat.</small>
@@ -139,12 +166,13 @@ const GiftForm = ({ onAddGift, defaultYear, allowedNames, statusOptions, default
             name="year"
             value={formData.year}
             onChange={handleChange}
+            disabled={!isEditable}
           />
         </label>
        
       </div>
       {error && <p className="gift-form__error">{error}</p>}
-      <button type="submit" disabled={!isValid}>
+      <button type="submit" disabled={!isEditable || !isValid}>
         Přidat dárek
       </button>
     </form>
@@ -154,7 +182,7 @@ const GiftForm = ({ onAddGift, defaultYear, allowedNames, statusOptions, default
 GiftForm.propTypes = {
   onAddGift: PropTypes.func.isRequired,
   defaultYear: PropTypes.number.isRequired,
-  allowedNames: PropTypes.arrayOf(PropTypes.string).isRequired,
+  namesByYear: PropTypes.objectOf(PropTypes.arrayOf(PropTypes.string)).isRequired,
   statusOptions: PropTypes.arrayOf(
     PropTypes.shape({
       value: PropTypes.string.isRequired,
@@ -162,6 +190,11 @@ GiftForm.propTypes = {
     }),
   ).isRequired,
   defaultStatus: PropTypes.string,
+  isEditable: PropTypes.bool,
+};
+
+GiftForm.defaultProps = {
+  isEditable: true,
 };
 
 export default GiftForm;

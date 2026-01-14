@@ -6,12 +6,14 @@ import GiftForm from './components/GiftForm';
 import HeroBudget from './components/HeroBudget';
 import HeroBudgetSummary from './components/HeroBudgetSummary';
 import PersonHistory from './components/PersonHistory';
+import PeopleManager from './components/PeopleManager';
 import DEFAULT_GIFTS from './data/defaultGifts';
 import ALLOWED_NAMES from './data/allowedNames';
 
 const STORAGE_KEY = 'gift-tracker:gifts';
 const YEARS_KEY = 'gift-tracker:extra-years';
 const BUDGETS_KEY = 'gift-tracker:budgets';
+const NAMES_KEY = 'gift-tracker:names';
 const DEFAULT_EXTRA_YEARS = [2022, 2021];
 const GIFT_STATUS = {
   bought: 'bought',
@@ -24,16 +26,14 @@ const STATUS_OPTIONS = [
 const STATUS_VALUES = new Set(Object.values(GIFT_STATUS));
 
 const normalizeGifts = (entries) =>
-  entries
-    .filter((gift) => ALLOWED_NAMES.includes(gift.name))
-    .map((gift) => {
-      const priceValue = Number(gift.price);
-      return {
-        ...gift,
-        price: Number.isFinite(priceValue) && priceValue > 0 ? priceValue : null,
-        status: STATUS_VALUES.has(gift.status) ? gift.status : GIFT_STATUS.bought,
-      };
-    });
+  entries.map((gift) => {
+    const priceValue = Number(gift.price);
+    return {
+      ...gift,
+      price: Number.isFinite(priceValue) && priceValue > 0 ? priceValue : null,
+      status: STATUS_VALUES.has(gift.status) ? gift.status : GIFT_STATUS.bought,
+    };
+  });
 
 const loadStoredGifts = () => {
   if (typeof window === 'undefined') {
@@ -48,7 +48,10 @@ const loadStoredGifts = () => {
         return normalizeGifts(parsedValue);
       }
     }
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(normalizeGifts(DEFAULT_GIFTS)));
+    window.localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify(normalizeGifts(DEFAULT_GIFTS)),
+    );
   } catch (error) {
     console.warn('Nepodařilo se načíst dárky z localStorage.', error);
   }
@@ -104,12 +107,78 @@ const loadStoredBudgets = () => {
   return {};
 };
 
+const buildNamesByYearFromGifts = (entries) => {
+  const map = entries.reduce((acc, gift) => {
+    const year = Number(gift.year);
+    if (!Number.isFinite(year)) {
+      return acc;
+    }
+    if (!acc[year]) {
+      acc[year] = new Set();
+    }
+    if (gift.name) {
+      acc[year].add(gift.name);
+    }
+    return acc;
+  }, {});
+
+  return Object.fromEntries(
+    Object.entries(map).map(([year, names]) => [Number(year), Array.from(names)]),
+  );
+};
+
+const loadStoredNames = (fallbackNamesByYear) => {
+  if (typeof window === 'undefined') {
+    return fallbackNamesByYear;
+  }
+
+  try {
+    const rawValue = window.localStorage.getItem(NAMES_KEY);
+    if (rawValue) {
+      const parsedValue = JSON.parse(rawValue);
+      if (parsedValue && typeof parsedValue === 'object') {
+        const cleaned = Object.entries(parsedValue).reduce((acc, [year, names]) => {
+          const numericYear = Number(year);
+          if (!Number.isFinite(numericYear) || !Array.isArray(names)) {
+            return acc;
+          }
+          const uniqueNames = Array.from(
+            new Set(names.map((name) => String(name).trim()).filter(Boolean)),
+          );
+          if (uniqueNames.length) {
+            acc[numericYear] = uniqueNames;
+          }
+          return acc;
+        }, {});
+        if (Object.keys(cleaned).length) {
+          return cleaned;
+        }
+      }
+    }
+  } catch (error) {
+    console.warn('Nepodařilo se načíst jména z localStorage.', error);
+  }
+
+  return fallbackNamesByYear;
+};
+
 function App() {
-  const [gifts, setGifts] = useState(normalizeGifts(DEFAULT_GIFTS));
-  const [selectedYear, setSelectedYear] = useState(DEFAULT_GIFTS[0]?.year ?? new Date().getFullYear());
+  const initialGifts = loadStoredGifts();
+  const fallbackNamesByYear =
+    Object.keys(buildNamesByYearFromGifts(initialGifts)).length > 0
+      ? buildNamesByYearFromGifts(initialGifts)
+      : { [new Date().getFullYear()]: [...ALLOWED_NAMES] };
+  const initialNamesByYear = loadStoredNames(fallbackNamesByYear);
+  const [namesByYear, setNamesByYear] = useState(initialNamesByYear);
+  const [gifts, setGifts] = useState(() => initialGifts);
+  const currentYear = new Date().getFullYear();
+  const [selectedYear, setSelectedYear] = useState(currentYear);
+  const [unlockedPastYears, setUnlockedPastYears] = useState({});
   const [isInitialized, setIsInitialized] = useState(false);
+  const [unlockConfirmOpen, setUnlockConfirmOpen] = useState(false);
   const [pendingDelete, setPendingDelete] = useState(null);
   const [pendingAdd, setPendingAdd] = useState(null);
+  const [pendingNameDelete, setPendingNameDelete] = useState(null);
   const [highlightedGiftId, setHighlightedGiftId] = useState(null);
   const [extraYears, setExtraYears] = useState(loadStoredYears);
   const [budgets, setBudgets] = useState(loadStoredBudgets);
@@ -119,17 +188,47 @@ function App() {
   const deleteTimeoutRef = useRef(null);
   const highlightTimeoutRef = useRef(null);
   const addToastTimeoutRef = useRef(null);
+  const nameDeleteTimeoutRef = useRef(null);
   useEffect(() => {
-    const storedGifts = loadStoredGifts();
-    setGifts(storedGifts);
-    const currentYear = new Date().getFullYear();
-    setSelectedYear(currentYear);
     setIsInitialized(true);
   }, []);
 
   useEffect(() => {
     setExtraYears((prev) => prev.filter((year) => year !== 2026 && year !== 2027));
   }, []);
+
+  const allowedNames = useMemo(
+    () => namesByYear[selectedYear] ?? [],
+    [namesByYear, selectedYear],
+  );
+  const isPreviousYear = selectedYear === currentYear - 1;
+  const isYearEditable =
+    selectedYear >= currentYear || (isPreviousYear && Boolean(unlockedPastYears[selectedYear]));
+  const canEditNames = isYearEditable;
+
+  const allNames = useMemo(() => {
+    const namesFromGifts = gifts.map((gift) => gift.name);
+    const namesFromYears = Object.values(namesByYear).flat();
+    return Array.from(new Set([...namesFromGifts, ...namesFromYears])).sort((a, b) =>
+      a.localeCompare(b, 'cs', { sensitivity: 'base' }),
+    );
+  }, [gifts, namesByYear]);
+
+  useEffect(() => {
+    if (namesByYear[selectedYear]) {
+      return;
+    }
+    setNamesByYear((prev) => {
+      if (prev[selectedYear]) {
+        return prev;
+      }
+      const previousYearNames = prev[selectedYear - 1] ?? [];
+      return {
+        ...prev,
+        [selectedYear]: previousYearNames.length ? [...previousYearNames] : [],
+      };
+    });
+  }, [namesByYear, selectedYear]);
 
   useEffect(() => {
     if (!isInitialized || typeof window === 'undefined') {
@@ -156,12 +255,23 @@ function App() {
   }, [budgets]);
 
   useEffect(() => {
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    window.localStorage.setItem(NAMES_KEY, JSON.stringify(namesByYear));
+  }, [namesByYear]);
+
+  useEffect(() => {
     return () => {
       if (deleteTimeoutRef.current) {
         clearTimeout(deleteTimeoutRef.current);
       }
       if (addToastTimeoutRef.current) {
         clearTimeout(addToastTimeoutRef.current);
+      }
+      if (nameDeleteTimeoutRef.current) {
+        clearTimeout(nameDeleteTimeoutRef.current);
       }
       if (highlightTimeoutRef.current) {
         clearTimeout(highlightTimeoutRef.current);
@@ -180,6 +290,10 @@ function App() {
       setShowAllYears(false);
     }
   }, [availableYears, selectedYear, showAllYears]);
+
+  useEffect(() => {
+    setUnlockConfirmOpen(false);
+  }, [selectedYear]);
 
   const handleYearsToggle = () => {
     if (showAllYears) {
@@ -323,6 +437,12 @@ function App() {
     setBudgetEditingYear(null);
   }, [selectedYear, currentBudget]);
 
+  useEffect(() => {
+    if (!isYearEditable && budgetEditingYear === selectedYear) {
+      setBudgetEditingYear(null);
+    }
+  }, [budgetEditingYear, isYearEditable, selectedYear]);
+
   const daysToChristmasEve = useMemo(() => {
     const now = new Date();
     const year = now.getMonth() === 11 && now.getDate() > 24 ? now.getFullYear() + 1 : now.getFullYear();
@@ -363,8 +483,11 @@ function App() {
     const status = STATUS_VALUES.has(giftInput.status) ? giftInput.status : GIFT_STATUS.bought;
     const priceValue = giftInput.price === '' || giftInput.price === null ? null : Number(giftInput.price);
     const hasValidPrice = Number.isFinite(priceValue) && priceValue > 0;
+    const namesForYear = namesByYear[year] ?? [];
+    const isTargetEditable =
+      year >= currentYear || (year === currentYear - 1 && Boolean(unlockedPastYears[year]));
 
-    if (!trimmedName || !trimmedGift || !ALLOWED_NAMES.includes(trimmedName)) {
+    if (!isTargetEditable || !trimmedName || !trimmedGift || !namesForYear.includes(trimmedName)) {
       return;
     }
 
@@ -410,6 +533,9 @@ function App() {
   };
 
   const handleBudgetEdit = () => {
+    if (!isYearEditable) {
+      return;
+    }
     setBudgetEditingYear(selectedYear);
   };
 
@@ -442,6 +568,12 @@ function App() {
       }
 
       const removedGift = prev[index];
+      if (
+        removedGift.year < currentYear &&
+        !(removedGift.year === currentYear - 1 && unlockedPastYears[removedGift.year])
+      ) {
+        return prev;
+      }
       if (deleteTimeoutRef.current) {
         clearTimeout(deleteTimeoutRef.current);
       }
@@ -457,8 +589,39 @@ function App() {
 
   const handleGiftUpdate = (giftId, updates) => {
     setGifts((prev) =>
-      prev.map((gift) => (gift.id === giftId ? { ...gift, ...updates } : gift)),
+      prev.map((gift) => {
+        if (gift.id !== giftId) {
+          return gift;
+        }
+        if (
+          gift.year < currentYear &&
+          !(gift.year === currentYear - 1 && unlockedPastYears[gift.year])
+        ) {
+          return gift;
+        }
+        return { ...gift, ...updates };
+      }),
     );
+  };
+
+  const handleNameRemove = (name) => {
+    const year = selectedYear;
+    const removedGifts = gifts.filter((gift) => gift.year === year && gift.name === name);
+
+    setNamesByYear((prev) => ({
+      ...prev,
+      [year]: (prev[year] ?? []).filter((item) => item !== name),
+    }));
+    setGifts((prev) => prev.filter((gift) => !(gift.year === year && gift.name === name)));
+
+    if (nameDeleteTimeoutRef.current) {
+      clearTimeout(nameDeleteTimeoutRef.current);
+    }
+    setPendingNameDelete({ name, year, gifts: removedGifts });
+    nameDeleteTimeoutRef.current = setTimeout(() => {
+      setPendingNameDelete(null);
+      nameDeleteTimeoutRef.current = null;
+    }, 5000);
   };
 
   const isBudgetDirty = (() => {
@@ -491,6 +654,34 @@ function App() {
       deleteTimeoutRef.current = null;
     }
     setPendingDelete(null);
+  };
+
+  const handleUndoNameDelete = () => {
+    if (!pendingNameDelete) {
+      return;
+    }
+
+    const { name, year, gifts: removedGifts } = pendingNameDelete;
+    setNamesByYear((prev) => {
+      const yearNames = prev[year] ?? [];
+      if (yearNames.includes(name)) {
+        return prev;
+      }
+      return { ...prev, [year]: [...yearNames, name] };
+    });
+    if (removedGifts.length) {
+      setGifts((prev) => {
+        const existingIds = new Set(prev.map((gift) => gift.id));
+        const restored = removedGifts.filter((gift) => !existingIds.has(gift.id));
+        return [...prev, ...restored];
+      });
+    }
+
+    if (nameDeleteTimeoutRef.current) {
+      clearTimeout(nameDeleteTimeoutRef.current);
+      nameDeleteTimeoutRef.current = null;
+    }
+    setPendingNameDelete(null);
   };
 
   return <div className='wrapper'>
@@ -550,9 +741,9 @@ function App() {
               <span>{showAllYears ? 'MÉNĚ' : 'VÍCE'}</span>
             </button>
           ) : null}
-          {/* <button type="button" className="hero__year hero__year--new" onClick={handleAddYear}>
+          <button type="button" className="hero__year hero__year--new" onClick={handleAddYear}>
             + Následující rok
-          </button> */}
+          </button>
         </div>
         <div className="hero-stats">
           <div className="hero-stat">
@@ -576,9 +767,69 @@ function App() {
           totalPercent={budgetPercents.total}
           overAmount={planDelta !== null && planDelta < 0 ? planDelta : null}
         />
+        <div className="year-lock-slot">
+          {selectedYear < currentYear ? (
+            <div className="year-lock">
+              <span>Rok {selectedYear} nelze editovat.</span>
+              {isPreviousYear ? (
+                isYearEditable ? (
+                  <button
+                    type="button"
+                    className="year-lock__button"
+                    onClick={() =>
+                      setUnlockedPastYears((prev) => ({
+                        ...prev,
+                        [selectedYear]: false,
+                      }))
+                    }
+                  >
+                    Zamknout úpravy
+                  </button>
+                ) : unlockConfirmOpen ? (
+                  <div className="table-status__confirm year-lock__confirm">
+                    <span className="table-status__confirm-text">Odemknout úpravy?</span>
+                    <div className="table-status__confirm-actions">
+                      <button
+                        type="button"
+                        className="table-status__confirm-button"
+                        onClick={() => {
+                          setUnlockedPastYears((prev) => ({
+                            ...prev,
+                            [selectedYear]: true,
+                          }));
+                          setUnlockConfirmOpen(false);
+                        }}
+                      >
+                        Ano
+                      </button>
+                      <button
+                        type="button"
+                        className="table-status__confirm-button"
+                        onClick={() => setUnlockConfirmOpen(false)}
+                      >
+                        Ne
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    className="year-lock__button"
+                    onClick={() => setUnlockConfirmOpen(true)}
+                  >
+                    Odemknout úpravy
+                  </button>
+                )
+              ) : (
+                <span className="year-lock__button-placeholder" aria-hidden="true" />
+              )}
+            </div>
+          ) : (
+            <span className="year-lock__placeholder" aria-hidden="true" />
+          )}
+        </div>
       </div>
     </div>
-
 
       <div className='section'>
         <h2 className="subtitle">Plán rozpočtu</h2>
@@ -598,6 +849,7 @@ function App() {
           ideaPercent={budgetPercents.idea}
           overPercent={budgetPercents.over}
             isDirty={isBudgetDirty}
+            isEditable={isYearEditable}
             onDraftChange={handleBudgetDraftChange}
             onEdit={handleBudgetEdit}
             onSave={handleBudgetSave}
@@ -607,15 +859,36 @@ function App() {
       </div>
 
       <div className='section'>
-        <h2 className="subtitle">Přidat dárek do seznamu</h2>
-        <GiftForm
-          onAddGift={handleGiftAdd}
-          defaultYear={selectedYear}
-          allowedNames={ALLOWED_NAMES}
-          statusOptions={STATUS_OPTIONS}
-          defaultStatus={GIFT_STATUS.bought}
+        <h2 className="subtitle">Seznam osob</h2>
+        <PeopleManager
+          names={allowedNames}
+          canEdit={canEditNames}
+          onAddName={(name) => {
+            setNamesByYear((prev) => {
+              const yearNames = prev[selectedYear] ?? [];
+              if (yearNames.some((item) => item.toLowerCase() === name.toLowerCase())) {
+                return prev;
+              }
+              return { ...prev, [selectedYear]: [...yearNames, name] };
+            });
+          }}
+          onRemoveName={handleNameRemove}
         />
       </div>
+
+      {isYearEditable ? (
+        <div className='section'>
+          <h2 className="subtitle">Přidat dárek do seznamu</h2>
+          <GiftForm
+            onAddGift={handleGiftAdd}
+            defaultYear={selectedYear}
+            namesByYear={namesByYear}
+            isEditable={isYearEditable}
+            statusOptions={STATUS_OPTIONS}
+            defaultStatus={GIFT_STATUS.bought}
+          />
+        </div>
+      ) : null}
 
       <div className='section'>
         <Table
@@ -626,12 +899,13 @@ function App() {
           onUpdateGift={handleGiftUpdate}
           availableYears={availableYears}
           onYearChange={setSelectedYear}
+          isEditable={isYearEditable}
         />
       </div>
 
       <div className='section'>
         <h2 className="subtitle">Historie dárků podle osoby</h2>
-        <PersonHistory gifts={gifts} allowedNames={ALLOWED_NAMES} />
+        <PersonHistory gifts={gifts} names={allNames} />
       </div>
 
       <div className='section'>
@@ -646,9 +920,16 @@ function App() {
         />
       </div>
      
-     {(pendingDelete || pendingAdd) && (
+     {(pendingDelete || pendingAdd || pendingNameDelete) && (
        <div className="undo-toast" role="status">
-         {pendingAdd ? (
+         {pendingNameDelete ? (
+           <>
+             <span>Jméno bylo odebráno.</span>
+             <button type="button" className="undo-toast__button" onClick={handleUndoNameDelete}>
+               Zpět
+             </button>
+           </>
+         ) : pendingAdd ? (
            <span>Dárek byl přidán.</span>
          ) : (
            <>

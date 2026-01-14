@@ -11,6 +11,7 @@ const Table = ({
   onUpdateGift,
   availableYears,
   onYearChange,
+  isEditable,
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [baseHeight, setBaseHeight] = useState(null);
@@ -85,6 +86,12 @@ const Table = ({
   }, [groupedGifts, hasFilter]);
 
   useEffect(() => {
+    if (!isEditable) {
+      setEditingPriceId(null);
+      setEditingPriceValue('');
+      setPendingStatusId(null);
+      return;
+    }
     if (!editingPriceId) {
       return;
     }
@@ -118,6 +125,9 @@ const Table = ({
   }, [editingPriceId]);
 
   const startPriceEdit = (gift) => {
+    if (!isEditable) {
+      return;
+    }
     if (gift.status !== 'idea') {
       return;
     }
@@ -147,6 +157,9 @@ const Table = ({
   };
 
   const beginStatusConfirm = (gift) => {
+    if (!isEditable) {
+      return;
+    }
     if (gift.status !== 'idea') {
       return;
     }
@@ -158,6 +171,9 @@ const Table = ({
   };
 
   const confirmStatusBought = (gift) => {
+    if (!isEditable) {
+      return;
+    }
     onUpdateGift(gift.id, { status: 'bought' });
     setPendingStatusId(null);
     if (editingPriceId === gift.id) {
@@ -285,41 +301,49 @@ const Table = ({
                                 />
                               ) : gift.status === 'idea' ? (
                                 <div className="table-price__edit-group">
-                                  {gift.price === null ? (
-                                    <button
-                                      type="button"
-                                      className="table-price__clickable table-price__value table-price__value--empty"
-                                      onClick={() => startPriceEdit(gift)}
-                                      aria-label={`Doplnit cenu pro dárek ${gift.gift}`}
-                                    >
-                                      —
-                                    </button>
+                                  {isEditable ? (
+                                    <>
+                                      {gift.price === null ? (
+                                        <button
+                                          type="button"
+                                          className="table-price__clickable table-price__value table-price__value--empty"
+                                          onClick={() => startPriceEdit(gift)}
+                                          aria-label={`Doplnit cenu pro dárek ${gift.gift}`}
+                                        >
+                                          —
+                                        </button>
+                                      ) : (
+                                        <button
+                                          type="button"
+                                          className="table-price__clickable table-price__value"
+                                          onClick={() => startPriceEdit(gift)}
+                                          aria-label={`Upravit cenu pro dárek ${gift.gift}`}
+                                        >
+                                          {formatCurrency(gift.price)}
+                                        </button>
+                                      )}
+                                      <button
+                                        type="button"
+                                        className="table-price__edit"
+                                        onClick={() => startPriceEdit(gift)}
+                                        aria-label={
+                                          gift.price === null
+                                            ? `Doplnit cenu pro dárek ${gift.gift}`
+                                            : `Upravit cenu pro dárek ${gift.gift}`
+                                        }
+                                      >
+                                        <span className="table-price__icon" aria-hidden="true">
+                                          <svg viewBox="0 0 24 24" role="presentation">
+                                            <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zm2.92 2.33H5v-.92l8.81-8.81.92.92-8.81 8.81zM20.71 7.04a1 1 0 0 0 0-1.41L18.37 3.3a1 1 0 0 0-1.41 0l-1.69 1.69 3.75 3.75 1.69-1.7z" />
+                                          </svg>
+                                        </span>
+                                      </button>
+                                    </>
                                   ) : (
-                                    <button
-                                      type="button"
-                                      className="table-price__clickable table-price__value"
-                                      onClick={() => startPriceEdit(gift)}
-                                      aria-label={`Upravit cenu pro dárek ${gift.gift}`}
-                                    >
-                                      {formatCurrency(gift.price)}
-                                    </button>
-                                  )}
-                                  <button
-                                    type="button"
-                                    className="table-price__edit"
-                                    onClick={() => startPriceEdit(gift)}
-                                    aria-label={
-                                      gift.price === null
-                                        ? `Doplnit cenu pro dárek ${gift.gift}`
-                                        : `Upravit cenu pro dárek ${gift.gift}`
-                                    }
-                                  >
-                                    <span className="table-price__icon" aria-hidden="true">
-                                      <svg viewBox="0 0 24 24" role="presentation">
-                                        <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zm2.92 2.33H5v-.92l8.81-8.81.92.92-8.81 8.81zM20.71 7.04a1 1 0 0 0 0-1.41L18.37 3.3a1 1 0 0 0-1.41 0l-1.69 1.69 3.75 3.75 1.69-1.7z" />
-                                      </svg>
+                                    <span className="table-price__value">
+                                      {gift.price === null ? '—' : formatCurrency(gift.price)}
                                     </span>
-                                  </button>
+                                  )}
                                 </div>
                               ) : (
                                 <span className="table-price__value">
@@ -353,7 +377,7 @@ const Table = ({
                                       Ne
                                     </button>
                                   </div>
-                                ) : (
+                                ) : isEditable ? (
                                   <button
                                     type="button"
                                     className={`table-status__badge table-status__badge--idea table-status__toggle`}
@@ -362,6 +386,10 @@ const Table = ({
                                   >
                                     Nápad
                                   </button>
+                                ) : (
+                                  <span className="table-status__badge table-status__badge--idea">
+                                    Nápad
+                                  </span>
                                 )
                               ) : (
                                 <span
@@ -370,14 +398,16 @@ const Table = ({
                                   Koupeno
                                 </span>
                               )}
-                              <button
-                                type="button"
-                                className="table-delete"
-                                aria-label={`Smazat dárek ${gift.gift} pro ${gift.name}`}
-                                onClick={() => onDeleteGift(gift.id)}
-                              >
-                                &times;
-                              </button>
+                              {isEditable ? (
+                                <button
+                                  type="button"
+                                  className="table-delete"
+                                  aria-label={`Smazat dárek ${gift.gift} pro ${gift.name}`}
+                                  onClick={() => onDeleteGift(gift.id)}
+                                >
+                                  &times;
+                                </button>
+                              ) : null}
                             </div>
                           </td>
                         </tr>
@@ -413,6 +443,11 @@ Table.propTypes = {
   onUpdateGift: PropTypes.func.isRequired,
   availableYears: PropTypes.arrayOf(PropTypes.number).isRequired,
   onYearChange: PropTypes.func.isRequired,
+  isEditable: PropTypes.bool,
+};
+
+Table.defaultProps = {
+  isEditable: true,
 };
 
 export default Table;

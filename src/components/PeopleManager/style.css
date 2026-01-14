@@ -1,0 +1,131 @@
+.people-manager {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.people-manager__form {
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) max-content;
+  gap: 16px;
+  align-items: end;
+}
+
+.people-manager__field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.people-manager__field input {
+  border-radius: 14px;
+  border: 1px solid rgba(15, 23, 42, 0.1);
+  padding: 12px 14px;
+  height: 44px;
+  font-size: 16px;
+  font-family: inherit;
+  background: #fff;
+  color: #111827;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  transition: border 0.2s ease, box-shadow 0.2s ease;
+}
+
+.people-manager__field input:focus {
+  outline: none;
+  border-color: rgba(244, 63, 94, 0.6);
+  box-shadow: 0 0 0 3px rgba(244, 63, 94, 0.1);
+}
+
+.people-manager__form button {
+  padding: 12px 28px;
+  height: 44px;
+  border: none;
+  border-radius: 999px;
+  background: linear-gradient(120deg, var(--primary), var(--accent));
+  color: #fff;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  transition: opacity 0.2s ease, background 0.2s ease;
+}
+
+.people-manager__form button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.people-manager__form button:not(:disabled):hover {
+  background: linear-gradient(120deg, var(--primary-dark), #0f766e);
+}
+
+.people-manager__list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.people-manager__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.04);
+  border: 1px solid rgba(15, 23, 42, 0.1);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.people-manager__remove {
+  margin-left: 0;
+}
+
+.people-manager__remove:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.people-manager__confirm {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.people-manager__confirm .table-status__confirm-text {
+  font-size: 10px;
+}
+
+.people-manager__confirm .table-status__confirm-button {
+  padding: 4px 8px;
+}
+
+.people-manager__empty {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 15px;
+}
+
+@media (max-width: 640px) {
+  .people-manager__form {
+    grid-template-columns: 1fr;
+  }
+
+  .people-manager__form button {
+    justify-self: start;
+  }
+
+  .people-manager__list {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .people-manager__item {
+    width: 100%;
+    justify-content: space-between;
+  }
+}

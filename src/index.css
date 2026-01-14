@@ -528,6 +528,67 @@ body {
   margin: 0 0 16px;
 }
 
+.year-lock {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0;
+  border-radius: 0;
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-size: 13px;
+  margin: 0;
+}
+
+.year-lock-slot {
+  min-height: 34px;
+  margin-top: 18px;
+}
+
+.year-lock__placeholder {
+  display: block;
+  height: 1px;
+}
+
+.year-lock__button {
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  border-radius: 999px;
+  padding: 6px 12px;
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.year-lock__button-placeholder {
+  display: inline-block;
+  width: 148px;
+  height: 28px;
+}
+
+.year-lock__confirm .table-status__confirm-text {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.year-lock__confirm .table-status__confirm-button {
+  border-color: rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+}
+
+.year-lock__confirm .table-status__confirm-button:hover {
+  border-color: rgba(255, 255, 255, 0.7);
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.year-lock__button:hover,
+.year-lock__button:focus-visible {
+  background: rgba(255, 255, 255, 0.2);
+}
+
 .icon-head,
 .icon-head-sm,
 .icon-head-lg {

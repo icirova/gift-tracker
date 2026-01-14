@@ -1,10 +1,10 @@
-import { Fragment, useMemo, useState } from 'react';
+import { Fragment, useEffect, useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
 import { formatCurrency } from '../../utils/formatCurrency';
 import './style.css';
 
-const PersonHistory = ({ gifts, allowedNames }) => {
-  const [selectedName, setSelectedName] = useState(allowedNames[0] ?? '');
+const PersonHistory = ({ gifts, names }) => {
+  const [selectedName, setSelectedName] = useState(names[0] ?? '');
 
   const groupedHistory = useMemo(() => {
     const filtered = gifts.filter(
@@ -32,13 +32,26 @@ const PersonHistory = ({ gifts, allowedNames }) => {
       .sort((a, b) => b.year - a.year);
   }, [gifts, selectedName]);
 
+  useEffect(() => {
+    if (names.length === 0) {
+      return;
+    }
+    if (!names.includes(selectedName)) {
+      setSelectedName(names[0]);
+    }
+  }, [names, selectedName]);
+
+  if (names.length === 0) {
+    return <p className="person-history__empty">Zatím nejsou přidané žádné osoby.</p>;
+  }
+
   return (
     <div className="person-history">
       <div className="person-history__toolbar">
         <label className="person-history__filter">
           <span>Osoba</span>
           <select value={selectedName} onChange={(event) => setSelectedName(event.target.value)}>
-            {allowedNames.map((name) => (
+            {names.map((name) => (
               <option key={name} value={name}>
                 {name}
               </option>
@@ -101,7 +114,7 @@ PersonHistory.propTypes = {
       status: PropTypes.oneOf(['bought', 'idea']).isRequired,
     }),
   ).isRequired,
-  allowedNames: PropTypes.arrayOf(PropTypes.string).isRequired,
+  names: PropTypes.arrayOf(PropTypes.string).isRequired,
 };
 
 export default PersonHistory;

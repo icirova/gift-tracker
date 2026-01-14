@@ -16,6 +16,7 @@ const HeroBudget = ({
   ideaPercent,
   overPercent,
   isDirty,
+  isEditable,
   onDraftChange,
   onEdit,
   onSave,
@@ -26,7 +27,7 @@ const HeroBudget = ({
       <div className="hero-budget__row">
         <div className="hero-budget__field">
           <span>Plánovaný rozpočet</span>
-          {budgetEditingYear === selectedYear ? (
+          {budgetEditingYear === selectedYear && isEditable ? (
             <input
               type="text"
               inputMode="numeric"
@@ -45,31 +46,47 @@ const HeroBudget = ({
               placeholder="Např. 15000"
             />
           ) : (
-            <button
-              type="button"
-              className="hero-budget__value-button"
-              onClick={onEdit}
-              aria-label={currentBudget === null ? 'Nastavit rozpočet' : 'Upravit rozpočet'}
-              title={currentBudget === null ? 'Nastavit' : 'Upravit'}
-            >
-              <span
-                className={`hero-budget__amount${
-                  currentBudget === null ? ' hero-budget__amount--placeholder' : ''
-                }`}
-              >
-                {currentBudget === null
-                  ? 'Nastavit'
-                  : `${currentBudget.toLocaleString('cs-CZ')} Kč`}
-              </span>
-              <span className="hero-budget__pencil" aria-hidden="true">
-                <svg viewBox="0 0 24 24" role="presentation">
-                  <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zm2.92 2.33H5v-.92l8.81-8.81.92.92-8.81 8.81zM20.71 7.04a1 1 0 0 0 0-1.41L18.37 3.3a1 1 0 0 0-1.41 0l-1.69 1.69 3.75 3.75 1.69-1.7z" />
-                </svg>
-              </span>
-            </button>
+            <>
+              {isEditable ? (
+                <button
+                  type="button"
+                  className="hero-budget__value-button"
+                  onClick={onEdit}
+                  aria-label={currentBudget === null ? 'Nastavit rozpočet' : 'Upravit rozpočet'}
+                  title={currentBudget === null ? 'Nastavit' : 'Upravit'}
+                >
+                  <span
+                    className={`hero-budget__amount${
+                      currentBudget === null ? ' hero-budget__amount--placeholder' : ''
+                    }`}
+                  >
+                    {currentBudget === null
+                      ? 'Nastavit'
+                      : `${currentBudget.toLocaleString('cs-CZ')} Kč`}
+                  </span>
+                  <span className="hero-budget__pencil" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" role="presentation">
+                      <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zm2.92 2.33H5v-.92l8.81-8.81.92.92-8.81 8.81zM20.71 7.04a1 1 0 0 0 0-1.41L18.37 3.3a1 1 0 0 0-1.41 0l-1.69 1.69 3.75 3.75 1.69-1.7z" />
+                    </svg>
+                  </span>
+                </button>
+              ) : (
+                <div className="hero-budget__value-static">
+                  <span
+                    className={`hero-budget__amount${
+                      currentBudget === null ? ' hero-budget__amount--placeholder' : ''
+                    }`}
+                  >
+                    {currentBudget === null
+                      ? 'Nastavit'
+                      : `${currentBudget.toLocaleString('cs-CZ')} Kč`}
+                  </span>
+                </div>
+              )}
+            </>
           )}
         </div>
-        {budgetEditingYear === selectedYear ? (
+        {budgetEditingYear === selectedYear && isEditable ? (
           <button
             type="button"
             className="hero-budget__button"
@@ -77,7 +94,12 @@ const HeroBudget = ({
           >
             {isDirty ? 'Uložit' : 'Zpět'}
           </button>
-        ) : null}
+        ) : (
+          <span
+            className="hero-budget__button hero-budget__button--placeholder"
+            aria-hidden="true"
+          />
+        )}
       </div>
     </div>
       <div className="hero-budget__summary-grid">
@@ -221,6 +243,7 @@ HeroBudget.propTypes = {
   ideaPercent: PropTypes.number.isRequired,
   overPercent: PropTypes.number.isRequired,
   isDirty: PropTypes.bool.isRequired,
+  isEditable: PropTypes.bool,
   onDraftChange: PropTypes.func.isRequired,
   onEdit: PropTypes.func.isRequired,
   onSave: PropTypes.func.isRequired,
@@ -231,6 +254,7 @@ HeroBudget.defaultProps = {
   currentBudget: null,
   budgetEditingYear: null,
   planDelta: null,
+  isEditable: true,
 };
 
 export default HeroBudget;
