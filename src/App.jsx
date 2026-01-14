@@ -5,6 +5,7 @@ import GiftCharts from './components/GiftCharts';
 import GiftForm from './components/GiftForm';
 import HeroBudget from './components/HeroBudget';
 import HeroBudgetSummary from './components/HeroBudgetSummary';
+import PersonHistory from './components/PersonHistory';
 import DEFAULT_GIFTS from './data/defaultGifts';
 import ALLOWED_NAMES from './data/allowedNames';
 
@@ -626,6 +627,11 @@ function App() {
           availableYears={availableYears}
           onYearChange={setSelectedYear}
         />
+      </div>
+
+      <div className='section'>
+        <h2 className="subtitle">Historie dárků podle osoby</h2>
+        <PersonHistory gifts={gifts} allowedNames={ALLOWED_NAMES} />
       </div>
 
       <div className='section'>

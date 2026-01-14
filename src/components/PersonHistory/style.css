@@ -1,0 +1,115 @@
+.person-history {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.person-history__toolbar {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.person-history__filter {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.person-history__filter select {
+  min-width: 180px;
+  border-radius: 999px;
+  border: 1px solid var(--stroke);
+  padding: 10px 16px;
+  background: rgba(15, 23, 42, 0.02);
+  color: var(--text);
+  font-size: 15px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='7' viewBox='0 0 12 7'%3E%3Cpath fill='%23000' fill-opacity='0.5' d='M6 7 0 0h12z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: calc(100% - 12px) 50%;
+  background-size: 12px;
+  padding-right: 32px;
+}
+
+.person-history__filter select:focus {
+  outline: none;
+  border-color: rgba(244, 63, 94, 0.6);
+  box-shadow: 0 0 0 3px rgba(244, 63, 94, 0.1);
+}
+
+.person-history__table {
+  border-radius: 26px;
+  border: 1px solid var(--stroke);
+  background: var(--surface);
+  box-shadow: 0 20px 40px rgba(15, 23, 42, 0.06);
+  overflow: hidden;
+}
+
+.person-history__scroll {
+  max-height: 520px;
+  overflow: auto;
+}
+
+.person-history__table table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.person-history__table thead {
+  background: linear-gradient(120deg, var(--primary), var(--accent));
+  color: #fff;
+}
+
+.person-history__table thead th {
+  background: linear-gradient(120deg, var(--primary), var(--accent));
+  box-shadow: 0 10px 20px rgba(15, 23, 42, 0.15);
+}
+
+.person-history__table th,
+.person-history__table td {
+  padding: 16px 20px;
+  text-align: left;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.06);
+  font-size: 16px;
+}
+
+.person-history__table th {
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
+.person-history__table tr:last-child td {
+  border-bottom: none;
+}
+
+.person-history__row-group-start td {
+  border-top: 2px solid rgba(244, 63, 94, 0.22);
+}
+
+.person-history__table tbody tr:hover td {
+  background: rgba(244, 63, 94, 0.06);
+}
+
+.person-history__year {
+  font-weight: 600;
+  background: rgba(15, 23, 42, 0.02);
+  border-right: 1px solid rgba(15, 23, 42, 0.04);
+}
+
+.person-history__price {
+  font-variant-numeric: tabular-nums;
+}
+
+.person-history__empty {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 15px;
+}
