@@ -291,6 +291,18 @@
   z-index: 5;
 }
 
+.table-status__confirm--wrap {
+  flex-wrap: wrap;
+  white-space: normal;
+  max-width: min(260px, 70vw);
+}
+
+.table-status__confirm--wrap .table-status__confirm-text {
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
+}
+
 .table-status__toggle {
   border: 1px solid transparent;
   background: transparent;
@@ -427,6 +439,9 @@
   width: 26px;
   height: 26px;
   flex: 0 0 26px;
+  padding: 7px;
+  margin: -7px;
+  box-sizing: content-box;
   border-radius: 999px;
   border: none;
   background: transparent;

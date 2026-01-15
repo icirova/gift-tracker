@@ -81,23 +81,29 @@ const PeopleManager = ({ names, onAddName, onRemoveName, canEdit }) => {
             <div key={name} className="people-manager__item">
               <span>{name}</span>
               {canEdit ? (
-                confirmName === name ? (
-                  <Confirm
-                    className="people-manager__confirm"
-                    message="Odebrat? Smaže dárky v tabulce."
-                    onConfirm={handleConfirmRemove}
-                    onCancel={handleCancelRemove}
-                  />
-                ) : (
+                <>
                   <button
                     type="button"
-                    className="table-delete people-manager__remove"
+                    className={`table-delete people-manager__remove${
+                      confirmName === name ? ' people-manager__remove--hidden' : ''
+                    }`}
                     onClick={() => handleRemove(name)}
                     aria-label={`Odebrat osobu ${name}`}
+                    disabled={confirmName === name}
+                    aria-hidden={confirmName === name}
+                    tabIndex={confirmName === name ? -1 : 0}
                   >
                     &times;
                   </button>
-                )
+                  {confirmName === name ? (
+                    <Confirm
+                      className="people-manager__confirm"
+                      message="Odebrat? Smaže dárky v tabulce."
+                      onConfirm={handleConfirmRemove}
+                      onCancel={handleCancelRemove}
+                    />
+                  ) : null}
+                </>
               ) : null}
             </div>
           ))}

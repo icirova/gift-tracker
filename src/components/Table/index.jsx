@@ -399,6 +399,7 @@ const Table = ({
                               {gift.status === 'idea' ? (
                                 pendingStatusId === gift.id ? (
                                   <Confirm
+                                    className="table-status__confirm--wrap"
                                     message="Koupeno? Zamkne úpravy."
                                     onConfirm={() => confirmStatusBought(gift)}
                                     onCancel={cancelStatusConfirm}
@@ -427,6 +428,7 @@ const Table = ({
                               {isEditable ? (
                                 pendingDeleteId === gift.id ? (
                                   <Confirm
+                                    className="table-status__confirm--wrap"
                                     message="Smazat? Odstraní dárek."
                                     onConfirm={() => {
                                       onDeleteGift(gift.id);

@@ -63,27 +63,44 @@
 }
 
 .people-manager__list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px 24px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(15, 23, 42, 0.06);
 }
 
 .people-manager__item {
-  display: inline-flex;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
-  gap: 10px;
-  padding: 8px 12px;
-  border-radius: 999px;
-  background: rgba(15, 23, 42, 0.04);
-  border: 1px solid rgba(15, 23, 42, 0.1);
-  font-size: 14px;
+  column-gap: 6px;
+  padding: 6px 4px 10px;
+  border-radius: 0;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.06);
+  box-shadow: none;
+  font-size: 15px;
   font-weight: 600;
   color: var(--text);
   position: relative;
+  width: 100%;
 }
 
-.people-manager__remove {
+.people-manager__item:last-child {
+  border-bottom: none;
+  padding-bottom: 8px;
+}
+
+.people-manager__item .people-manager__remove {
   margin-left: 0;
+  justify-self: start;
+  padding: 7px;
+  margin: -7px;
+  box-sizing: content-box;
 }
 
 .people-manager__remove:disabled {
@@ -91,31 +108,29 @@
   opacity: 0.45;
 }
 
+.people-manager__remove--hidden {
+  visibility: hidden;
+  pointer-events: none;
+  opacity: 0;
+}
+
 .people-manager__confirm {
   display: inline-flex;
   align-items: center;
   gap: 8px;
   position: absolute;
-  top: 0;
-  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  right: 6px;
   left: auto;
   z-index: 5;
-  min-width: 0;
-  max-width: 100%;
-  flex-wrap: wrap;
+  min-width: max-content;
+  max-width: min(320px, calc(100vw - 32px));
 }
 
-.people-manager__confirm.table-status__confirm {
-  left: auto;
-  right: 0;
-}
-
-.people-manager__confirm .table-status__confirm-text {
-  white-space: normal;
-}
-
-.people-manager__confirm .table-status__confirm-text {
-  max-width: 140px;
+.people-manager__confirm--left {
+  left: 6px;
+  right: auto;
 }
 
 .people-manager__confirm .table-status__confirm-text {
@@ -145,12 +160,17 @@
   }
 
   .people-manager__list {
-    flex-direction: column;
-    align-items: flex-start;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .people-manager__item {
     width: 100%;
     justify-content: space-between;
+  }
+}
+
+@media (min-width: 900px) {
+  .people-manager__list {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }

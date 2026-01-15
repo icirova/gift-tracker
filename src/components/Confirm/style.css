@@ -10,6 +10,7 @@
   border: 1px solid var(--stroke);
   box-shadow: 0 10px 20px rgba(15, 23, 42, 0.1);
   white-space: nowrap;
+  max-width: 100%;
 }
 
 .table-status__confirm-text {
@@ -19,12 +20,16 @@
   color: #0f172a;
   font-weight: 700;
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
 }
 
 .table-status__confirm-actions {
   display: inline-flex;
   gap: 8px;
   align-items: center;
+  flex-shrink: 0;
 }
 
 .table-status__confirm-button {
