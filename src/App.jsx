@@ -15,7 +15,12 @@ const STORAGE_KEY = 'gift-tracker:gifts';
 const YEARS_KEY = 'gift-tracker:extra-years';
 const BUDGETS_KEY = 'gift-tracker:budgets';
 const NAMES_KEY = 'gift-tracker:names';
+const SESSION_KEY = 'gift-tracker:session-init';
 const DEFAULT_EXTRA_YEARS = [];
+const DEFAULT_BUDGETS = {
+  2025: 16000,
+  2024: 14000,
+};
 const GIFT_STATUS = {
   bought: 'bought',
   idea: 'idea',
@@ -85,7 +90,7 @@ const loadStoredYears = () => {
 
 const loadStoredBudgets = () => {
   if (typeof window === 'undefined') {
-    return {};
+    return DEFAULT_BUDGETS;
   }
 
   try {
@@ -107,7 +112,7 @@ const loadStoredBudgets = () => {
     console.warn('Nepodařilo se načíst rozpočty z localStorage.', error);
   }
 
-  return {};
+  return DEFAULT_BUDGETS;
 };
 
 const buildNamesByYearFromGifts = (entries) => {
@@ -128,6 +133,30 @@ const buildNamesByYearFromGifts = (entries) => {
   return Object.fromEntries(
     Object.entries(map).map(([year, names]) => [Number(year), Array.from(names)]),
   );
+};
+
+const ensureDemoDefaults = () => {
+  if (typeof window === 'undefined') {
+    return;
+  }
+
+  try {
+    if (window.sessionStorage.getItem(SESSION_KEY)) {
+      return;
+    }
+    window.sessionStorage.setItem(SESSION_KEY, '1');
+    const normalizedGifts = normalizeGifts(DEFAULT_GIFTS);
+    const fallbackNamesByYear =
+      Object.keys(buildNamesByYearFromGifts(normalizedGifts)).length > 0
+        ? buildNamesByYearFromGifts(normalizedGifts)
+        : { [new Date().getFullYear()]: [...ALLOWED_NAMES] };
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(normalizedGifts));
+    window.localStorage.setItem(YEARS_KEY, JSON.stringify(DEFAULT_EXTRA_YEARS));
+    window.localStorage.setItem(BUDGETS_KEY, JSON.stringify(DEFAULT_BUDGETS));
+    window.localStorage.setItem(NAMES_KEY, JSON.stringify(fallbackNamesByYear));
+  } catch (error) {
+    console.warn('Nepodařilo se inicializovat demo data.', error);
+  }
 };
 
 const loadStoredNames = (fallbackNamesByYear) => {
@@ -166,6 +195,7 @@ const loadStoredNames = (fallbackNamesByYear) => {
 };
 
 function App() {
+  ensureDemoDefaults();
   const initialGifts = loadStoredGifts();
   const fallbackNamesByYear =
     Object.keys(buildNamesByYearFromGifts(initialGifts)).length > 0

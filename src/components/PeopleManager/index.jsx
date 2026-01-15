@@ -66,7 +66,7 @@ const PeopleManager = ({ names, onAddName, onRemoveName, canEdit }) => {
               type="text"
               value={draft}
               onChange={(event) => setDraft(event.target.value)}
-              placeholder="Např. Ivetka"
+              placeholder="Např. Iveta"
             />
           </label>
           <button type="submit" disabled={draft.trim().length < 2}>

@@ -1,3 +1,3 @@
-const ALLOWED_NAMES = ['Ivetka', 'Lukášek', 'Adámek', 'Sofinka', 'Babička', 'Děda'];
+const ALLOWED_NAMES = ['Anna', 'Jakub', 'Petra', 'Martin'];
 
 export default ALLOWED_NAMES;
