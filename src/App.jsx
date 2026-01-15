@@ -367,6 +367,13 @@ function App() {
     setShowAllYears((prev) => !prev);
   };
 
+  const handleScrollToGiftForm = () => {
+    const target = document.getElementById('gift-form');
+    if (target) {
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+
   useEffect(() => {
     if (!availableYears.length) {
       return;
@@ -772,6 +779,9 @@ function App() {
           Dárky bez chaosu. Rozpočet pod dohledem.
           <em className="hero__lead-break">Ať vás realita nepřekvapí.</em>
         </p>
+        <button type="button" className="hero__cta" onClick={handleScrollToGiftForm}>
+          Přidat dárek
+        </button>
         <div className="hero__timeline" role="tablist" aria-label="Roky">
           {canAddNextYear ? (
             <div className="hero__year-add">

@@ -319,6 +319,30 @@ body {
   color: rgba(248, 250, 252, 0.92);
 }
 
+.hero__cta {
+  align-self: flex-start;
+  padding: 12px 26px;
+  border-radius: 999px;
+  border: none;
+  background: linear-gradient(120deg, var(--primary), var(--accent));
+  color: #fff;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+  box-shadow: 0 14px 28px rgba(15, 23, 42, 0.25);
+}
+
+.hero__cta:hover {
+  background: linear-gradient(120deg, var(--primary-dark), #0f766e);
+}
+
+.hero__cta:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(244, 63, 94, 0.25);
+}
+
 .hero-stats {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -715,6 +739,10 @@ body {
 
   .subtitle {
     text-align: center;
+  }
+
+  .hero__cta {
+    align-self: center;
   }
 
   .hero__year-confirm,
