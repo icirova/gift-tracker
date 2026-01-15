@@ -9,25 +9,28 @@ const HeroBudgetSummary = ({ currentBudget, totalPercent, deltaAmount }) => {
     : `+${(deltaAmount ?? 0).toLocaleString('cs-CZ')} Kč`;
 
   return (
-    <div className="hero-budget-summary">
-      <div className="hero-budget-summary__value-row">
-        <span className="hero-budget-summary__value">
-          {`Rozpočet: ${
-            currentBudget === null ? '—' : `${currentBudget.toLocaleString('cs-CZ')} Kč`
-          }`}
+  <div className="hero-budget-summary" data-testid="gift-hero-budget-summary">
+    <div className="hero-budget-summary__value-row">
+      <span className="hero-budget-summary__value">
+        {`Rozpočet: ${
+          currentBudget === null ? '—' : `${currentBudget.toLocaleString('cs-CZ')} Kč`
+        }`}
+      </span>
+      {showDelta ? (
+        <span className="hero-budget-summary__over" data-testid="gift-hero-budget-delta">
+          {formattedDelta}
         </span>
-        {showDelta ? (
-          <span className="hero-budget-summary__over">{formattedDelta}</span>
-        ) : null}
-      </div>
-      <div className="hero-budget-summary__bar" aria-hidden="true">
-        <span
-          className={`hero-budget-summary__fill${
-            isOverBudget ? ' hero-budget-summary__fill--over' : ''
-          }`}
-          style={{ width: `${totalPercent}%` }}
-        />
-      </div>
+      ) : null}
+    </div>
+    <div className="hero-budget-summary__bar" aria-hidden="true">
+      <span
+        className={`hero-budget-summary__fill${
+          isOverBudget ? ' hero-budget-summary__fill--over' : ''
+        }`}
+        data-testid="gift-hero-budget-bar"
+        style={{ width: `${totalPercent}%` }}
+      />
+    </div>
     </div>
   );
 };

@@ -272,7 +272,7 @@ const Table = ({
       >
         {hasGifts ? (
           <div className="table-scroll">
-            <table className='table'>
+            <table className='table' data-testid="gift-table">
               <thead>
                 <tr>
                   <th className="table-col-name">Jméno</th>
@@ -292,6 +292,7 @@ const Table = ({
                       {items.map((gift, index) => (
                         <tr
                           key={gift.id}
+                          data-testid={`gift-table-row-${gift.id}`}
                           className={`table-row${index === 0 ? ' table-row--group-start' : ''}${
                             gift.id === highlightedGiftId ? ' table-row--highlight' : ''
                           }`}
@@ -316,7 +317,7 @@ const Table = ({
                             </td>
                           )}
                           <td className="table-gift">{gift.gift}</td>
-                          <td className="table-price">
+                          <td className="table-price" data-testid={`gift-table-price-${gift.id}`}>
                             <div className="table-price__cell">
                               {gift.status === 'idea' && editingPriceId === gift.id ? (
                                 <input
@@ -408,19 +409,24 @@ const Table = ({
                                   <button
                                     type="button"
                                     className={`table-status__badge table-status__badge--idea table-status__toggle`}
+                                    data-testid={`gift-table-status-${gift.id}`}
                                     onClick={() => beginStatusConfirm(gift)}
                                     aria-label={`Přepnout na koupeno: ${gift.gift}`}
                                   >
                                     Plánováno
                                   </button>
                                 ) : (
-                                  <span className="table-status__badge table-status__badge--idea">
+                                  <span
+                                    className="table-status__badge table-status__badge--idea"
+                                    data-testid={`gift-table-status-${gift.id}`}
+                                  >
                                     Plánováno
                                   </span>
                                 )
                               ) : (
                                 <span
                                   className={`table-status__badge table-status__badge--${gift.status}`}
+                                  data-testid={`gift-table-status-${gift.id}`}
                                 >
                                   Koupeno
                                 </span>

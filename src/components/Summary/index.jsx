@@ -21,21 +21,25 @@ const Summary = ({ mostExpensiveGift, cheapestGift, yearChange, averageBoughtPri
         label="Nejlevnější dárek"
         value={cheapestGift === null ? '—' : formatCurrency(cheapestGift)}
         variant="gifts"
+        testId="gift-summary-cheapest"
       />
       <SummaryItem
         label="Nejdražší dárek"
         value={mostExpensiveGift === null ? '—' : formatCurrency(mostExpensiveGift)}
         variant="expensive"
+        testId="gift-summary-expensive"
       />
       <SummaryItem
         label="Průměrná cena dárku"
         value={averageBoughtPrice === null ? '—' : formatCurrency(averageBoughtPrice)}
         variant="budget"
+        testId="gift-summary-average"
       />
       <SummaryItem
         label="Meziroční změna"
         value={formatSignedCurrency(yearChange)}
         variant="trend"
+        testId="gift-summary-trend"
       />
     </div>
   );

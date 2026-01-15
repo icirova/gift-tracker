@@ -103,7 +103,7 @@ const HeroBudget = ({
       </div>
     </div>
       <div className="hero-budget__summary-grid">
-        <div className="hero-budget__summary-item">
+        <div className="hero-budget__summary-item" data-testid="gift-budget-spent">
           <span className="hero-budget__summary-icon" aria-hidden="true">
             <svg viewBox="0 0 24 24" role="presentation">
               <path
@@ -123,7 +123,7 @@ const HeroBudget = ({
             </span>
           </div>
         </div>
-        <div className="hero-budget__summary-item">
+        <div className="hero-budget__summary-item" data-testid="gift-budget-planned">
           <span className="hero-budget__summary-icon" aria-hidden="true">
             <svg viewBox="0 0 24 24" role="presentation">
               <path
@@ -149,7 +149,7 @@ const HeroBudget = ({
             </div>
           </div>
         </div>
-        <div className="hero-budget__summary-item">
+        <div className="hero-budget__summary-item" data-testid="gift-budget-total">
           <span className="hero-budget__summary-icon" aria-hidden="true">
             <svg viewBox="0 0 24 24" role="presentation">
               <text
@@ -171,7 +171,7 @@ const HeroBudget = ({
             </span>
           </div>
         </div>
-        <div className="hero-budget__summary-item">
+        <div className="hero-budget__summary-item" data-testid="gift-budget-delta">
           <span className="hero-budget__summary-icon" aria-hidden="true">
             <svg viewBox="0 0 24 24" role="presentation">
               <path

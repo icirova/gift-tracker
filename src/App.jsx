@@ -926,18 +926,22 @@ function App() {
         <div className="hero-stats">
           <div className="hero-stat">
             <span className="hero-stat__label">ROK</span>
-            <span className="hero-stat__value">{selectedYear}</span>
+            <span className="hero-stat__value" data-testid="gift-hero-year">
+              {selectedYear}
+            </span>
           </div>
           <div className="hero-stat">
             <span className="hero-stat__label">Celkový počet</span>
-            <span className="hero-stat__value">
+            <span className="hero-stat__value" data-testid="gift-hero-count">
               {summary.totalItems}
               {summary.totalItems === 0 ? '' : ` ${formatGiftLabel(summary.totalItems)}`}
             </span>
           </div>
           <div className="hero-stat">
             <span className="hero-stat__label">Utraceno</span>
-            <span className="hero-stat__value">{summary.spentTotal.toLocaleString('cs-CZ')} Kč</span>
+            <span className="hero-stat__value" data-testid="gift-hero-spent">
+              {summary.spentTotal.toLocaleString('cs-CZ')} Kč
+            </span>
           </div>
         </div>
         <HeroBudgetSummary

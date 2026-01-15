@@ -61,11 +61,11 @@ const ICONS = {
   ),
 };
 
-const SummaryItem = ({ label, value, variant }) => {
+const SummaryItem = ({ label, value, variant, testId }) => {
   const icon = ICONS[variant];
 
   return (
-    <div className="summary-item">
+    <div className="summary-item" data-testid={testId}>
       <div className={`summary-item-icon ${variant ? `summary-item-icon--${variant}` : ''}`}>
         {icon}
       </div>
@@ -81,10 +81,12 @@ SummaryItem.propTypes = {
   label: PropTypes.string.isRequired,
   value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
   variant: PropTypes.oneOf(['year', 'gifts', 'budget', 'expensive', 'trend']),
+  testId: PropTypes.string,
 };
 
 SummaryItem.defaultProps = {
   variant: undefined,
+  testId: undefined,
 };
 
 export default SummaryItem;
