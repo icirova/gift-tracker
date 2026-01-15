@@ -4,202 +4,31 @@ import Summary from './components/Summary';
 import GiftCharts from './components/GiftCharts';
 import GiftForm from './components/GiftForm';
 import HeroBudget from './components/HeroBudget';
-import HeroBudgetSummary from './components/HeroBudgetSummary';
+import HeroHeader from './components/HeroHeader';
 import PersonHistory from './components/PersonHistory';
 import PeopleManager from './components/PeopleManager';
-import Confirm from './components/Confirm';
-import DEFAULT_GIFTS from './data/defaultGifts';
+import UndoToast from './components/UndoToast';
 import ALLOWED_NAMES from './data/allowedNames';
+import useBudget from './hooks/useBudget';
+import { GIFT_STATUS, STATUS_OPTIONS, STATUS_VALUES } from './utils/giftConstants';
 import {
   buildYearlyTotals,
   calculateBudgetPercents,
   calculateSpentTotalForYear,
   calculateYearStats,
 } from './utils/giftStats';
-
-const STORAGE_KEY = 'gift-tracker:gifts';
-const YEARS_KEY = 'gift-tracker:extra-years';
-const BUDGETS_KEY = 'gift-tracker:budgets';
-const NAMES_KEY = 'gift-tracker:names';
-const SESSION_KEY = 'gift-tracker:session-init';
-const DEFAULT_EXTRA_YEARS = [];
-const DEFAULT_BUDGETS = {
-  2026: 18000,
-  2025: 16000,
-  2024: 14000,
-};
-const GIFT_STATUS = {
-  bought: 'bought',
-  idea: 'idea',
-};
-const STATUS_OPTIONS = [
-  { value: GIFT_STATUS.bought, label: 'Koupeno' },
-  { value: GIFT_STATUS.idea, label: 'Plánováno' },
-];
-const STATUS_VALUES = new Set(Object.values(GIFT_STATUS));
-
-const normalizeGifts = (entries) =>
-  entries.map((gift) => {
-    const priceValue = Number(gift.price);
-    return {
-      ...gift,
-      price: Number.isFinite(priceValue) && priceValue > 0 ? priceValue : null,
-      status: STATUS_VALUES.has(gift.status) ? gift.status : GIFT_STATUS.bought,
-    };
-  });
-
-const loadStoredGifts = () => {
-  if (typeof window === 'undefined') {
-    return normalizeGifts(DEFAULT_GIFTS);
-  }
-
-  try {
-    const rawValue = window.localStorage.getItem(STORAGE_KEY);
-    if (rawValue) {
-      const parsedValue = JSON.parse(rawValue);
-      if (Array.isArray(parsedValue)) {
-        return normalizeGifts(parsedValue);
-      }
-    }
-    window.localStorage.setItem(
-      STORAGE_KEY,
-      JSON.stringify(normalizeGifts(DEFAULT_GIFTS)),
-    );
-  } catch (error) {
-    console.warn('Nepodařilo se načíst dárky z localStorage.', error);
-  }
-
-  return normalizeGifts(DEFAULT_GIFTS);
-};
-
-const loadStoredYears = () => {
-  if (typeof window === 'undefined') {
-    return DEFAULT_EXTRA_YEARS;
-  }
-
-  try {
-    const rawValue = window.localStorage.getItem(YEARS_KEY);
-    if (rawValue) {
-      const parsedValue = JSON.parse(rawValue);
-      if (Array.isArray(parsedValue)) {
-        const storedYears = parsedValue.filter((year) => Number.isFinite(year)).map(Number);
-        return Array.from(new Set([...DEFAULT_EXTRA_YEARS, ...storedYears])).filter(
-          (year) => year !== 2021 && year !== 2022 && year !== 2027,
-        );
-      }
-    }
-  } catch (error) {
-    console.warn('Nepodařilo se načíst roky z localStorage.', error);
-  }
-
-  return DEFAULT_EXTRA_YEARS;
-};
-
-const loadStoredBudgets = () => {
-  if (typeof window === 'undefined') {
-    return DEFAULT_BUDGETS;
-  }
-
-  try {
-    const rawValue = window.localStorage.getItem(BUDGETS_KEY);
-    if (rawValue) {
-      const parsedValue = JSON.parse(rawValue);
-      if (parsedValue && typeof parsedValue === 'object') {
-        return Object.entries(parsedValue).reduce((acc, [year, value]) => {
-          const numericYear = Number(year);
-          const numericValue = Number(value);
-          if (Number.isFinite(numericYear) && Number.isFinite(numericValue)) {
-            acc[numericYear] = numericValue;
-          }
-          return acc;
-        }, {});
-      }
-    }
-  } catch (error) {
-    console.warn('Nepodařilo se načíst rozpočty z localStorage.', error);
-  }
-
-  return DEFAULT_BUDGETS;
-};
-
-const buildNamesByYearFromGifts = (entries) => {
-  const map = entries.reduce((acc, gift) => {
-    const year = Number(gift.year);
-    if (!Number.isFinite(year)) {
-      return acc;
-    }
-    if (!acc[year]) {
-      acc[year] = new Set();
-    }
-    if (gift.name) {
-      acc[year].add(gift.name);
-    }
-    return acc;
-  }, {});
-
-  return Object.fromEntries(
-    Object.entries(map).map(([year, names]) => [Number(year), Array.from(names)]),
-  );
-};
-
-const ensureDemoDefaults = () => {
-  if (typeof window === 'undefined') {
-    return;
-  }
-
-  try {
-    if (window.sessionStorage.getItem(SESSION_KEY)) {
-      return;
-    }
-    window.sessionStorage.setItem(SESSION_KEY, '1');
-    const normalizedGifts = normalizeGifts(DEFAULT_GIFTS);
-    const fallbackNamesByYear =
-      Object.keys(buildNamesByYearFromGifts(normalizedGifts)).length > 0
-        ? buildNamesByYearFromGifts(normalizedGifts)
-        : { [new Date().getFullYear()]: [...ALLOWED_NAMES] };
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(normalizedGifts));
-    window.localStorage.setItem(YEARS_KEY, JSON.stringify(DEFAULT_EXTRA_YEARS));
-    window.localStorage.setItem(BUDGETS_KEY, JSON.stringify(DEFAULT_BUDGETS));
-    window.localStorage.setItem(NAMES_KEY, JSON.stringify(fallbackNamesByYear));
-  } catch (error) {
-    console.warn('Nepodařilo se inicializovat demo data.', error);
-  }
-};
-
-const loadStoredNames = (fallbackNamesByYear) => {
-  if (typeof window === 'undefined') {
-    return fallbackNamesByYear;
-  }
-
-  try {
-    const rawValue = window.localStorage.getItem(NAMES_KEY);
-    if (rawValue) {
-      const parsedValue = JSON.parse(rawValue);
-      if (parsedValue && typeof parsedValue === 'object') {
-        const cleaned = Object.entries(parsedValue).reduce((acc, [year, names]) => {
-          const numericYear = Number(year);
-          if (!Number.isFinite(numericYear) || !Array.isArray(names)) {
-            return acc;
-          }
-          const uniqueNames = Array.from(
-            new Set(names.map((name) => String(name).trim()).filter(Boolean)),
-          );
-          if (uniqueNames.length) {
-            acc[numericYear] = uniqueNames;
-          }
-          return acc;
-        }, {});
-        if (Object.keys(cleaned).length) {
-          return cleaned;
-        }
-      }
-    }
-  } catch (error) {
-    console.warn('Nepodařilo se načíst jména z localStorage.', error);
-  }
-
-  return fallbackNamesByYear;
-};
+import {
+  buildNamesByYearFromGifts,
+  ensureDemoDefaults,
+  loadStoredBudgets,
+  loadStoredGifts,
+  loadStoredNames,
+  loadStoredYears,
+  saveStoredBudgets,
+  saveStoredGifts,
+  saveStoredNames,
+  saveStoredYears,
+} from './utils/giftStorage';
 
 function App() {
   ensureDemoDefaults();
@@ -216,23 +45,34 @@ function App() {
   const [selectedYear, setSelectedYear] = useState(currentYear);
   const [unlockedPastYears, setUnlockedPastYears] = useState({});
   const [isInitialized, setIsInitialized] = useState(false);
-  const [unlockConfirmOpen, setUnlockConfirmOpen] = useState(false);
   const [pendingDelete, setPendingDelete] = useState(null);
   const [pendingAdd, setPendingAdd] = useState(null);
   const [pendingNameDelete, setPendingNameDelete] = useState(null);
   const [highlightedGiftId, setHighlightedGiftId] = useState(null);
   const [extraYears, setExtraYears] = useState(loadStoredYears);
   const [budgets, setBudgets] = useState(loadStoredBudgets);
-  const [budgetEditingYear, setBudgetEditingYear] = useState(null);
-  const [budgetDraft, setBudgetDraft] = useState('');
-  const [showAllYears, setShowAllYears] = useState(false);
-  const [addYearConfirmOpen, setAddYearConfirmOpen] = useState(false);
+  const isPreviousYear = selectedYear === currentYear - 1;
+  const isYearEditable =
+    selectedYear >= currentYear || (isPreviousYear && Boolean(unlockedPastYears[selectedYear]));
+  const currentBudget = budgets[selectedYear] ?? null;
+  const {
+    budgetDraft,
+    budgetEditingYear,
+    isBudgetDirty,
+    handleBudgetDraftChange,
+    handleBudgetEdit,
+    handleBudgetCancel,
+    handleBudgetSave,
+  } = useBudget({
+    selectedYear,
+    currentBudget,
+    isYearEditable,
+    setBudgets,
+  });
   const deleteTimeoutRef = useRef(null);
   const highlightTimeoutRef = useRef(null);
   const addToastTimeoutRef = useRef(null);
   const nameDeleteTimeoutRef = useRef(null);
-  const yearsMenuRef = useRef(null);
-  const yearsToggleRef = useRef(null);
   useEffect(() => {
     setIsInitialized(true);
   }, []);
@@ -241,9 +81,6 @@ function App() {
     () => namesByYear[selectedYear] ?? [],
     [namesByYear, selectedYear],
   );
-  const isPreviousYear = selectedYear === currentYear - 1;
-  const isYearEditable =
-    selectedYear >= currentYear || (isPreviousYear && Boolean(unlockedPastYears[selectedYear]));
   const canEditNames = isYearEditable;
 
   const allNames = useMemo(() => {
@@ -271,35 +108,23 @@ function App() {
   }, [namesByYear, selectedYear]);
 
   useEffect(() => {
-    if (!isInitialized || typeof window === 'undefined') {
+    if (!isInitialized) {
       return;
     }
 
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(gifts));
+    saveStoredGifts(gifts);
   }, [gifts, isInitialized]);
 
   useEffect(() => {
-    if (typeof window === 'undefined') {
-      return;
-    }
-
-    window.localStorage.setItem(YEARS_KEY, JSON.stringify(extraYears));
+    saveStoredYears(extraYears);
   }, [extraYears]);
 
   useEffect(() => {
-    if (typeof window === 'undefined') {
-      return;
-    }
-
-    window.localStorage.setItem(BUDGETS_KEY, JSON.stringify(budgets));
+    saveStoredBudgets(budgets);
   }, [budgets]);
 
   useEffect(() => {
-    if (typeof window === 'undefined') {
-      return;
-    }
-
-    window.localStorage.setItem(NAMES_KEY, JSON.stringify(namesByYear));
+    saveStoredNames(namesByYear);
   }, [namesByYear]);
 
   useEffect(() => {
@@ -330,80 +155,6 @@ function App() {
     setExtraYears((prev) => prev.filter((year) => year !== currentYear));
   }, [currentYear]);
 
-  useEffect(() => {
-    if (availableYears.length <= 3 && showAllYears) {
-      setShowAllYears(false);
-    }
-  }, [availableYears, selectedYear, showAllYears]);
-
-  useEffect(() => {
-    setUnlockConfirmOpen(false);
-  }, [selectedYear]);
-
-  useEffect(() => {
-    setAddYearConfirmOpen(false);
-  }, [selectedYear]);
-
-  useEffect(() => {
-    if (!showAllYears) {
-      return;
-    }
-
-    const handleOutsideClick = (event) => {
-      const menuNode = yearsMenuRef.current;
-      const toggleNode = yearsToggleRef.current;
-      if (menuNode && menuNode.contains(event.target)) {
-        return;
-      }
-      if (toggleNode && toggleNode.contains(event.target)) {
-        return;
-      }
-      setShowAllYears(false);
-    };
-
-    const handleEscape = (event) => {
-      if (event.key === 'Escape') {
-        setShowAllYears(false);
-      }
-    };
-
-    document.addEventListener('mousedown', handleOutsideClick);
-    document.addEventListener('keydown', handleEscape);
-    return () => {
-      document.removeEventListener('mousedown', handleOutsideClick);
-      document.removeEventListener('keydown', handleEscape);
-    };
-  }, [showAllYears]);
-
-  useEffect(() => {
-    if (!unlockConfirmOpen && !addYearConfirmOpen) {
-      return;
-    }
-
-    const handleEscape = (event) => {
-      if (event.key !== 'Escape') {
-        return;
-      }
-      setUnlockConfirmOpen(false);
-      setAddYearConfirmOpen(false);
-    };
-
-    document.addEventListener('keydown', handleEscape);
-    return () => {
-      document.removeEventListener('keydown', handleEscape);
-    };
-  }, [unlockConfirmOpen, addYearConfirmOpen]);
-
-  useEffect(() => {
-    if (!canAddNextYear) {
-      setAddYearConfirmOpen(false);
-    }
-  }, [canAddNextYear]);
-
-  const handleYearsToggle = () => {
-    setShowAllYears((prev) => !prev);
-  };
-
   const handleScrollToGiftForm = () => {
     const target = document.getElementById('gift-form');
     if (target) {
@@ -423,12 +174,10 @@ function App() {
 
   const handleAddYear = () => {
     if (!canAddNextYear) {
-      setAddYearConfirmOpen(false);
       return;
     }
     setExtraYears((prev) => (prev.includes(nextYear) ? prev : [...prev, nextYear]));
     setSelectedYear(nextYear);
-    setAddYearConfirmOpen(false);
   };
 
   const giftsForActiveYear = useMemo(
@@ -464,7 +213,6 @@ function App() {
 
   const yearlyTotals = useMemo(() => buildYearlyTotals(gifts), [gifts]);
 
-  const currentBudget = budgets[selectedYear] ?? null;
   const planDelta = currentBudget === null ? null : currentBudget - planTotal;
   const isPlanOverBudget = currentBudget !== null && planDelta < 0;
   const budgetPercents = useMemo(
@@ -477,17 +225,6 @@ function App() {
       }),
     [boughtTotal, currentBudget, ideaTotalForStats, planTotal],
   );
-
-  useEffect(() => {
-    setBudgetDraft(currentBudget === null ? '' : String(currentBudget));
-    setBudgetEditingYear(null);
-  }, [selectedYear, currentBudget]);
-
-  useEffect(() => {
-    if (!isYearEditable && budgetEditingYear === selectedYear) {
-      setBudgetEditingYear(null);
-    }
-  }, [budgetEditingYear, isYearEditable, selectedYear]);
 
   const daysToChristmasEve = useMemo(() => {
     const now = new Date();
@@ -520,6 +257,28 @@ function App() {
       return 'dárky';
     }
     return 'dárků';
+  };
+
+  const heroRibbonText =
+    daysToChristmasEve === 0
+      ? 'Štědrý den je dnes'
+      : `Do Vánoc ${formatDaysVerb(daysToChristmasEve)} ${daysToChristmasEve} ${formatDaysLabel(
+          daysToChristmasEve,
+        )}`;
+  const giftCountSuffix =
+    summary.totalItems === 0 ? '' : ` ${formatGiftLabel(summary.totalItems)}`;
+  const handleUnlockPastYear = (year) => {
+    setUnlockedPastYears((prev) => ({
+      ...prev,
+      [year]: true,
+    }));
+  };
+
+  const handleLockPastYear = (year) => {
+    setUnlockedPastYears((prev) => ({
+      ...prev,
+      [year]: false,
+    }));
   };
 
   const handleGiftAdd = (giftInput) => {
@@ -572,38 +331,6 @@ function App() {
       setPendingAdd(null);
       addToastTimeoutRef.current = null;
     }, 3000);
-  };
-
-  const handleBudgetDraftChange = (event) => {
-    setBudgetDraft(event.target.value);
-  };
-
-  const handleBudgetEdit = () => {
-    if (!isYearEditable) {
-      return;
-    }
-    setBudgetEditingYear(selectedYear);
-  };
-
-  const handleBudgetCancel = () => {
-    setBudgetDraft(currentBudget === null ? '' : String(currentBudget));
-    setBudgetEditingYear(null);
-  };
-
-  const handleBudgetSave = () => {
-    setBudgets((prev) => {
-      if (!budgetDraft.trim()) {
-        const next = { ...prev };
-        delete next[selectedYear];
-        return next;
-      }
-      const numericValue = Number(budgetDraft);
-      if (!Number.isFinite(numericValue) || numericValue < 0) {
-        return prev;
-      }
-      return { ...prev, [selectedYear]: numericValue };
-    });
-    setBudgetEditingYear(null);
   };
 
   const handleGiftDelete = (giftId) => {
@@ -670,14 +397,6 @@ function App() {
     }, 5000);
   };
 
-  const isBudgetDirty = (() => {
-    const trimmed = budgetDraft.trim();
-    if (currentBudget === null) {
-      return trimmed !== '';
-    }
-    return trimmed !== String(currentBudget);
-  })();
-
   const handleUndoDelete = () => {
     if (!pendingDelete) {
       return;
@@ -731,195 +450,27 @@ function App() {
   };
 
   return <div className='wrapper'>
-
-    <div className='hero'>
-      <div className='hero__decor' aria-hidden="true">
-        <span className='hero__spark hero__spark--left-lg' />
-        <span className='hero__spark hero__spark--left-sm' data-variant="rose" />
-        <span className='hero__spark hero__spark--right-lg' />
-        <span className='hero__spark hero__spark--right-sm' data-variant="rose" />
-        <span className='hero__spark hero__spark--top' />
-        <span className='hero__spark hero__spark--center' />
-        <span className='hero__spark hero__spark--left-mini' />
-        <span className='hero__spark hero__spark--right-mini' data-variant="rose" />
-        <span className='hero__spark hero__spark--bottom' />
-        <span className='hero__spark hero__spark--midline' />
-        <span className='hero__spark hero__spark--scatter-one' />
-        <span className='hero__spark hero__spark--scatter-two' />
-      </div>
-      <div className='hero__content'>
-        <p className='hero__eyebrow'>Holiday planning</p>
-        <div className='hero__ribbon'>
-          {daysToChristmasEve === 0
-            ? 'Štědrý den je dnes'
-            : `Do Vánoc ${formatDaysVerb(daysToChristmasEve)} ${daysToChristmasEve} ${formatDaysLabel(
-                daysToChristmasEve,
-              )}`}
-        </div>
-        <h1 className='hero__title'>Christmas <span className='hero__title-accent'>Gift</span> Tracker</h1>
-        <p className='hero__lead'>
-          Dárky bez chaosu. Rozpočet pod dohledem.
-          <em className="hero__lead-break">Ať vás realita nepřekvapí.</em>
-        </p>
-        <button type="button" className="hero__cta" onClick={handleScrollToGiftForm}>
-          Přidat dárek
-        </button>
-        <div className="hero__timeline" role="tablist" aria-label="Roky">
-          {canAddNextYear ? (
-            <div className="hero__year-add">
-              <button
-                type="button"
-                className="hero__year hero__year--new"
-                onClick={() => setAddYearConfirmOpen(true)}
-              >
-                + {nextYear}
-              </button>
-              {addYearConfirmOpen ? (
-                <Confirm
-                  className="hero__year-confirm table-status__confirm--wrap"
-                  message={`Přidat ${nextYear}?`}
-                  onConfirm={handleAddYear}
-                  onCancel={() => setAddYearConfirmOpen(false)}
-                />
-              ) : null}
-            </div>
-          ) : null}
-          {(() => {
-            const baseYears = availableYears.slice(0, 3);
-            if (selectedYear && !baseYears.includes(selectedYear)) {
-              const nextYears = [...baseYears];
-              nextYears[nextYears.length - 1] = selectedYear;
-              return nextYears;
-            }
-            return baseYears;
-          })().map((year) => {
-            const isActive = year === selectedYear;
-            return (
-              <button
-                key={year}
-                type="button"
-                role="tab"
-                aria-selected={isActive}
-                className={`hero__year${isActive ? ' is-active' : ''}`}
-                onClick={() => setSelectedYear(year)}
-              >
-                <span>{year}</span>
-              </button>
-            );
-          })}
-          {availableYears.length > 3 ? (
-            <button
-              type="button"
-              className="hero__year hero__year--ellipsis"
-              onClick={handleYearsToggle}
-              ref={yearsToggleRef}
-              aria-label={showAllYears ? 'Skrýt starší roky' : 'Zobrazit všechny roky'}
-            >
-              <span>{showAllYears ? 'MÉNĚ' : 'VÍCE'}</span>
-            </button>
-          ) : null}
-          {showAllYears ? (
-            <div className="hero__year-menu" ref={yearsMenuRef}>
-              {availableYears
-                .filter((year) => {
-                  const baseYears = availableYears.slice(0, 3);
-                  const visibleYears = baseYears.includes(selectedYear)
-                    ? baseYears
-                    : [...baseYears.slice(0, 2), selectedYear];
-                  return !visibleYears.includes(year);
-                })
-                .map((year) => (
-                  <button
-                    key={year}
-                    type="button"
-                    className="hero__year hero__year--menu"
-                    onClick={() => {
-                      setSelectedYear(year);
-                      setShowAllYears(false);
-                    }}
-                  >
-                    {year}
-                  </button>
-                ))}
-            </div>
-          ) : null}
-        </div>
-        <div className="hero-stats">
-          <div className="hero-stat">
-            <span className="hero-stat__label">ROK</span>
-            <span className="hero-stat__value" data-testid="gift-hero-year">
-              {selectedYear}
-            </span>
-          </div>
-          <div className="hero-stat">
-            <span className="hero-stat__label">Celkový počet</span>
-            <span className="hero-stat__value" data-testid="gift-hero-count">
-              {summary.totalItems}
-              {summary.totalItems === 0 ? '' : ` ${formatGiftLabel(summary.totalItems)}`}
-            </span>
-          </div>
-          <div className="hero-stat">
-            <span className="hero-stat__label">Utraceno</span>
-            <span className="hero-stat__value" data-testid="gift-hero-spent">
-              {summary.spentTotal.toLocaleString('cs-CZ')} Kč
-            </span>
-          </div>
-        </div>
-        <HeroBudgetSummary
-          currentBudget={currentBudget}
-          totalPercent={budgetPercents.total}
-          deltaAmount={planDelta}
-        />
-        <div className="year-lock-slot">
-          {selectedYear < currentYear ? (
-            <div className="year-lock">
-              <span>Rok {selectedYear} nelze editovat.</span>
-              {isPreviousYear ? (
-                isYearEditable ? (
-                  <button
-                    type="button"
-                    className="year-lock__button"
-                    onClick={() =>
-                      setUnlockedPastYears((prev) => ({
-                        ...prev,
-                        [selectedYear]: false,
-                      }))
-                    }
-                  >
-                    Zamknout úpravy
-                  </button>
-                ) : unlockConfirmOpen ? (
-                  <Confirm
-                    className="year-lock__confirm table-status__confirm--wrap"
-                    message="Odemknout? Umožní úpravy."
-                    onConfirm={() => {
-                      setUnlockedPastYears((prev) => ({
-                        ...prev,
-                        [selectedYear]: true,
-                      }));
-                      setUnlockConfirmOpen(false);
-                    }}
-                    onCancel={() => setUnlockConfirmOpen(false)}
-                  />
-                ) : (
-                  <button
-                    type="button"
-                    className="year-lock__button"
-                    onClick={() => setUnlockConfirmOpen(true)}
-                  >
-                    Odemknout úpravy
-                  </button>
-                )
-              ) : (
-                <span className="year-lock__button-placeholder" aria-hidden="true" />
-              )}
-            </div>
-          ) : (
-            <span className="year-lock__placeholder" aria-hidden="true" />
-          )}
-        </div>
-      </div>
-    </div>
+    <HeroHeader
+      heroRibbonText={heroRibbonText}
+      onScrollToGiftForm={handleScrollToGiftForm}
+      canAddNextYear={canAddNextYear}
+      nextYear={nextYear}
+      onAddYear={handleAddYear}
+      availableYears={availableYears}
+      selectedYear={selectedYear}
+      onSelectYear={setSelectedYear}
+      totalItems={summary.totalItems}
+      giftCountSuffix={giftCountSuffix}
+      spentTotal={summary.spentTotal}
+      currentBudget={currentBudget}
+      budgetPercentTotal={budgetPercents.total}
+      budgetDelta={planDelta}
+      currentYear={currentYear}
+      isPreviousYear={isPreviousYear}
+      isYearEditable={isYearEditable}
+      onUnlockPastYear={handleUnlockPastYear}
+      onLockPastYear={handleLockPastYear}
+    />
 
       <div className='section'>
         <h2 className="subtitle">Plán rozpočtu</h2>
@@ -1011,27 +562,13 @@ function App() {
         />
       </div>
      
-     {(pendingDelete || pendingAdd || pendingNameDelete) && (
-       <div className="undo-toast" role="status">
-         {pendingNameDelete ? (
-           <>
-             <span>Jméno bylo odebráno.</span>
-             <button type="button" className="undo-toast__button" onClick={handleUndoNameDelete}>
-               Zpět
-             </button>
-           </>
-         ) : pendingAdd ? (
-           <span>Dárek byl přidán.</span>
-         ) : (
-           <>
-             <span>Dárek byl smazán.</span>
-             <button type="button" className="undo-toast__button" onClick={handleUndoDelete}>
-               Vrátit zpět
-             </button>
-           </>
-         )}
-       </div>
-     )}
+     <UndoToast
+       pendingDelete={pendingDelete}
+       pendingAdd={pendingAdd}
+       pendingNameDelete={pendingNameDelete}
+       onUndoDelete={handleUndoDelete}
+       onUndoNameDelete={handleUndoNameDelete}
+     />
      <footer className="app-footer">
        <span>Gift Tracker · {new Date().getFullYear()} · Iveta Círová</span>
        <span className="app-footer__note">Rodinný přehled dárků</span>
