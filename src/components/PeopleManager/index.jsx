@@ -97,7 +97,7 @@ const PeopleManager = ({ names, onAddName, onRemoveName, canEdit }) => {
                   </button>
                   {confirmName === name ? (
                     <Confirm
-                      className="people-manager__confirm"
+                      className="people-manager__confirm table-status__confirm--wrap"
                       message="Odebrat? Smaže dárky v tabulce."
                       onConfirm={handleConfirmRemove}
                       onCancel={handleCancelRemove}

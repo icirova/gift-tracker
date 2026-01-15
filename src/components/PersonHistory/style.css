@@ -6,7 +6,7 @@
 
 .person-history__toolbar {
   display: flex;
-  justify-content: flex-end;
+  justify-content: flex-start;
 }
 
 .person-history__filter {
@@ -40,6 +40,42 @@
   outline: none;
   border-color: rgba(244, 63, 94, 0.6);
   box-shadow: 0 0 0 3px rgba(244, 63, 94, 0.1);
+}
+
+@media (max-width: 640px) {
+  .person-history__toolbar {
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%;
+  }
+
+  .person-history__filter {
+    width: 100%;
+    text-align: center;
+  }
+
+  .person-history__filter select {
+    width: 100%;
+    min-width: 0;
+  }
+}
+
+@media (min-width: 641px) and (max-width: 899px) {
+  .person-history__toolbar {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+    width: 100%;
+  }
+
+  .person-history__filter {
+    width: 100%;
+  }
+
+  .person-history__filter select {
+    width: 100%;
+    min-width: 0;
+  }
 }
 
 .person-history__table {

@@ -314,6 +314,9 @@ body {
 
 .hero__lead-break {
   display: block;
+  margin-top: 10px;
+  font-weight: 600;
+  color: rgba(248, 250, 252, 0.92);
 }
 
 .hero-stats {
@@ -684,6 +687,7 @@ body {
 @media (max-width: 640px) {
   .wrapper {
     padding-top: 32px;
+    text-align: center;
   }
 
   .hero {
@@ -698,6 +702,47 @@ body {
     flex-direction: column;
     align-items: flex-start;
     gap: 6px;
+  }
+
+  .section {
+    text-align: center;
+  }
+
+  .section > * {
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .subtitle {
+    text-align: center;
+  }
+
+  .hero__year-confirm,
+  .year-lock__confirm {
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+  }
+
+  .hero__year-confirm.table-status__confirm,
+  .year-lock__confirm.table-status__confirm {
+    left: 50%;
+    right: auto;
+    transform: translate(-50%, -50%);
+  }
+}
+
+@media (max-width: 360px) {
+  .hero__timeline {
+    justify-content: center;
+  }
+
+  .hero__content {
+    text-align: center;
+  }
+
+  .hero__lead-break {
+    padding-left: 0;
   }
 }
 

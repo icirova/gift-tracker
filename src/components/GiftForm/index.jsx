@@ -158,18 +158,6 @@ const GiftForm = ({
             <small className="gift-form__hint">Cenu lze později editovat.</small>
           )}
         </label>
-        <label>
-          <span>Rok</span>
-          <input
-            type="number"
-            min="2000"
-            name="year"
-            value={formData.year}
-            onChange={handleChange}
-            disabled={!isEditable}
-          />
-        </label>
-       
       </div>
       {error && <p className="gift-form__error">{error}</p>}
       <button type="submit" disabled={!isEditable || !isValid}>

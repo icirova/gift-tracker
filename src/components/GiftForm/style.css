@@ -123,4 +123,28 @@
   .gift-form {
     padding: 16px;
   }
+
+  .gift-form label {
+    text-align: left;
+    align-items: flex-start;
+  }
+
+  .gift-form button {
+    align-self: center;
+  }
+
+  .gift-form__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .gift-form label {
+    text-align: center;
+    align-items: center;
+    width: 100%;
+  }
+
+  .gift-form input,
+  .gift-form select {
+    width: 100%;
+  }
 }

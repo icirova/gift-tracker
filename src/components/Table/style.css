@@ -12,7 +12,7 @@
 .table-toolbar {
   margin-top: 20px;
   display: flex;
-  justify-content: flex-end;
+  justify-content: flex-start;
   gap: 16px;
   flex-wrap: wrap;
 }
@@ -25,6 +25,7 @@
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--text-muted);
+  text-align: left;
 }
 
 .table-filter {
@@ -35,6 +36,7 @@
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--text-muted);
+  text-align: left;
 }
 
 .table-year {
@@ -45,6 +47,7 @@
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--text-muted);
+  text-align: left;
 }
 
 .table-search input {
@@ -90,6 +93,49 @@
   background-position: calc(100% - 12px) 50%;
   background-size: 12px;
   padding-right: 32px;
+}
+
+@media (max-width: 640px) {
+  .table-toolbar {
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%;
+  }
+
+  .table-search,
+  .table-filter,
+  .table-year {
+    width: 100%;
+    text-align: center;
+  }
+
+  .table-search input,
+  .table-filter select,
+  .table-year select {
+    width: 100%;
+    min-width: 0;
+  }
+}
+
+@media (min-width: 641px) and (max-width: 899px) {
+  .table-toolbar {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+  }
+
+  .table-search,
+  .table-filter,
+  .table-year {
+    width: 100%;
+  }
+
+  .table-search input,
+  .table-filter select,
+  .table-year select {
+    width: 100%;
+    min-width: 0;
+  }
 }
 
 .table-filter select:focus {
@@ -266,6 +312,7 @@
   align-items: center;
   gap: 10px;
   position: relative;
+  min-height: 32px;
 }
 
 .table-status__badge {
@@ -273,6 +320,8 @@
   align-items: center;
   justify-content: center;
   width: 96px;
+  min-width: 96px;
+  flex: 0 0 96px;
   padding: 6px 12px;
   border-radius: 999px;
   font-size: 12px;
@@ -291,17 +340,14 @@
   z-index: 5;
 }
 
-.table-status__confirm--wrap {
-  flex-wrap: wrap;
-  white-space: normal;
-  max-width: min(260px, 70vw);
+@media (max-width: 640px) {
+  .table-status__confirm {
+    left: 50%;
+    right: auto;
+    transform: translate(-50%, -50%);
+  }
 }
 
-.table-status__confirm--wrap .table-status__confirm-text {
-  white-space: normal;
-  overflow: visible;
-  text-overflow: clip;
-}
 
 .table-status__toggle {
   border: 1px solid transparent;

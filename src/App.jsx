@@ -770,7 +770,7 @@ function App() {
         <h1 className='hero__title'>Christmas <span className='hero__title-accent'>Gift</span> Tracker</h1>
         <p className='hero__lead'>
           Dárky bez chaosu. Rozpočet pod dohledem.
-          <em className="hero__lead-break">Realita může překvapit… nebo vyděsit.</em>
+          <em className="hero__lead-break">Ať vás realita nepřekvapí.</em>
         </p>
         <div className="hero__timeline" role="tablist" aria-label="Roky">
           {canAddNextYear ? (
@@ -784,7 +784,7 @@ function App() {
               </button>
               {addYearConfirmOpen ? (
                 <Confirm
-                  className="hero__year-confirm"
+                  className="hero__year-confirm table-status__confirm--wrap"
                   message={`Přidat ${nextYear}?`}
                   onConfirm={handleAddYear}
                   onCancel={() => setAddYearConfirmOpen(false)}
@@ -894,7 +894,7 @@ function App() {
                   </button>
                 ) : unlockConfirmOpen ? (
                   <Confirm
-                    className="year-lock__confirm"
+                    className="year-lock__confirm table-status__confirm--wrap"
                     message="Odemknout? Umožní úpravy."
                     onConfirm={() => {
                       setUnlockedPastYears((prev) => ({

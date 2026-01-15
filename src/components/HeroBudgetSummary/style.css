@@ -46,3 +46,19 @@
 .hero-budget-summary__fill--over {
   background: rgba(244, 63, 94, 0.9);
 }
+
+@media (max-width: 360px) {
+  .hero-budget-summary {
+    align-items: center;
+    text-align: center;
+  }
+
+  .hero-budget-summary__value-row {
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .hero-budget-summary__over {
+    white-space: normal;
+  }
+}

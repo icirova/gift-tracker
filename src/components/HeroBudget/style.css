@@ -286,3 +286,46 @@
     flex-wrap: wrap;
   }
 }
+
+@media (max-width: 640px) {
+  .hero-budget__summary-grid {
+    width: 100%;
+  }
+
+  .hero-budget__summary-item {
+    width: 100%;
+  }
+}
+
+@media (max-width: 360px) {
+  .hero-budget {
+    align-items: center;
+    text-align: center;
+  }
+
+  .hero-budget__row {
+    justify-content: center;
+  }
+
+  .hero-budget__field {
+    align-items: center;
+  }
+
+  .hero-budget__value-button,
+  .hero-budget__value-static {
+    justify-content: center;
+  }
+
+  .hero-budget__summary-grid {
+    justify-items: center;
+  }
+
+  .hero-budget__summary-item {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .hero-budget__summary-content {
+    align-items: center;
+  }
+}
