@@ -10,6 +10,12 @@ import PeopleManager from './components/PeopleManager';
 import Confirm from './components/Confirm';
 import DEFAULT_GIFTS from './data/defaultGifts';
 import ALLOWED_NAMES from './data/allowedNames';
+import {
+  buildYearlyTotals,
+  calculateBudgetPercents,
+  calculateSpentTotalForYear,
+  calculateYearStats,
+} from './utils/giftStats';
 
 const STORAGE_KEY = 'gift-tracker:gifts';
 const YEARS_KEY = 'gift-tracker:extra-years';
@@ -430,132 +436,47 @@ function App() {
     [gifts, selectedYear],
   );
 
-  const { boughtTotal, ideaTotal, ideaMissingCount } = useMemo(
-    () =>
-      giftsForActiveYear.reduce(
-        (acc, gift) => {
-          const priceValue = Number(gift.price);
-          const hasValidPrice = Number.isFinite(priceValue) && priceValue > 0;
-          if (gift.status === GIFT_STATUS.bought && hasValidPrice) {
-            acc.boughtTotal += priceValue;
-          }
-          if (gift.status === GIFT_STATUS.idea) {
-            if (hasValidPrice) {
-              acc.ideaTotal += priceValue;
-            } else {
-              acc.ideaMissingCount += 1;
-            }
-          }
-          return acc;
-        },
-        { boughtTotal: 0, ideaTotal: 0, ideaMissingCount: 0 },
-      ),
-    [giftsForActiveYear],
-  );
-  const boughtCount = useMemo(
-    () =>
-      giftsForActiveYear.filter((gift) => {
-        const priceValue = Number(gift.price);
-        return gift.status === GIFT_STATUS.bought && Number.isFinite(priceValue) && priceValue > 0;
-      }).length,
-    [giftsForActiveYear],
-  );
+  const yearStats = useMemo(() => calculateYearStats(giftsForActiveYear), [giftsForActiveYear]);
+  const { boughtTotal, ideaTotal, ideaMissingCount, boughtCount } = yearStats;
   const averageBoughtPrice = boughtCount > 0 ? boughtTotal / boughtCount : null;
 
   const ideaTotalForStats = isYearEditable ? ideaTotal : 0;
   const ideaMissingCountForStats = isYearEditable ? ideaMissingCount : 0;
   const planTotal = boughtTotal + ideaTotalForStats;
 
-  const summary = useMemo(() => {
-    const totalItems = giftsForActiveYear.length;
-    return { totalItems, spentTotal: boughtTotal };
-  }, [boughtTotal, giftsForActiveYear.length]);
+  const summary = useMemo(
+    () => ({ totalItems: yearStats.totalItems, spentTotal: boughtTotal }),
+    [boughtTotal, yearStats.totalItems],
+  );
 
-  const mostExpensiveGift = useMemo(() => {
-    const prices = giftsForActiveYear
-      .map((gift) => gift.price)
-      .filter((price) => Number.isFinite(price) && price > 0);
-    if (!prices.length) {
-      return null;
-    }
-    return Math.max(...prices);
-  }, [giftsForActiveYear]);
+  const mostExpensiveGift = yearStats.mostExpensiveGift;
+  const cheapestGift = yearStats.cheapestGift;
 
-  const cheapestGift = useMemo(() => {
-    const prices = giftsForActiveYear
-      .filter((gift) => gift.status === GIFT_STATUS.bought)
-      .map((gift) => gift.price)
-      .filter((price) => Number.isFinite(price) && price > 0);
-    if (!prices.length) {
-      return null;
-    }
-    return Math.min(...prices);
-  }, [giftsForActiveYear]);
-
-  const previousYearTotal = useMemo(() => {
-    const previousYear = selectedYear - 1;
-    return gifts
-      .filter((gift) => gift.year === previousYear)
-      .reduce((sum, gift) => {
-        const priceValue = Number(gift.price);
-        if (gift.status !== GIFT_STATUS.bought || !Number.isFinite(priceValue) || priceValue <= 0) {
-          return sum;
-        }
-        return sum + priceValue;
-      }, 0);
-  }, [gifts, selectedYear]);
+  const previousYearTotal = useMemo(
+    () => calculateSpentTotalForYear(gifts, selectedYear - 1),
+    [gifts, selectedYear],
+  );
 
   const hasPreviousYear = useMemo(
     () => gifts.some((gift) => gift.year === selectedYear - 1),
     [gifts, selectedYear],
   );
 
-  const yearlyTotals = useMemo(() => {
-    const annualTotals = gifts.reduce((acc, gift) => {
-      const priceValue = Number(gift.price);
-      if (gift.status !== GIFT_STATUS.bought || !Number.isFinite(priceValue) || priceValue <= 0) {
-        return acc;
-      }
-      acc[gift.year] = (acc[gift.year] ?? 0) + priceValue;
-      return acc;
-    }, {});
-
-    return Object.entries(annualTotals)
-      .map(([year, total]) => ({ year: Number(year), total }))
-      .sort((a, b) => a.year - b.year);
-  }, [gifts]);
+  const yearlyTotals = useMemo(() => buildYearlyTotals(gifts), [gifts]);
 
   const currentBudget = budgets[selectedYear] ?? null;
   const planDelta = currentBudget === null ? null : currentBudget - planTotal;
   const isPlanOverBudget = currentBudget !== null && planDelta < 0;
-  const budgetPercents = useMemo(() => {
-    if (!currentBudget || currentBudget <= 0 || planTotal <= 0) {
-      return { bought: 0, idea: 0, over: 0, total: 0 };
-    }
-
-    if (planTotal > currentBudget) {
-      const withinPercent = (currentBudget / planTotal) * 100;
-      const boughtShare = (boughtTotal / planTotal) * withinPercent;
-      const ideaShare = (ideaTotalForStats / planTotal) * withinPercent;
-      const overShare = 100 - withinPercent;
-      return {
-        bought: boughtShare,
-        idea: ideaShare,
-        over: overShare,
-        total: 100,
-      };
-    }
-
-    const boughtPercent = (boughtTotal / currentBudget) * 100;
-    const ideaPercent = (ideaTotalForStats / currentBudget) * 100;
-    const totalPercent = Math.min((planTotal / currentBudget) * 100, 100);
-    return {
-      bought: boughtPercent,
-      idea: ideaPercent,
-      over: 0,
-      total: totalPercent,
-    };
-  }, [boughtTotal, currentBudget, ideaTotal, planTotal]);
+  const budgetPercents = useMemo(
+    () =>
+      calculateBudgetPercents({
+        currentBudget,
+        boughtTotal,
+        ideaTotal: ideaTotalForStats,
+        planTotal,
+      }),
+    [boughtTotal, currentBudget, ideaTotalForStats, planTotal],
+  );
 
   useEffect(() => {
     setBudgetDraft(currentBudget === null ? '' : String(currentBudget));
