@@ -1,6 +1,5 @@
 import { Fragment, useMemo, useState, useLayoutEffect, useRef, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { formatCurrency } from '../../utils/formatCurrency';
 import Confirm from '../Confirm';
 import './style.css';
 
@@ -14,6 +13,7 @@ const Table = ({
   onYearChange,
   isEditable,
 }) => {
+  const formatPriceValue = (value) => Number(value).toLocaleString('cs-CZ');
   const [searchQuery, setSearchQuery] = useState('');
   const [baseHeight, setBaseHeight] = useState(null);
   const [hoveredName, setHoveredName] = useState(null);
@@ -247,7 +247,7 @@ const Table = ({
             onChange={(event) => setStatusFilter(event.target.value)}
           >
             <option value="all">Vše</option>
-            <option value="idea">Nápady</option>
+            <option value="idea">Plánováno</option>
             <option value="bought">Koupeno</option>
           </select>
         </label>
@@ -277,7 +277,7 @@ const Table = ({
                 <tr>
                   <th className="table-col-name">Jméno</th>
                   <th className="table-col-gift">Dárek</th>
-                  <th className="table-col-price">Cena</th>
+                  <th className="table-col-price">Cena (Kč)</th>
                   <th className="table-col-status">Stav</th>
                 </tr>
               </thead>
@@ -305,7 +305,7 @@ const Table = ({
                             >
                               <div className="table-name__label">{name}</div>
                               <div className="table-mini">
-                                <span className="table-mini__value">{formatCurrency(total)}</span>
+                                <span className="table-mini__value">{formatPriceValue(total)}</span>
                                 <div className="table-mini__bar" aria-hidden="true">
                                   <span
                                     className="table-mini__fill"
@@ -345,25 +345,6 @@ const Table = ({
                                 <div className="table-price__edit-group">
                                   {isEditable ? (
                                     <>
-                                      {gift.price === null ? (
-                                        <button
-                                          type="button"
-                                          className="table-price__clickable table-price__value table-price__value--empty"
-                                          onClick={() => startPriceEdit(gift)}
-                                          aria-label={`Doplnit cenu pro dárek ${gift.gift}`}
-                                        >
-                                          —
-                                        </button>
-                                      ) : (
-                                        <button
-                                          type="button"
-                                          className="table-price__clickable table-price__value"
-                                          onClick={() => startPriceEdit(gift)}
-                                          aria-label={`Upravit cenu pro dárek ${gift.gift}`}
-                                        >
-                                          {formatCurrency(gift.price)}
-                                        </button>
-                                      )}
                                       <button
                                         type="button"
                                         className="table-price__edit"
@@ -380,16 +361,35 @@ const Table = ({
                                           </svg>
                                         </span>
                                       </button>
+                                      {gift.price === null ? (
+                                        <button
+                                          type="button"
+                                          className="table-price__clickable table-price__value table-price__value--empty"
+                                          onClick={() => startPriceEdit(gift)}
+                                          aria-label={`Doplnit cenu pro dárek ${gift.gift}`}
+                                        >
+                                          —
+                                        </button>
+                                      ) : (
+                                        <button
+                                          type="button"
+                                          className="table-price__clickable table-price__value"
+                                          onClick={() => startPriceEdit(gift)}
+                                          aria-label={`Upravit cenu pro dárek ${gift.gift}`}
+                                        >
+                                          {formatPriceValue(gift.price)}
+                                        </button>
+                                      )}
                                     </>
                                   ) : (
                                     <span className="table-price__value">
-                                      {gift.price === null ? '—' : formatCurrency(gift.price)}
+                                      {gift.price === null ? '—' : formatPriceValue(gift.price)}
                                     </span>
                                   )}
                                 </div>
                               ) : (
                                 <span className="table-price__value">
-                                  {formatCurrency(gift.price)}
+                                  {formatPriceValue(gift.price)}
                                 </span>
                               )}
                             </div>
@@ -411,11 +411,11 @@ const Table = ({
                                     onClick={() => beginStatusConfirm(gift)}
                                     aria-label={`Přepnout na koupeno: ${gift.gift}`}
                                   >
-                                    Nápad
+                                    Plánováno
                                   </button>
                                 ) : (
                                   <span className="table-status__badge table-status__badge--idea">
-                                    Nápad
+                                    Plánováno
                                   </span>
                                 )
                               ) : (

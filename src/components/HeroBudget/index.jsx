@@ -117,7 +117,7 @@ const HeroBudget = ({
             </svg>
           </span>
           <div className="hero-budget__summary-content">
-            <span className="hero-budget__summary-label">Koupeno</span>
+            <span className="hero-budget__summary-label">Utraceno</span>
             <span className="hero-budget__summary-value hero-budget__summary-value--bought">
               {currentBudget === null ? '—' : `${boughtTotal.toLocaleString('cs-CZ')} Kč`}
             </span>
@@ -136,13 +136,17 @@ const HeroBudget = ({
             </svg>
           </span>
           <div className="hero-budget__summary-content">
-            <span className="hero-budget__summary-label">Nápady</span>
-            <span className="hero-budget__summary-value hero-budget__summary-value--idea">
-              {currentBudget === null ? '—' : `${ideaTotal.toLocaleString('cs-CZ')} Kč`}
-            </span>
-            <span className="hero-budget__summary-note">
-              {ideaMissingCount > 0 ? `+ ${ideaMissingCount} bez ceny` : '\u00a0'}
-            </span>
+            <span className="hero-budget__summary-label">Plánováno</span>
+            <div className="hero-budget__summary-value-row">
+              <span className="hero-budget__summary-value hero-budget__summary-value--idea">
+                {currentBudget === null ? '—' : `${ideaTotal.toLocaleString('cs-CZ')} Kč`}
+              </span>
+              {ideaMissingCount > 0 ? (
+                <span className="hero-budget__summary-note">
+                  {`+ ${ideaMissingCount} dárek bez ceny`}
+                </span>
+              ) : null}
+            </div>
           </div>
         </div>
         <div className="hero-budget__summary-item">
@@ -181,7 +185,9 @@ const HeroBudget = ({
             </svg>
           </span>
           <div className="hero-budget__summary-content">
-            <span className="hero-budget__summary-label">Zbývá</span>
+            <span className="hero-budget__summary-label">
+              {isPlanOverBudget ? 'Překročeno' : 'Zbývá'}
+            </span>
             <span className="hero-budget__summary-value hero-budget__summary-value--delta">
               {currentBudget === null
                 ? '—'

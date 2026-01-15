@@ -15,7 +15,7 @@ const TotalPriceChart = ({ persons, totalPrice, colors }) => {
     labels: persons,
     datasets: [
       {
-        label: 'Celková cena',
+        label: 'Utraceno za dárky',
         data: totalPrice,
         backgroundColor: colors,
         borderColor: '#fff',
@@ -57,7 +57,7 @@ const TotalPriceChart = ({ persons, totalPrice, colors }) => {
 
   return (
     <div className='chart chart--pie'>
-      <h2 className='subtitle'>Cena dárků</h2>
+      <h2 className='subtitle'>Utraceno podle osob</h2>
       <Pie data={data} options={options} />
     </div>
   );

@@ -1,4 +1,14 @@
 const DEFAULT_GIFTS = [
+  // 2026
+  { id: '2026-anna-1', year: 2026, name: 'Anna', gift: 'Výlet do lázní', price: 3600, status: 'bought' },
+  { id: '2026-anna-2', year: 2026, name: 'Anna', gift: 'Čtečka knih', price: 2800, status: 'idea' },
+  { id: '2026-jakub-1', year: 2026, name: 'Jakub', gift: 'Kolo', price: 8200, status: 'bought' },
+  { id: '2026-petra-1', year: 2026, name: 'Petra', gift: 'Kurz vaření', price: 1900, status: 'bought' },
+  { id: '2026-petra-2', year: 2026, name: 'Petra', gift: 'Skicovací sada', price: null, status: 'idea' },
+  { id: '2026-martin-1', year: 2026, name: 'Martin', gift: 'Projektor', price: 5400, status: 'idea' },
+  { id: '2026-eva-1', year: 2026, name: 'Eva', gift: 'Wellness balíček', price: 2400, status: 'bought' },
+  { id: '2026-david-1', year: 2026, name: 'David', gift: 'Sportovní bunda', price: 2100, status: 'bought' },
+
   // 2025
   { id: '2025-anna-1', year: 2025, name: 'Anna', gift: 'Noise-cancelling sluchátka', price: 4200, status: 'bought' },
   { id: '2025-jakub-1', year: 2025, name: 'Jakub', gift: 'Outdoorová výbava', price: 3200, status: 'bought' },

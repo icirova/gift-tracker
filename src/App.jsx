@@ -18,6 +18,7 @@ const NAMES_KEY = 'gift-tracker:names';
 const SESSION_KEY = 'gift-tracker:session-init';
 const DEFAULT_EXTRA_YEARS = [];
 const DEFAULT_BUDGETS = {
+  2026: 18000,
   2025: 16000,
   2024: 14000,
 };
@@ -27,7 +28,7 @@ const GIFT_STATUS = {
 };
 const STATUS_OPTIONS = [
   { value: GIFT_STATUS.bought, label: 'Koupeno' },
-  { value: GIFT_STATUS.idea, label: 'Nápad' },
+  { value: GIFT_STATUS.idea, label: 'Plánováno' },
 ];
 const STATUS_VALUES = new Set(Object.values(GIFT_STATUS));
 
@@ -451,14 +452,24 @@ function App() {
       ),
     [giftsForActiveYear],
   );
+  const boughtCount = useMemo(
+    () =>
+      giftsForActiveYear.filter((gift) => {
+        const priceValue = Number(gift.price);
+        return gift.status === GIFT_STATUS.bought && Number.isFinite(priceValue) && priceValue > 0;
+      }).length,
+    [giftsForActiveYear],
+  );
+  const averageBoughtPrice = boughtCount > 0 ? boughtTotal / boughtCount : null;
 
-  const planTotal = boughtTotal + ideaTotal;
+  const ideaTotalForStats = isYearEditable ? ideaTotal : 0;
+  const ideaMissingCountForStats = isYearEditable ? ideaMissingCount : 0;
+  const planTotal = boughtTotal + ideaTotalForStats;
 
   const summary = useMemo(() => {
     const totalItems = giftsForActiveYear.length;
-    const totalPrice = giftsForActiveYear.reduce((sum, gift) => sum + (gift.price ?? 0), 0);
-    return { totalItems, totalPrice };
-  }, [giftsForActiveYear]);
+    return { totalItems, spentTotal: boughtTotal };
+  }, [boughtTotal, giftsForActiveYear.length]);
 
   const mostExpensiveGift = useMemo(() => {
     const prices = giftsForActiveYear
@@ -470,11 +481,28 @@ function App() {
     return Math.max(...prices);
   }, [giftsForActiveYear]);
 
+  const cheapestGift = useMemo(() => {
+    const prices = giftsForActiveYear
+      .filter((gift) => gift.status === GIFT_STATUS.bought)
+      .map((gift) => gift.price)
+      .filter((price) => Number.isFinite(price) && price > 0);
+    if (!prices.length) {
+      return null;
+    }
+    return Math.min(...prices);
+  }, [giftsForActiveYear]);
+
   const previousYearTotal = useMemo(() => {
     const previousYear = selectedYear - 1;
     return gifts
       .filter((gift) => gift.year === previousYear)
-      .reduce((sum, gift) => sum + (gift.price ?? 0), 0);
+      .reduce((sum, gift) => {
+        const priceValue = Number(gift.price);
+        if (gift.status !== GIFT_STATUS.bought || !Number.isFinite(priceValue) || priceValue <= 0) {
+          return sum;
+        }
+        return sum + priceValue;
+      }, 0);
   }, [gifts, selectedYear]);
 
   const hasPreviousYear = useMemo(
@@ -484,7 +512,11 @@ function App() {
 
   const yearlyTotals = useMemo(() => {
     const annualTotals = gifts.reduce((acc, gift) => {
-      acc[gift.year] = (acc[gift.year] ?? 0) + (gift.price ?? 0);
+      const priceValue = Number(gift.price);
+      if (gift.status !== GIFT_STATUS.bought || !Number.isFinite(priceValue) || priceValue <= 0) {
+        return acc;
+      }
+      acc[gift.year] = (acc[gift.year] ?? 0) + priceValue;
       return acc;
     }, {});
 
@@ -494,7 +526,6 @@ function App() {
   }, [gifts]);
 
   const currentBudget = budgets[selectedYear] ?? null;
-  const budgetDelta = currentBudget === null ? null : currentBudget - summary.totalPrice;
   const planDelta = currentBudget === null ? null : currentBudget - planTotal;
   const isPlanOverBudget = currentBudget !== null && planDelta < 0;
   const budgetPercents = useMemo(() => {
@@ -505,7 +536,7 @@ function App() {
     if (planTotal > currentBudget) {
       const withinPercent = (currentBudget / planTotal) * 100;
       const boughtShare = (boughtTotal / planTotal) * withinPercent;
-      const ideaShare = (ideaTotal / planTotal) * withinPercent;
+      const ideaShare = (ideaTotalForStats / planTotal) * withinPercent;
       const overShare = 100 - withinPercent;
       return {
         bought: boughtShare,
@@ -516,7 +547,7 @@ function App() {
     }
 
     const boughtPercent = (boughtTotal / currentBudget) * 100;
-    const ideaPercent = (ideaTotal / currentBudget) * 100;
+    const ideaPercent = (ideaTotalForStats / currentBudget) * 100;
     const totalPercent = Math.min((planTotal / currentBudget) * 100, 100);
     return {
       bought: boughtPercent,
@@ -905,14 +936,14 @@ function App() {
             </span>
           </div>
           <div className="hero-stat">
-            <span className="hero-stat__label">Celková suma</span>
-            <span className="hero-stat__value">{summary.totalPrice.toLocaleString('cs-CZ')} Kč</span>
+            <span className="hero-stat__label">Utraceno</span>
+            <span className="hero-stat__value">{summary.spentTotal.toLocaleString('cs-CZ')} Kč</span>
           </div>
         </div>
         <HeroBudgetSummary
           currentBudget={currentBudget}
           totalPercent={budgetPercents.total}
-          overAmount={planDelta !== null && planDelta < 0 ? planDelta : null}
+          deltaAmount={planDelta}
         />
         <div className="year-lock-slot">
           {selectedYear < currentYear ? (
@@ -974,8 +1005,8 @@ function App() {
             budgetEditingYear={budgetEditingYear}
             budgetDraft={budgetDraft}
             boughtTotal={boughtTotal}
-            ideaTotal={ideaTotal}
-            ideaMissingCount={ideaMissingCount}
+            ideaTotal={ideaTotalForStats}
+            ideaMissingCount={ideaMissingCountForStats}
           planTotal={planTotal}
           planDelta={planDelta}
           isPlanOverBudget={isPlanOverBudget}
@@ -1049,8 +1080,9 @@ function App() {
       <div className='section'>
         <Summary
           mostExpensiveGift={mostExpensiveGift}
-          yearChange={hasPreviousYear ? summary.totalPrice - previousYearTotal : null}
-          budgetDelta={budgetDelta}
+          cheapestGift={cheapestGift}
+          yearChange={hasPreviousYear ? summary.spentTotal - previousYearTotal : null}
+          averageBoughtPrice={averageBoughtPrice}
         />
       </div>
      

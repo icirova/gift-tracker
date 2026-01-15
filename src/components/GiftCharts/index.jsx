@@ -19,7 +19,9 @@ const GiftCharts = ({ gifts, yearlyTotals }) => {
         }
 
         acc.counts[index] += 1;
-        acc.totals[index] += gift.price ?? 0;
+        if (gift.status === 'bought') {
+          acc.totals[index] += gift.price ?? 0;
+        }
         return acc;
       },
       {

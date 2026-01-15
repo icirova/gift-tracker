@@ -179,6 +179,13 @@
   gap: 6px;
 }
 
+.hero-budget__summary-value-row {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
 .hero-budget__summary-icon {
   width: 40px;
   height: 40px;
@@ -216,6 +223,7 @@
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--text-muted);
+  font-weight: 700;
 }
 
 .hero-budget__summary-value {
@@ -240,6 +248,7 @@
   font-size: 12px;
   color: var(--text-muted);
   letter-spacing: 0.04em;
+  line-height: 1.2;
 }
 
 .hero-budget__summary-grid {
@@ -251,11 +260,9 @@
   width: 100%;
 }
 
-@media (min-width: 900px) {
+@media (min-width: 640px) {
   .hero-budget__summary-grid {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 18px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 

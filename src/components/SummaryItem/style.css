@@ -33,8 +33,9 @@
 }
 
 .summary-item-icon {
-  width: 64px;
-  height: 64px;
+  width: 56px;
+  height: 56px;
+  flex: 0 0 56px;
   border-radius: 20px;
   display: flex;
   align-items: center;
@@ -51,7 +52,7 @@
 }
 
 .summary-value {
-  font-size: 28px;
+  font-size: 22px;
   font-weight: 600;
   margin: 0;
 }

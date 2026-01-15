@@ -16,12 +16,12 @@ const ICONS = {
   gifts: (
     <svg viewBox="0 0 24 24" aria-hidden="true">
       <path
-        d="M4 11h16v9a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-9ZM12 11V4m0 0h3a1.5 1.5 0 0 1 0 3H9a1.5 1.5 0 0 1 0-3h3Z"
-        strokeWidth="1.5"
+        d="M12 5v12M8 13l4 4 4-4"
+        strokeWidth="1.8"
         strokeLinecap="round"
         strokeLinejoin="round"
+        fill="none"
       />
-      <path d="M4 11h16" strokeWidth="1.5" strokeLinecap="round" />
     </svg>
   ),
   budget: (
@@ -40,7 +40,7 @@ const ICONS = {
   expensive: (
     <svg viewBox="0 0 24 24" aria-hidden="true">
       <path
-        d="M12 17V7M8 11l4-4 4 4"
+        d="M12 19V7M8 11l4-4 4 4"
         strokeWidth="1.8"
         strokeLinecap="round"
         strokeLinejoin="round"

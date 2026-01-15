@@ -10,7 +10,7 @@ const YearlySpendingChart = ({ data }) => {
   if (!data.length) {
     return (
       <div className='chart chart--line chart--empty'>
-        <h2 className='subtitle'>Historie celkové ceny</h2>
+        <h2 className='subtitle'>Historie utracené částky</h2>
         <p className='chart-message'>Zatím nemáme žádné historické údaje.</p>
       </div>
     );
@@ -26,7 +26,7 @@ const YearlySpendingChart = ({ data }) => {
     labels,
     datasets: [
       {
-        label: 'Celková suma za dárky (Kč)',
+        label: 'Utraceno za dárky (Kč)',
         data: totals,
         borderColor: 'rgba(244, 63, 94, 0.9)',
         backgroundColor: 'rgba(244, 63, 94, 0.12)',
@@ -92,7 +92,7 @@ const YearlySpendingChart = ({ data }) => {
 
   return (
     <div className='chart chart--line'>
-      <h2 className='subtitle'>Historie celkové ceny</h2>
+      <h2 className='subtitle'>Historie utracené částky</h2>
       <Line data={chartData} options={options} />
     </div>
   );

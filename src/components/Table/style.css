@@ -396,9 +396,11 @@
 .table-price__edit-group {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
+  justify-content: space-between;
+  gap: 0;
   cursor: pointer;
   margin-left: 0;
+  width: 100%;
 }
 
 .table-price__edit-group:hover .table-price__clickable,
@@ -411,6 +413,9 @@
   align-items: center;
   gap: 10px;
   padding: 2px;
+  width: 24px;
+  height: 24px;
+  flex: 0 0 24px;
   border-radius: 999px;
   border: 1px solid transparent;
   background: transparent;
@@ -471,6 +476,7 @@
   color: inherit;
   font: inherit;
   text-align: left;
+  flex: 1 1 auto;
 }
 
 .table-price__clickable:focus-visible {
