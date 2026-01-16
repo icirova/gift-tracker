@@ -334,6 +334,14 @@ body {
   box-shadow: 0 14px 28px rgba(15, 23, 42, 0.25);
 }
 
+.hero__cta:disabled,
+.hero__cta:disabled:hover,
+.hero__cta:disabled:focus-visible {
+  opacity: 0.5;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
 .hero__cta:hover {
   background: linear-gradient(120deg, var(--primary-dark), #0f766e);
 }

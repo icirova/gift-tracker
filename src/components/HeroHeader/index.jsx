@@ -21,6 +21,7 @@ const HeroHeader = ({
   currentYear,
   isPreviousYear,
   isYearEditable,
+  canAddGift,
   onUnlockPastYear,
   onLockPastYear,
 }) => {
@@ -139,7 +140,12 @@ const HeroHeader = ({
           Dárky bez chaosu. Rozpočet pod dohledem.
           <em className="hero__lead-break">Ať vás realita nepřekvapí.</em>
         </p>
-        <button type="button" className="hero__cta" onClick={onScrollToGiftForm}>
+        <button
+          type="button"
+          className="hero__cta"
+          onClick={onScrollToGiftForm}
+          disabled={!canAddGift}
+        >
           Přidat dárek
         </button>
         <div className="hero__timeline" role="tablist" aria-label="Roky">
@@ -311,6 +317,7 @@ HeroHeader.propTypes = {
   currentYear: PropTypes.number.isRequired,
   isPreviousYear: PropTypes.bool.isRequired,
   isYearEditable: PropTypes.bool.isRequired,
+  canAddGift: PropTypes.bool.isRequired,
   onUnlockPastYear: PropTypes.func.isRequired,
   onLockPastYear: PropTypes.func.isRequired,
 };

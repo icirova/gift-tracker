@@ -54,6 +54,7 @@ function App() {
   const isPreviousYear = selectedYear === currentYear - 1;
   const isYearEditable =
     selectedYear >= currentYear || (isPreviousYear && Boolean(unlockedPastYears[selectedYear]));
+  const canAddGift = selectedYear === currentYear || (isPreviousYear && isYearEditable);
   const currentBudget = budgets[selectedYear] ?? null;
   const {
     budgetDraft,
@@ -468,6 +469,7 @@ function App() {
       currentYear={currentYear}
       isPreviousYear={isPreviousYear}
       isYearEditable={isYearEditable}
+      canAddGift={canAddGift}
       onUnlockPastYear={handleUnlockPastYear}
       onLockPastYear={handleLockPastYear}
     />
