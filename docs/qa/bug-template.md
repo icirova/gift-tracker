@@ -1,21 +1,51 @@
 # Bug Report
 
 ## Shrnutí
-Strucny popis chyby.
+Krátký a výstižný popis chyby (co + kde + za jakých podmínek).
 
-## Prostredi
-- Verze aplikace:
-- Prohlizec + verze:
-- OS:
+---
+
+## Reference
+- Test Scenario: TS-XX (pokud relevantní)
+
+---
+
+## Prostředí
+- Aplikace / URL:
+- Prohlížeč + verze:
+- Operační systém:
+- Viewport (desktop / mobil):
+
+---
 
 ## Kroky k reprodukci
-1.
-2.
-3.
+1. 
+2. 
+3. 
 
-## Ocekavany vysledek
+---
 
-## Skutecny vysledek
+## Očekávaný výsledek
+Popis očekávaného chování aplikace.
 
-## Prilohy
+---
+
+## Skutečný výsledek
+Popis skutečného chování aplikace.
+
+---
+
+## Priorita
+- **High** – blokující nebo kritická chyba, výrazně omezuje použití aplikace
+- **Medium** – významná chyba, funkce funguje omezeně nebo nekonzistentně
+- **Low** – drobná chyba nebo kosmetický problém
+
+---
+
+## Poznámky
+Např. frekvence výskytu, workaround, podezření na příčinu (volitelné).
+
+---
+
+## Přílohy
 - Screenshoty / video / logy
