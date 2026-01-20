@@ -1,16 +1,17 @@
-# Exploratory Notes
+# Exploratorní poznámky
 
-## Session
+## Sezení
 - Datum:
 - Tester:
-- Verze build:
-- Prohlizec:
+- Prohlížeč:
+- URL (lokálně / Netlify):
+- Poznámka k prostředí (volitelné):
 
-## Pozorovani
+## Pozorování
 - 
 
-## Nalezene chyby
+## Nalezené chyby
 - 
 
-## Navrhy na zlepseni
+## Návrhy na zlepšení
 - 
