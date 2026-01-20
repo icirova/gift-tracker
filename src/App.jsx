@@ -573,7 +573,7 @@ function App() {
      />
      <footer className="app-footer">
        <span>Gift Tracker · {new Date().getFullYear()} · Iveta Círová</span>
-       <span className="app-footer__note">Rodinný přehled dárků</span>
+       <span className="app-footer__note">Přehled dárků, rozpočtu a statistik.</span>
      </footer>
     </div>
 }
