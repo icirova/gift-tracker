@@ -63,6 +63,19 @@ Zvolený přístup k testování se liší podle rozsahu a dopadu změn:
 
 ---
 
+## Evidence test runů
+
+Výsledky manuálního testování (test runy) nejsou evidovány přímo v repozitáři, ale v externím nástroji ve formě checklistu s výsledky (PASS / FAIL / N/A).
+
+Pro účely tohoto projektu je použit test run checklist v Google Sheets:
+- Test Run Checklist (Google Sheets): <https://docs.google.com/spreadsheets/d/1raT5bJjBXFXynN59qBXKJSKXf--ijaf4KEj2uX7CH0g/edit?usp=sharing>
+
+Test run checklist vychází z regresního checklistu a testovacích scénářů (`test-scenarios.md`) a slouží k zaznamenání výsledků konkrétního testovacího běhu.
+
+V reálném týmovém prostředí by byla evidence test runů vedena v test management nástroji (např. JIRA + Xray).
+
+---
+
 ## Odpovědnosti
 - **QA:** provedení testovacích scénářů, evidování a report chyb
 - **PO / Dev:** prioritizace nalezených chyb a ověření opravených defektů
