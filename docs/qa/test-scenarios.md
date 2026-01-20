@@ -33,6 +33,7 @@ Poznámka: Scénáře jsou psané modulově a pokrývají happy path i vybrané 
 1. Přepni rok v hlavičce / hero sekci.
 **Očekávání:** Zobrazí se data pro zvolený rok (tabulka, rozpočet, statistiky).
 
+<a id="ts-04"></a>
 ### TS-04 – Ruční přidání následujícího roku
 **Cíl:** Ověřit, že uživatel může přidat pouze následující kalendářní rok a ten se aktivuje.  
 **Předpoklad:** Čistý profil prohlížeče (bez uložených dat), aby následující rok ještě nebyl v nabídce.  
@@ -43,6 +44,7 @@ Poznámka: Scénáře jsou psané modulově a pokrývají happy path i vybrané 
 - Nový rok se stane aktivním a je editovatelný.  
 - CTA pro přidání dalšího roku po přidání zmizí.
 
+<a id="ts-05"></a>
 ### TS-05 – Aktuální rok se objeví po změně data
 **Cíl:** Ověřit, že se po přechodu na nový kalendářní rok zobrazí nový aktuální rok.  
 **Poznámka:** Ověřitelné změnou systémového data.  
@@ -51,6 +53,7 @@ Poznámka: Scénáře jsou psané modulově a pokrývají happy path i vybrané 
 - Windows: Settings → Time & Language → Date & Time → vypnout „Set time automatically“ → nastavit 1. 1.
 **Očekávání:** Aktuální rok se automaticky objeví v přepínači let a je editovatelný; další rok je možné přidat ručně přes CTA.
 
+<a id="ts-05b"></a>
 ### TS-05b – Po přechodu roku je dostupné přidání dalšího roku
 **Cíl:** Ověřit, že po změně aktuálního roku je v hero sekci dostupné CTA pro přidání následujícího roku (pokud ještě není v nabídce).  
 **Předpoklad:** Následující rok (aktuální + 1) není ještě přidaný v nabídce let.  
@@ -59,6 +62,7 @@ Poznámka: Scénáře jsou psané modulově a pokrývají happy path i vybrané 
 2. Otevři aplikaci a zkontroluj hero sekci.
 **Očekávání:** CTA pro přidání dalšího roku je dostupné a umožňuje přidat rok (aktuální + 1).
 
+<a id="ts-06"></a>
 ### TS-06 – Zamčený minulý rok (nelze editovat)
 **Cíl:** Ověřit, že minulý rok je zamčený a změny nelze provést.  
 **Kroky:**
@@ -66,6 +70,7 @@ Poznámka: Scénáře jsou psané modulově a pokrývají happy path i vybrané 
 2. Zkus upravit rozpočet nebo dárek.
 **Očekávání:** Editace není možná (disabled/readonly), žádná změna se neuloží.
 
+<a id="ts-07"></a>
 ### TS-07 – Odemknutí minulého roku (lock/unlock logika)
 **Cíl:** Ověřit, že po odemknutí lze minulý rok editovat a změny se uloží.  
 **Kroky:**
@@ -95,6 +100,7 @@ Poznámka: Scénáře jsou psané modulově a pokrývají happy path i vybrané 
 2. Zkontroluj rozdíl vůči rozpočtu (delta).
 **Očekávání:** Součty a delta odpovídají tabulkovým datům.
 
+<a id="ts-10"></a>
 ### TS-10 – Stav „over budget“
 **Cíl:** Ověřit správné chování při překročení rozpočtu.  
 **Kroky:**
@@ -111,6 +117,7 @@ Poznámka: Scénáře jsou psané modulově a pokrývají happy path i vybrané 
 **Kroky:** Přidej novou osobu.  
 **Očekávání:** Osoba se objeví v seznamu a je dostupná pro přiřazení dárků.
 
+<a id="ts-12"></a>
 ### TS-12 – Duplicitní osoba (case-insensitive)
 **Cíl:** Ověřit ochranu proti duplicitám bez ohledu na velikost písmen.  
 **Kroky:**
@@ -126,6 +133,7 @@ Poznámka: Scénáře jsou psané modulově a pokrývají happy path i vybrané 
 2. Smaž ji.
 **Očekávání:** Osoba zmizí a její dárky se odstraní.
 
+<a id="ts-14"></a>
 ### TS-14 – Undo po smazání osoby
 **Cíl:** Ověřit návrat smazané osoby i dárků.  
 **Kroky:**
@@ -149,11 +157,13 @@ Poznámka: Scénáře jsou psané modulově a pokrývají happy path i vybrané 
 **Kroky:** Přidej dárek se stavem „Koupeno“ a vyplň cenu.  
 **Očekávání:** Dárek se uloží, rozpočet a statistiky se přepočítají.
 
+<a id="ts-17"></a>
 ### TS-17 – Validace: „Koupeno“ bez ceny nelze uložit
 **Cíl:** Ověřit validaci povinné ceny.  
 **Kroky:** Zkus uložit dárek ve stavu „Koupeno“ bez ceny.  
 **Očekávání:** Uložení není možné, UI zobrazí validaci.
 
+<a id="ts-18"></a>
 ### TS-18 – Editace dárku v editovatelném roce
 **Cíl:** Ověřit editaci (stav, cena, popis) a přepočty.  
 **Kroky:**
@@ -180,11 +190,13 @@ Poznámka: Scénáře jsou psané modulově a pokrývají happy path i vybrané 
 **Kroky:** Přepínej roky a sleduj obsah tabulky.  
 **Očekávání:** Tabulka vždy odpovídá aktivnímu roku.
 
+<a id="ts-21"></a>
 ### TS-21 – Historie podle osoby napříč roky
 **Cíl:** Ověřit zobrazení historie dárků pro osobu.  
 **Kroky:** Otevři přehled historie pro vybranou osobu.  
 **Očekávání:** Zobrazí se dárky napříč roky.
 
+<a id="ts-22"></a>
 ### TS-22 – Grafy a souhrny odpovídají datům
 **Cíl:** Ověřit konzistenci tabulky vs. grafů/souhrnů.  
 **Kroky:** Porovnej grafy (součty, průměr, nejdražší/nejlevnější) s daty v tabulce.  
@@ -194,11 +206,13 @@ Poznámka: Scénáře jsou psané modulově a pokrývají happy path i vybrané 
 
 ## Modul G: UX (scroll, toasty, zvýraznění)
 
+<a id="ts-23"></a>
 ### TS-23 – CTA scroll na formulář přidání dárku
 **Cíl:** Ověřit, že CTA posune stránku na formulář.  
 **Kroky:** Klikni na CTA pro přidání dárku.  
 **Očekávání:** Stránka se posune na formulář pro aktivní rok; u needitovatelných roků je stav jasně indikovaný.
 
+<a id="ts-24"></a>
 ### TS-24 – Toast a timeout (Undo)
 **Cíl:** Ověřit chování toast notifikací.  
 **Kroky:**
@@ -206,6 +220,7 @@ Poznámka: Scénáře jsou psané modulově a pokrývají happy path i vybrané 
 2. Sleduj toast a jeho zmizení po timeoutu.
 **Očekávání:** Toast odpovídá akci a po čase zmizí; Undo funguje v rámci limitu.
 
+<a id="ts-25"></a>
 ### TS-25 – Zvýraznění nově přidané nebo změněné položky
 **Cíl:** Ověřit vizuální feedback po změně dat.  
 **Kroky:** Přidej nebo uprav dárek a sleduj UI.  
