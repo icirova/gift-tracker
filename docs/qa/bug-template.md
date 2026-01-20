@@ -6,7 +6,7 @@ Krátký a výstižný popis chyby (co + kde + za jakých podmínek).
 ---
 
 ## Reference
-- Test Scenario: TS-XX (pokud relevantní)
+- Test Scenario: TS-XX
 
 ---
 
