@@ -56,7 +56,8 @@ const Table = ({
         acc[gift.name] = { name: gift.name, items: [], total: 0 };
       }
       acc[gift.name].items.push(gift);
-      acc[gift.name].total += gift.price ?? 0;
+      const isPlannedAndLocked = gift.status === 'idea' && !isEditable;
+      acc[gift.name].total += isPlannedAndLocked ? 0 : gift.price ?? 0;
       return acc;
     }, {});
 
@@ -67,7 +68,7 @@ const Table = ({
     const max = groupedList.reduce((maxValue, group) => Math.max(maxValue, group.total), 0);
 
     return { groupedGifts: groupedList, maxTotal: max };
-  }, [gifts, normalizedQuery, statusFilter]);
+  }, [gifts, normalizedQuery, statusFilter, isEditable]);
 
   const hasGifts = groupedGifts.length > 0;
   const emptyMessage = hasFilter
@@ -384,7 +385,7 @@ const Table = ({
                                     </>
                                   ) : (
                                     <span className="table-price__value">
-                                      {gift.price === null ? '—' : formatPriceValue(gift.price)}
+                                      {gift.price === null || !isEditable ? '—' : formatPriceValue(gift.price)}
                                     </span>
                                   )}
                                 </div>
