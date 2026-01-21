@@ -188,61 +188,89 @@ Poznámka: Scénáře jsou psané modulově a pokrývají happy path i vybrané 
 1. Přidej osobu „Eva“.
 2. Zkus přidat „eva“.
 
-**Očekávání:** Duplicitní jméno se neuloží nebo je validováno.
+**Očekávání:** Duplicitní jméno se neuloží. Vyskočí chybová hláška.
 
 <a id="ts-13"></a>
-### TS-13 – Smazání osoby odstraní její dárky
-**Cíl:** Ověřit vazbu osoba → dárky.  
+
+### TS-13 – Smazání osoby odstraní její dárky a možnost přidat dárek
+
+**Cíl:** Ověřit vazbu osoba → dárky. 
+
 **Kroky:**
 1. Vyber osobu, která má dárky.
 2. Smaž ji.
-**Očekávání:** Osoba zmizí a její dárky se odstraní.
+
+**Očekávání:** Osoba zmizí ze seznamu, z nabídky ve formuláři pro přidání dárků a její dárky se odstraní z tabulky.
 
 <a id="ts-14"></a>
+
 ### TS-14 – Undo po smazání osoby
-**Cíl:** Ověřit návrat smazané osoby i dárků.  
+
+**Cíl:** Ověřit návrat smazané osoby, nabídky i dárků.
+
 **Kroky:**
 1. Smaž osobu.
 2. V toastu klikni na Undo.
-**Očekávání:** Osoba i její dárky se vrátí do původního stavu.
+
+**Očekávání:** Osoba i její dárky se vrátí do původního stavu. Je v seznamu osob, ve formuláři pro přidání dárků i v tabulce.
 
 ---
 
 ## Modul E: Správa dárků (validace, CRUD)
 
 <a id="ts-15"></a>
+
 ### TS-15 – Přidání dárku ve stavu „Plánováno“
-**Cíl:** Ověřit uložení plánovaného dárku (cena volitelná).  
-**Kroky:** Přidej dárek se stavem „Plánováno“ bez ceny.  
+
+**Cíl:** Ověřit uložení plánovaného dárku (cena volitelná).
+
+**Kroky:** Přidej dárek se stavem „Plánováno“ bez ceny.
+
 **Očekávání:** Dárek se uloží a zobrazí v tabulce.
 
 <a id="ts-16"></a>
+
 ### TS-16 – Přidání dárku ve stavu „Koupeno“ (cena povinná)
-**Cíl:** Ověřit uložení koupeného dárku s cenou.  
-**Kroky:** Přidej dárek se stavem „Koupeno“ a vyplň cenu.  
+
+**Cíl:** Ověřit uložení koupeného dárku s cenou.
+
+**Kroky:** Přidej dárek se stavem „Koupeno“ a vyplň cenu.
+
 **Očekávání:** Dárek se uloží, rozpočet a statistiky se přepočítají.
 
 <a id="ts-17"></a>
+
 ### TS-17 – Validace: „Koupeno“ bez ceny nelze uložit
-**Cíl:** Ověřit validaci povinné ceny.  
-**Kroky:** Zkus uložit dárek ve stavu „Koupeno“ bez ceny.  
-**Očekávání:** Uložení není možné, UI zobrazí validaci.
+
+**Cíl:** Ověřit validaci povinné ceny.
+
+**Kroky:** Zkus uložit dárek ve stavu „Koupeno“ bez ceny.
+
+**Očekávání:** Uložení není možné, tlačítko pro přidání je neaktivní.
 
 <a id="ts-18"></a>
-### TS-18 – Editace dárku v editovatelném roce
-**Cíl:** Ověřit editaci (stav, cena, popis) a přepočty.  
+
+### TS-18 – Editace ceny plánovaného dárku v editovatelném roce
+
+**Cíl:** Ověřit editaci ceny a přepočty.
+
 **Kroky:**
-1. Otevři editaci existujícího dárku.
-2. Změň stav/cenu/popis.
+1. Otevři editaci ceny dárku (plánováno) v tabulce Seznam dárků.
+2. Změň částku.
 3. Ulož.
-**Očekávání:** Změna se projeví v tabulce i ve statistikách.
+
+**Očekávání:** Změna se projeví v tabulce i ve statistikách - plán rozpočtu.
 
 <a id="ts-19"></a>
+
 ### TS-19 – Smazání dárku + Undo
-**Cíl:** Ověřit bezpečné mazání a možnost vrácení.  
+
+**Cíl:** Ověřit bezpečné mazání a možnost vrácení.
+
 **Kroky:**
 1. Smaž dárek.
 2. Klikni na Undo.
+
 **Očekávání:** Dárek se vrátí, pokud byl Undo proveden v časovém limitu.
 
 ---
@@ -250,21 +278,36 @@ Poznámka: Scénáře jsou psané modulově a pokrývají happy path i vybrané 
 ## Modul F: Tabulka, historie a přehledy
 
 <a id="ts-20"></a>
-### TS-20 – Tabulka filtruje data podle roku
-**Cíl:** Ověřit, že tabulka zobrazuje pouze data aktivního roku.  
-**Kroky:** Přepínej roky a sleduj obsah tabulky.  
-**Očekávání:** Tabulka vždy odpovídá aktivnímu roku.
+
+### TS-20 – Tabulka Seznam dárků filtruje data podle jména, stavu a roku
+
+**Cíl:** Ověřit, že tabulka zobrazuje pouze relevantní data.
+
+**Kroky:** 
+1. Hledej podle jména nebo názvu a sleduj obsah tabulky.
+2. Přepínej stav Vše/koupeno/plánováno a sleduj data v tabulce.
+3. Přepínej roky a sleduj, že se zobrazí jen dárky ve vybraném roce.
+
+**Očekávání:** Tabulka vždy odpovídá aktivnímu filtru.
 
 <a id="ts-21"></a>
-### TS-21 – Historie podle osoby napříč roky
-**Cíl:** Ověřit zobrazení historie dárků pro osobu.  
-**Kroky:** Otevři přehled historie pro vybranou osobu.  
-**Očekávání:** Zobrazí se dárky napříč roky.
+
+### TS-21 – Tabulka Historie dárků podle osoby napříč roky
+
+**Cíl:** Ověřit zobrazení historie dárků pro osobu.
+
+**Kroky:** Přepínej osoby a sleduj změnu dat v tabulce.
+
+**Očekávání:** Zobrazí se dárky pro vybranou osobu napříč roky.
 
 <a id="ts-22"></a>
+
 ### TS-22 – Grafy a souhrny odpovídají datům
-**Cíl:** Ověřit konzistenci tabulky vs. grafů/souhrnů.  
-**Kroky:** Porovnej grafy (součty, průměr, nejdražší/nejlevnější) s daty v tabulce.  
+
+**Cíl:** Ověřit konzistenci tabulky vs. grafů/souhrnů.
+
+**Kroky:** Porovnej grafy (součty, průměr, nejdražší/nejlevnější) s daty v tabulce.
+
 **Očekávání:** Grafy a souhrny odpovídají tabulkovým datům.
 
 ---
@@ -272,21 +315,33 @@ Poznámka: Scénáře jsou psané modulově a pokrývají happy path i vybrané 
 ## Modul G: UX (scroll, toasty, zvýraznění)
 
 <a id="ts-23"></a>
+
 ### TS-23 – CTA scroll na formulář přidání dárku
-**Cíl:** Ověřit, že CTA posune stránku na formulář.  
-**Kroky:** Klikni na CTA pro přidání dárku.  
-**Očekávání:** Stránka se posune na formulář pro aktivní rok; u needitovatelných roků je stav jasně indikovaný.
+
+**Cíl:** Ověřit, že CTA v Hero sekci posune stránku na formulář.
+
+**Kroky:** Klikni na CTA v Hero sekci pro přidání dárku (aktivní jen v editačním režimu).
+
+**Očekávání:** Stránka se posune na formulář pro aktivní rok; u needitovatelných roků je CTA neaktivní.
 
 <a id="ts-24"></a>
+
 ### TS-24 – Toast a timeout (Undo)
-**Cíl:** Ověřit chování toast notifikací.  
+
+**Cíl:** Ověřit chování toast notifikací.
+
 **Kroky:**
-1. Proveď akci se stavem (např. smazání).
+1. Proveď akci se stavem (např. smazání dárku z tabulky nebo jména ze seznamu).
 2. Sleduj toast a jeho zmizení po timeoutu.
+
 **Očekávání:** Toast odpovídá akci a po čase zmizí; Undo funguje v rámci limitu.
 
 <a id="ts-25"></a>
+
 ### TS-25 – Zvýraznění nově přidané nebo změněné položky
-**Cíl:** Ověřit vizuální feedback po změně dat.  
-**Kroky:** Přidej nebo uprav dárek a sleduj UI.  
-**Očekávání:** Nová nebo změněná položka je zvýrazněna dle návrhu.
+
+**Cíl:** Ověřit vizuální feedback po změně dat.
+
+**Kroky:** Přidej dárek a sleduj UI v tabulce Seznam dárků.
+
+**Očekávání:** Nová položka je zvýrazněna (žluté podbarvení řádku) a po čase zmizí.
