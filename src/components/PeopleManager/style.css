@@ -21,6 +21,21 @@
   color: var(--text-muted);
 }
 
+.people-manager__label-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: flex-start;
+  gap: 6px;
+}
+
+.people-manager__error {
+  display: block;
+  font-size: 12px;
+  text-transform: none;
+  letter-spacing: 0;
+  color: #be123c;
+}
+
 .people-manager__field input {
   border-radius: 14px;
   border: 1px solid rgba(15, 23, 42, 0.1);

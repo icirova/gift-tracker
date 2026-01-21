@@ -154,28 +154,40 @@ Poznámka: Scénáře jsou psané modulově a pokrývají happy path i vybrané 
 **Očekávání:** Součty a delta odpovídají tabulkovým datům.
 
 <a id="ts-10"></a>
+
 ### TS-10 – Stav „over budget“
-**Cíl:** Ověřit správné chování při překročení rozpočtu.  
+
+**Cíl:** Ověřit správné chování při překročení rozpočtu.
+
 **Kroky:**
 1. Nastav rozpočet tak, aby součet výdajů rozpočet překročil.
-**Očekávání:** UI zobrazí stav překročení rozpočtu (např. „over budget“).
+
+**Očekávání:** UI zobrazí stav překročení rozpočtu - Hero sekce (částka, o kolik byl rozpočet překročen, červené zbarvení baru), Plán rozpočtu - částka a červená část baru.
 
 ---
 
 ## Modul D: Správa osob
 
 <a id="ts-11"></a>
+
 ### TS-11 – Přidání osoby
-**Cíl:** Ověřit vytvoření osoby a zobrazení v seznamu.  
-**Kroky:** Přidej novou osobu.  
-**Očekávání:** Osoba se objeví v seznamu a je dostupná pro přiřazení dárků.
+
+**Cíl:** Ověřit vytvoření osoby a zobrazení v seznamu.
+
+**Kroky:** Přidej novou osobu.
+
+**Očekávání:** Osoba se objeví v seznamu a je dostupná pro přiřazení dárků ve formuláři pro přidání dárků do seznamu.
 
 <a id="ts-12"></a>
+
 ### TS-12 – Duplicitní osoba (case-insensitive)
-**Cíl:** Ověřit ochranu proti duplicitám bez ohledu na velikost písmen.  
+
+**Cíl:** Ověřit ochranu proti duplicitám bez ohledu na velikost písmen.
+
 **Kroky:**
 1. Přidej osobu „Eva“.
 2. Zkus přidat „eva“.
+
 **Očekávání:** Duplicitní jméno se neuloží nebo je validováno.
 
 <a id="ts-13"></a>

@@ -6,6 +6,7 @@ import './style.css';
 const PeopleManager = ({ names, onAddName, onRemoveName, canEdit }) => {
   const [draft, setDraft] = useState('');
   const [confirmName, setConfirmName] = useState(null);
+  const [error, setError] = useState('');
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -16,8 +17,13 @@ const PeopleManager = ({ names, onAddName, onRemoveName, canEdit }) => {
     if (trimmed.length < 2) {
       return;
     }
+    if (names.some((name) => name.toLowerCase() === trimmed.toLowerCase())) {
+      setError('Osoba s tímto jménem už existuje.');
+      return;
+    }
     onAddName(trimmed);
     setDraft('');
+    setError('');
   };
 
   const handleRemove = (name) => {
@@ -61,11 +67,21 @@ const PeopleManager = ({ names, onAddName, onRemoveName, canEdit }) => {
       {canEdit ? (
         <form className="people-manager__form" onSubmit={handleSubmit}>
           <label className="people-manager__field">
-            <span>Jméno</span>
+            <span className="people-manager__label-row">
+              <span>Jméno</span>
+              <span className="people-manager__error" aria-live="polite">
+                {error}
+              </span>
+            </span>
             <input
               type="text"
               value={draft}
-              onChange={(event) => setDraft(event.target.value)}
+              onChange={(event) => {
+                setDraft(event.target.value);
+                if (error) {
+                  setError('');
+                }
+              }}
               placeholder="Např. Iveta"
             />
           </label>
