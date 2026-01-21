@@ -5,6 +5,12 @@ Krátký a výstižný popis chyby (co + kde + za jakých podmínek).
 
 ---
 
+## Označení chyby
+- ID: GT-YYYYMMDD-XX (např. GT-20260120-01)
+- Název: `TS-XX – stručný popis problému`
+
+---
+
 ## Reference
 - Test Scenario: TS-XX
 
