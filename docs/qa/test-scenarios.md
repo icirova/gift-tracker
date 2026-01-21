@@ -7,11 +7,15 @@ Poznámka: Scénáře jsou psané modulově a pokrývají happy path i vybrané 
 ## Modul A: Start a demo data
 
 <a id="ts-01"></a>
+
 ### TS-01 – První načtení aplikace (demo data)
-**Cíl:** Ověřit inicializaci demo dat v čistém profilu prohlížeče.  
+
+**Cíl:** Ověřit inicializaci demo dat v čistém profilu prohlížeče.
+
 **Kroky:**
 1. Otevři aplikaci v čistém profilu (bez uložených dat).
 2. Zkontroluj, že jsou viditelné osoby, dárky, rozpočet a statistiky.
+
 **Očekávání:** Demo data jsou načtena, aplikace je použitelná bez dalších kroků.
 
 <a id="ts-02"></a>
