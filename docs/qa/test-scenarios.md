@@ -1,6 +1,6 @@
 # Test Scenarios
 
-Poznámka: Scénáře jsou psané modulově a pokrývají happy path i vybrané hraniční situace. Výsledky exekuce (PASS/FAIL) se nezapisují sem, ale do checklistu / test runu.
+Poznámka: Scénáře jsou psané modulově a pokrývají happy path i vybrané hraniční situace. Výsledky exekuce (PASS/FAIL) se zapisují do test run checklistu v Google Sheets: <https://docs.google.com/spreadsheets/d/1raT5bJjBXFXynN59qBXKJSKXf--ijaf4KEj2uX7CH0g/edit?usp=sharing>
 
 ---
 
@@ -13,6 +13,7 @@ Poznámka: Scénáře jsou psané modulově a pokrývají happy path i vybrané 
 **Cíl:** Ověřit inicializaci demo dat v čistém profilu prohlížeče.
 
 **Kroky:**
+
 1. Otevři aplikaci v čistém profilu (bez uložených dat).
 2. Zkontroluj, že je viditelný plán rozpoču, seznam osob, formulář pro přidání dárku, tabulky (historie, seznam), grafy a statistiky.
 
@@ -25,6 +26,7 @@ Poznámka: Scénáře jsou psané modulově a pokrývají happy path i vybrané 
 **Cíl:** Ověřit, že se uživatelská data po refreshi neztratí ani nepřepíší demo daty.
 
 **Kroky:**
+
 1. Proveď změnu (např. přidej dárek nebo uprav rozpočet).
 2. Proveď refresh stránky.
 
@@ -41,6 +43,7 @@ Poznámka: Scénáře jsou psané modulově a pokrývají happy path i vybrané 
 **Cíl:** Ověřit, že přepnutí roku přefiltruje data.
 
 **Kroky:**
+
 1. Přepni rok v hlavičce / hero sekci.
 
 **Očekávání:** Zobrazí se data pro zvolený rok (tabulka, rozpočet, statistiky).
@@ -54,14 +57,17 @@ Poznámka: Scénáře jsou psané modulově a pokrývají happy path i vybrané 
 **Předpoklad:** Čistý profil prohlížeče (bez uložených dat), aby následující rok ještě nebyl v nabídce.
 
 **Kroky:**
+
 1. V hero sekci klikni na CTA pro přidání následujícího roku.
 
-**Očekávání:**  
-- Přidá se pouze následující rok (aktuální rok + 1).  
-- Nový rok se stane aktivním a je editovatelný.  
+**Očekávání:**
+
+- Přidá se pouze následující rok (aktuální rok + 1).
+- Nový rok se stane aktivním a je editovatelný.
 - CTA pro přidání dalšího roku po přidání zmizí.
 
 **Poznámka:**
+
 - seznam osob přebírá data z aktuálního roku (nebude prázdný)
 
 <a id="ts-05"></a>
@@ -73,11 +79,13 @@ Poznámka: Scénáře jsou psané modulově a pokrývají happy path i vybrané 
 **Poznámka:** Ověřitelné změnou systémového data. Test lze provést pouze na lokálním buildu.
 
 **Postup (macOS):**
+
 1. Otevři System Settings → General → Date & Time.
 2. Vypni „Set automatically“ a nastav datum na 1. 1. nového roku (např. 1. 1. 2025).
 3. Otevři lokální build aplikace a udělej refresh.
 
 **Postup (Windows):**
+
 1. Otevři Settings → Time & Language → Date & Time.
 2. Vypni „Set time automatically“ a nastav datum na 1. 1. nového roku (např. 1. 1. 2025).
 3. Otevři lokální build aplikace a udělej refresh.
@@ -88,11 +96,12 @@ Poznámka: Scénáře jsou psané modulově a pokrývají happy path i vybrané 
 
 ### TS-05b – Po přechodu roku je dostupné přidání dalšího roku
 
-**Cíl:** Ověřit, že po změně aktuálního roku je v hero sekci dostupné CTA pro přidání následujícího roku (pokud ještě není v nabídce). 
+**Cíl:** Ověřit, že po změně aktuálního roku je v hero sekci dostupné CTA pro přidání následujícího roku (pokud ještě není v nabídce).
 
-**Předpoklad:** Následující rok (aktuální + 1) není ještě přidaný v nabídce let. 
+**Předpoklad:** Následující rok (aktuální + 1) není ještě přidaný v nabídce let.
 
 **Kroky:**
+
 1. Změň systémové datum na 1. 1. nového roku.
 2. Otevři aplikaci a zkontroluj hero sekci.
 
@@ -105,6 +114,7 @@ Poznámka: Scénáře jsou psané modulově a pokrývají happy path i vybrané 
 **Cíl:** Ověřit, že minulý rok je zamčený a změny nelze provést.
 
 **Kroky:**
+
 1. Přepni na minulý rok.
 2. Zkus upravit rozpočet nebo dárek.
 
@@ -136,6 +146,7 @@ Poznámka: Scénáře jsou psané modulově a pokrývají happy path i vybrané 
 **Cíl:** Ověřit uložení rozpočtu a perzistenci.
 
 **Kroky:**
+
 1. Změň hodnotu rozpočtu pro aktivní rok.
 2. Ulož a proveď refresh.
 
@@ -145,9 +156,10 @@ Poznámka: Scénáře jsou psané modulově a pokrývají happy path i vybrané 
 
 ### TS-09 – Výpočty: koupeno + plánováno + delta
 
-**Cíl:** Ověřit, že součty odpovídají datům v tabulce. 
+**Cíl:** Ověřit, že součty odpovídají datům v tabulce.
 
 **Kroky:**
+
 1. Porovnej součet „koupeno“ a „plánováno“ s položkami v tabulce.
 2. Zkontroluj rozdíl vůči rozpočtu (delta).
 
@@ -160,6 +172,7 @@ Poznámka: Scénáře jsou psané modulově a pokrývají happy path i vybrané 
 **Cíl:** Ověřit správné chování při překročení rozpočtu.
 
 **Kroky:**
+
 1. Nastav rozpočet tak, aby součet výdajů rozpočet překročil.
 
 **Očekávání:** UI zobrazí stav překročení rozpočtu - Hero sekce (částka, o kolik byl rozpočet překročen, červené zbarvení baru), Plán rozpočtu - částka a červená část baru.
@@ -185,6 +198,7 @@ Poznámka: Scénáře jsou psané modulově a pokrývají happy path i vybrané 
 **Cíl:** Ověřit ochranu proti duplicitám bez ohledu na velikost písmen.
 
 **Kroky:**
+
 1. Přidej osobu „Eva“.
 2. Zkus přidat „eva“.
 
@@ -194,9 +208,10 @@ Poznámka: Scénáře jsou psané modulově a pokrývají happy path i vybrané 
 
 ### TS-13 – Smazání osoby odstraní její dárky a možnost přidat dárek
 
-**Cíl:** Ověřit vazbu osoba → dárky. 
+**Cíl:** Ověřit vazbu osoba → dárky.
 
 **Kroky:**
+
 1. Vyber osobu, která má dárky.
 2. Smaž ji.
 
@@ -209,6 +224,7 @@ Poznámka: Scénáře jsou psané modulově a pokrývají happy path i vybrané 
 **Cíl:** Ověřit návrat smazané osoby, nabídky i dárků.
 
 **Kroky:**
+
 1. Smaž osobu.
 2. V toastu klikni na Undo.
 
@@ -255,6 +271,7 @@ Poznámka: Scénáře jsou psané modulově a pokrývají happy path i vybrané 
 **Cíl:** Ověřit editaci ceny a přepočty.
 
 **Kroky:**
+
 1. Otevři editaci ceny dárku (plánováno) v tabulce Seznam dárků.
 2. Změň částku.
 3. Ulož.
@@ -268,6 +285,7 @@ Poznámka: Scénáře jsou psané modulově a pokrývají happy path i vybrané 
 **Cíl:** Ověřit bezpečné mazání a možnost vrácení.
 
 **Kroky:**
+
 1. Smaž dárek.
 2. Klikni na Undo.
 
@@ -283,7 +301,8 @@ Poznámka: Scénáře jsou psané modulově a pokrývají happy path i vybrané 
 
 **Cíl:** Ověřit, že tabulka zobrazuje pouze relevantní data.
 
-**Kroky:** 
+**Kroky:**
+
 1. Hledej podle jména nebo názvu a sleduj obsah tabulky.
 2. Přepínej stav Vše/koupeno/plánováno a sleduj data v tabulce.
 3. Přepínej roky a sleduj, že se zobrazí jen dárky ve vybraném roce.
@@ -331,6 +350,7 @@ Poznámka: Scénáře jsou psané modulově a pokrývají happy path i vybrané 
 **Cíl:** Ověřit chování toast notifikací.
 
 **Kroky:**
+
 1. Proveď akci se stavem (např. smazání dárku z tabulky nebo jména ze seznamu).
 2. Sleduj toast a jeho zmizení po timeoutu.
 
