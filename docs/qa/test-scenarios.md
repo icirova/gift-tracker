@@ -14,16 +14,20 @@ Poznámka: Scénáře jsou psané modulově a pokrývají happy path i vybrané 
 
 **Kroky:**
 1. Otevři aplikaci v čistém profilu (bez uložených dat).
-2. Zkontroluj, že jsou viditelné osoby, dárky, rozpočet a statistiky.
+2. Zkontroluj, že je viditelný plán rozpoču, seznam osob, formulář pro přidání dárku, tabulky (historie, seznam), grafy a statistiky.
 
 **Očekávání:** Demo data jsou načtena, aplikace je použitelná bez dalších kroků.
 
 <a id="ts-02"></a>
+
 ### TS-02 – Persistace dat po refreshi
-**Cíl:** Ověřit, že se uživatelská data po refreshi neztratí ani nepřepíší demo daty.  
+
+**Cíl:** Ověřit, že se uživatelská data po refreshi neztratí ani nepřepíší demo daty.
+
 **Kroky:**
 1. Proveď změnu (např. přidej dárek nebo uprav rozpočet).
 2. Proveď refresh stránky.
+
 **Očekávání:** Změny zůstávají zachovány, demo data se znovu neinicializují.
 
 ---
@@ -31,77 +35,122 @@ Poznámka: Scénáře jsou psané modulově a pokrývají happy path i vybrané 
 ## Modul B: Roky (přepínání, přidání, zamykání)
 
 <a id="ts-03"></a>
+
 ### TS-03 – Přepnutí aktivního roku
-**Cíl:** Ověřit, že přepnutí roku přefiltruje data.  
+
+**Cíl:** Ověřit, že přepnutí roku přefiltruje data.
+
 **Kroky:**
 1. Přepni rok v hlavičce / hero sekci.
+
 **Očekávání:** Zobrazí se data pro zvolený rok (tabulka, rozpočet, statistiky).
 
 <a id="ts-04"></a>
+
 ### TS-04 – Ruční přidání následujícího roku
-**Cíl:** Ověřit, že uživatel může přidat pouze následující kalendářní rok a ten se aktivuje.  
-**Předpoklad:** Čistý profil prohlížeče (bez uložených dat), aby následující rok ještě nebyl v nabídce.  
+
+**Cíl:** Ověřit, že uživatel může přidat pouze následující kalendářní rok a ten se aktivuje.
+
+**Předpoklad:** Čistý profil prohlížeče (bez uložených dat), aby následující rok ještě nebyl v nabídce.
+
 **Kroky:**
 1. V hero sekci klikni na CTA pro přidání následujícího roku.
+
 **Očekávání:**  
 - Přidá se pouze následující rok (aktuální rok + 1).  
 - Nový rok se stane aktivním a je editovatelný.  
 - CTA pro přidání dalšího roku po přidání zmizí.
 
+**Poznámka:**
+- seznam osob přebírá data z aktuálního roku (nebude prázdný)
+
 <a id="ts-05"></a>
+
 ### TS-05 – Aktuální rok se objeví po změně data
-**Cíl:** Ověřit, že se po přechodu na nový kalendářní rok zobrazí nový aktuální rok.  
-**Poznámka:** Ověřitelné změnou systémového data.  
-**Postup (OS):**
-- macOS: System Settings → General → Date & Time → vypnout „Set automatically“ → nastavit 1. 1.
-- Windows: Settings → Time & Language → Date & Time → vypnout „Set time automatically“ → nastavit 1. 1.
+
+**Cíl:** Ověřit, že se po přechodu na nový kalendářní rok zobrazí nový aktuální rok.
+
+**Poznámka:** Ověřitelné změnou systémového data. Test lze provést pouze na lokálním buildu.
+
+**Postup (macOS):**
+1. Otevři System Settings → General → Date & Time.
+2. Vypni „Set automatically“ a nastav datum na 1. 1. nového roku (např. 1. 1. 2025).
+3. Otevři lokální build aplikace a udělej refresh.
+
+**Postup (Windows):**
+1. Otevři Settings → Time & Language → Date & Time.
+2. Vypni „Set time automatically“ a nastav datum na 1. 1. nového roku (např. 1. 1. 2025).
+3. Otevři lokální build aplikace a udělej refresh.
+
 **Očekávání:** Aktuální rok se automaticky objeví v přepínači let a je editovatelný; další rok je možné přidat ručně přes CTA.
 
 <a id="ts-05b"></a>
+
 ### TS-05b – Po přechodu roku je dostupné přidání dalšího roku
-**Cíl:** Ověřit, že po změně aktuálního roku je v hero sekci dostupné CTA pro přidání následujícího roku (pokud ještě není v nabídce).  
-**Předpoklad:** Následující rok (aktuální + 1) není ještě přidaný v nabídce let.  
+
+**Cíl:** Ověřit, že po změně aktuálního roku je v hero sekci dostupné CTA pro přidání následujícího roku (pokud ještě není v nabídce). 
+
+**Předpoklad:** Následující rok (aktuální + 1) není ještě přidaný v nabídce let. 
+
 **Kroky:**
 1. Změň systémové datum na 1. 1. nového roku.
 2. Otevři aplikaci a zkontroluj hero sekci.
+
 **Očekávání:** CTA pro přidání dalšího roku je dostupné a umožňuje přidat rok (aktuální + 1).
 
 <a id="ts-06"></a>
+
 ### TS-06 – Zamčený minulý rok (nelze editovat)
-**Cíl:** Ověřit, že minulý rok je zamčený a změny nelze provést.  
+
+**Cíl:** Ověřit, že minulý rok je zamčený a změny nelze provést.
+
 **Kroky:**
 1. Přepni na minulý rok.
 2. Zkus upravit rozpočet nebo dárek.
+
 **Očekávání:** Editace není možná (disabled/readonly), žádná změna se neuloží.
 
 <a id="ts-07"></a>
+
 ### TS-07 – Odemknutí minulého roku (lock/unlock logika)
-**Cíl:** Ověřit, že po odemknutí lze minulý rok editovat a změny se uloží.  
+
+**Cíl:** Ověřit, že po odemknutí lze minulý rok editovat a změny se uloží.
+
 **Kroky:**
+
 1. Přepni na minulý rok.
 2. Odemkni editaci.
 3. Proveď změnu (rozpočet / dárek).
-4. Proveď refresh.
-**Očekávání:** Minulý rok je editovatelný, změny se uloží a přetrvají po refreshi.
+4. Proveď refresh a znovu vyber minulý rok.
+
+**Očekávání:** Minulý rok je editovatelný, změny se uloží a přetrvají po refreshi. Editace je po refreshi zamknutá.
 
 ---
 
 ## Modul C: Rozpočet a výpočty
 
 <a id="ts-08"></a>
+
 ### TS-08 – Nastavení rozpočtu pro aktivní rok
-**Cíl:** Ověřit uložení rozpočtu a perzistenci.  
+
+**Cíl:** Ověřit uložení rozpočtu a perzistenci.
+
 **Kroky:**
 1. Změň hodnotu rozpočtu pro aktivní rok.
 2. Ulož a proveď refresh.
+
 **Očekávání:** Rozpočet je uložen a po refreshi zůstává.
 
 <a id="ts-09"></a>
+
 ### TS-09 – Výpočty: koupeno + plánováno + delta
-**Cíl:** Ověřit, že součty odpovídají datům v tabulce.  
+
+**Cíl:** Ověřit, že součty odpovídají datům v tabulce. 
+
 **Kroky:**
 1. Porovnej součet „koupeno“ a „plánováno“ s položkami v tabulce.
 2. Zkontroluj rozdíl vůči rozpočtu (delta).
+
 **Očekávání:** Součty a delta odpovídají tabulkovým datům.
 
 <a id="ts-10"></a>
