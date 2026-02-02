@@ -11,7 +11,7 @@ const Table = ({
   onUpdateGift,
   availableYears,
   onYearChange,
-  isEditable,
+  isEditable = true,
 }) => {
   const formatPriceValue = (value) => Number(value).toLocaleString('cs-CZ');
   const [searchQuery, setSearchQuery] = useState('');
@@ -490,10 +490,6 @@ Table.propTypes = {
   availableYears: PropTypes.arrayOf(PropTypes.number).isRequired,
   onYearChange: PropTypes.func.isRequired,
   isEditable: PropTypes.bool,
-};
-
-Table.defaultProps = {
-  isEditable: true,
 };
 
 export default Table;

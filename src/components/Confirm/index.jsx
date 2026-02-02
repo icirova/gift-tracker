@@ -1,7 +1,14 @@
 import PropTypes from 'prop-types';
 import './style.css';
 
-const Confirm = ({ message, onConfirm, onCancel, confirmLabel, cancelLabel, className }) => (
+const Confirm = ({
+  message,
+  onConfirm,
+  onCancel,
+  confirmLabel = 'Ano',
+  cancelLabel = 'Ne',
+  className = '',
+}) => (
   <div className={`table-status__confirm${className ? ` ${className}` : ''}`}>
     <span className="table-status__confirm-text">{message}</span>
     <div className="table-status__confirm-actions">
@@ -22,12 +29,6 @@ Confirm.propTypes = {
   confirmLabel: PropTypes.string,
   cancelLabel: PropTypes.string,
   className: PropTypes.string,
-};
-
-Confirm.defaultProps = {
-  confirmLabel: 'Ano',
-  cancelLabel: 'Ne',
-  className: '',
 };
 
 export default Confirm;

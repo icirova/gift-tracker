@@ -84,9 +84,4 @@ SummaryItem.propTypes = {
   testId: PropTypes.string,
 };
 
-SummaryItem.defaultProps = {
-  variant: undefined,
-  testId: undefined,
-};
-
 export default SummaryItem;

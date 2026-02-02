@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import './style.css';
 
-const HeroBudgetSummary = ({ currentBudget, totalPercent, deltaAmount }) => {
+const HeroBudgetSummary = ({ currentBudget = null, totalPercent, deltaAmount = null }) => {
   const isOverBudget = deltaAmount !== null && deltaAmount < 0;
   const showDelta = currentBudget !== null && deltaAmount !== null;
   const formattedDelta = isOverBudget
@@ -39,11 +39,6 @@ HeroBudgetSummary.propTypes = {
   currentBudget: PropTypes.number,
   totalPercent: PropTypes.number.isRequired,
   deltaAmount: PropTypes.number,
-};
-
-HeroBudgetSummary.defaultProps = {
-  deltaAmount: null,
-  currentBudget: null,
 };
 
 export default HeroBudgetSummary;

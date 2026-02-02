@@ -16,7 +16,7 @@ const GiftForm = ({
   namesByYear,
   statusOptions,
   defaultStatus,
-  isEditable,
+  isEditable = true,
 }) => {
   const namesForYear = namesByYear[defaultYear] ?? [];
   const defaultName = namesForYear[0] ?? '';
@@ -179,10 +179,6 @@ GiftForm.propTypes = {
   ).isRequired,
   defaultStatus: PropTypes.string,
   isEditable: PropTypes.bool,
-};
-
-GiftForm.defaultProps = {
-  isEditable: true,
 };
 
 export default GiftForm;

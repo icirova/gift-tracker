@@ -34,7 +34,7 @@ export default defineConfig({
   // Sdílené nastavení pro všechny projekty/prohlížeče.
   use: {
     /* Base URL to use in actions like `await page.goto('')`. */
-    // Základní URL, takže můžeš psát page.goto('/') místo celé adresy.
+    // Základní URL, takže můžu psát page.goto('/') místo celé adresy.
     baseURL: 'http://localhost:5173',
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */

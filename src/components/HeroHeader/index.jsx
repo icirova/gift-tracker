@@ -15,9 +15,9 @@ const HeroHeader = ({
   totalItems,
   giftCountSuffix,
   spentTotal,
-  currentBudget,
+  currentBudget = null,
   budgetPercentTotal,
-  budgetDelta,
+  budgetDelta = null,
   currentYear,
   isPreviousYear,
   isYearEditable,
@@ -320,11 +320,6 @@ HeroHeader.propTypes = {
   canAddGift: PropTypes.bool.isRequired,
   onUnlockPastYear: PropTypes.func.isRequired,
   onLockPastYear: PropTypes.func.isRequired,
-};
-
-HeroHeader.defaultProps = {
-  currentBudget: null,
-  budgetDelta: null,
 };
 
 export default HeroHeader;

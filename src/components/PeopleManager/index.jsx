@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import Confirm from '../Confirm';
 import './style.css';
 
-const PeopleManager = ({ names, onAddName, onRemoveName, canEdit }) => {
+const PeopleManager = ({ names, onAddName, onRemoveName, canEdit = true }) => {
   const [draft, setDraft] = useState('');
   const [confirmName, setConfirmName] = useState(null);
   const [error, setError] = useState('');
@@ -136,10 +136,6 @@ PeopleManager.propTypes = {
   onAddName: PropTypes.func.isRequired,
   onRemoveName: PropTypes.func.isRequired,
   canEdit: PropTypes.bool,
-};
-
-PeopleManager.defaultProps = {
-  canEdit: true,
 };
 
 export default PeopleManager;

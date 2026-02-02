@@ -1,6 +1,12 @@
 import PropTypes from 'prop-types';
 
-const UndoToast = ({ pendingDelete, pendingAdd, pendingNameDelete, onUndoDelete, onUndoNameDelete }) => {
+const UndoToast = ({
+  pendingDelete = null,
+  pendingAdd = null,
+  pendingNameDelete = null,
+  onUndoDelete,
+  onUndoNameDelete,
+}) => {
   if (!pendingDelete && !pendingAdd && !pendingNameDelete) {
     return null;
   }
@@ -45,12 +51,6 @@ UndoToast.propTypes = {
   }),
   onUndoDelete: PropTypes.func.isRequired,
   onUndoNameDelete: PropTypes.func.isRequired,
-};
-
-UndoToast.defaultProps = {
-  pendingDelete: null,
-  pendingAdd: null,
-  pendingNameDelete: null,
 };
 
 export default UndoToast;

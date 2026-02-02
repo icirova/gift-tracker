@@ -3,20 +3,20 @@ import './style.css';
 
 const HeroBudget = ({
   selectedYear,
-  currentBudget,
-  budgetEditingYear,
+  currentBudget = null,
+  budgetEditingYear = null,
   budgetDraft,
   boughtTotal,
   ideaTotal,
   ideaMissingCount,
   planTotal,
-  planDelta,
+  planDelta = null,
   isPlanOverBudget,
   boughtPercent,
   ideaPercent,
   overPercent,
   isDirty,
-  isEditable,
+  isEditable = true,
   onDraftChange,
   onEdit,
   onSave,
@@ -254,13 +254,6 @@ HeroBudget.propTypes = {
   onEdit: PropTypes.func.isRequired,
   onSave: PropTypes.func.isRequired,
   onCancel: PropTypes.func.isRequired,
-};
-
-HeroBudget.defaultProps = {
-  currentBudget: null,
-  budgetEditingYear: null,
-  planDelta: null,
-  isEditable: true,
 };
 
 export default HeroBudget;

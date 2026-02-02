@@ -1,5 +1,5 @@
 // @ts-check
-import { test, expect } from './fixtures';
+import { test, expect } from '../fixtures';
 
 test('TS-01: první načtení aplikace načte demo data', async ({ page }) => {
   await test.step('Základní sekce jsou viditelné', async () => {

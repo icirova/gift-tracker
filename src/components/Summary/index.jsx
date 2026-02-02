@@ -14,7 +14,12 @@ const formatSignedCurrency = (value) => {
   return `${sign}${formatCurrency(Math.abs(value))}`;
 };
 
-const Summary = ({ mostExpensiveGift, cheapestGift, yearChange, averageBoughtPrice }) => {
+const Summary = ({
+  mostExpensiveGift = null,
+  cheapestGift = null,
+  yearChange = null,
+  averageBoughtPrice = null,
+}) => {
   return (
     <div className='summary'>
       <SummaryItem
@@ -50,13 +55,6 @@ Summary.propTypes = {
   cheapestGift: PropTypes.number,
   yearChange: PropTypes.number,
   averageBoughtPrice: PropTypes.number,
-};
-
-Summary.defaultProps = {
-  mostExpensiveGift: null,
-  cheapestGift: null,
-  yearChange: null,
-  averageBoughtPrice: null,
 };
 
 export default Summary;
