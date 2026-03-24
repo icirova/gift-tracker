@@ -24,6 +24,15 @@ test('TS-20: tabulka seznam dárků filtruje podle hledání, stavu a roku', asy
     await expect(giftTable).not.toContainText('Kolo');
   });
 
+  await test.step('Filtr stavu zobrazí jen koupené dárky', async () => {
+    await statusFilter.selectOption('bought');
+
+    await expect(giftTable).toContainText('Výlet do lázní');
+    await expect(giftTable).toContainText('Kolo');
+    await expect(giftTable).not.toContainText('Čtečka knih');
+    await expect(giftTable).not.toContainText('Skicovací sada');
+  });
+
   await test.step('Přepnutí roku v tabulce zobrazí pouze data z daného roku', async () => {
     await statusFilter.selectOption('all');
     await yearFilter.selectOption('2025');
