@@ -108,7 +108,7 @@ const Table = ({
       setEditingPriceId(null);
       setEditingPriceValue('');
     }
-  }, [editingPriceId, gifts]);
+  }, [editingPriceId, gifts, isEditable]);
 
   useEffect(() => {
     if (!pendingStatusId) {
