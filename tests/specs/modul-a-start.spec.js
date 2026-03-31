@@ -1,6 +1,9 @@
 // @ts-check
 import { test, expect } from './fixtures';
 
+/** @param {import('@playwright/test').Page} page */
+const giftRows = (page) => page.locator('[data-testid^="gift-table-row-"]');
+
 test('TS-01: první načtení aplikace načte demo data', async ({ page }) => {
   await test.step('Základní sekce jsou viditelné', async () => {
     await expect(page.getByRole('heading', { name: 'Plán rozpočtu' })).toBeVisible();
@@ -17,9 +20,9 @@ test('TS-01: první načtení aplikace načte demo data', async ({ page }) => {
   await test.step('Seznam dárků obsahuje demo data', async () => {
     await expect(page.getByRole('heading', { name: /Seznam dárků/ })).toBeVisible();
     await expect(page.getByTestId('gift-table')).toBeVisible();
-    await expect(page.locator('[data-testid^="gift-table-row-"]').first()).toBeVisible();
-    await expect(page.getByTestId('gift-table')).toContainText('Anna');
-    await expect(page.getByTestId('gift-table')).toContainText('Výlet do lázní');
+    await expect(giftRows(page)).toHaveCount(8);
+    await expect(page.getByTestId('gift-table-row-2026-anna-1')).toContainText('Výlet do lázní');
+    await expect(page.getByTestId('gift-table-row-2026-jakub-1')).toContainText('Kolo');
   });
 
   await test.step('Historie, grafy a statistiky jsou zobrazené', async () => {
@@ -48,13 +51,15 @@ test('TS-02: data zůstávají po refreshi a nepřepíší se demo daty', async 
     await expect(giftForm.getByRole('button', { name: 'Přidat dárek' })).toBeEnabled();
     await giftForm.getByRole('button', { name: 'Přidat dárek' }).click();
 
-    await expect(page.locator('.table-gift', { hasText: addedGiftName })).toBeVisible();
+    await expect(giftRows(page)).toHaveCount(9);
+    await expect(giftRows(page).filter({ hasText: addedGiftName })).toHaveCount(1);
   });
 
   await test.step('Po refreshi zůstávají změny', async () => {
     await page.reload();
 
-    await expect(page.locator('.table-gift', { hasText: addedGiftName })).toBeVisible();
-    await expect(page.getByTestId('gift-table')).toContainText('Výlet do lázní');
+    await expect(giftRows(page)).toHaveCount(9);
+    await expect(giftRows(page).filter({ hasText: addedGiftName })).toHaveCount(1);
+    await expect(page.getByTestId('gift-table-row-2026-anna-1')).toContainText('Výlet do lázní');
   });
 });

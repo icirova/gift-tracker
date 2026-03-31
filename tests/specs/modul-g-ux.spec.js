@@ -3,6 +3,11 @@ import { test, expect } from './fixtures';
 
 /** @typedef {import('@playwright/test').Page} Page */
 
+/** @param {Page} page */
+const installClock = async (page) => {
+  await page.clock.install();
+};
+
 /**
  * @param {Page} page
  * @param {string} giftName
@@ -48,6 +53,7 @@ test('TS-23: CTA v hero sekci scrolluje na formulář a v needitovatelném roce 
 
 test('TS-24: toast odpovídá akci, undo funguje a toast po timeoutu zmizí', async ({ page }) => {
   await test.step('Po smazání dárku se zobrazí toast a undo ho vrátí', async () => {
+    await installClock(page);
     await page.getByRole('button', { name: 'Smazat dárek Sportovní bunda pro David' }).click();
     await page.locator('.table-status__confirm--wrap').getByRole('button', { name: 'Ano' }).click();
 
@@ -61,7 +67,7 @@ test('TS-24: toast odpovídá akci, undo funguje a toast po timeoutu zmizí', as
     await page.locator('.table-status__confirm--wrap').getByRole('button', { name: 'Ano' }).click();
 
     await expect(page.getByRole('status')).toContainText('Dárek byl smazán.');
-    await page.waitForTimeout(5200);
+    await page.clock.runFor(5000);
     await expect(page.getByRole('status')).toHaveCount(0);
   });
 });
@@ -71,6 +77,7 @@ test('TS-25: nově přidaná položka je dočasně zvýrazněná v tabulce', asy
   const highlightedRow = page.locator('tr.table-row--highlight', { hasText: giftName });
 
   await test.step('Po přidání dárku je nový řádek zvýrazněný', async () => {
+    await installClock(page);
     await fillGiftForm(page, giftName);
     await page.locator('#gift-form').getByRole('button', { name: 'Přidat dárek' }).click();
 
@@ -79,7 +86,7 @@ test('TS-25: nově přidaná položka je dočasně zvýrazněná v tabulce', asy
   });
 
   await test.step('Zvýraznění po čase zmizí', async () => {
-    await page.waitForTimeout(2700);
+    await page.clock.runFor(2500);
     await expect(highlightedRow).toHaveCount(0);
   });
 });
