@@ -1,24 +1,6 @@
 // @ts-check
 import { test, expect } from './fixtures';
-
-/** @typedef {import('@playwright/test').Page} Page */
-
-/**
- * @param {Page} page
- * @param {string} name
- */
-const addPerson = async (page, name) => {
-  const peopleForm = page.getByTestId('people-form');
-  await peopleForm.getByRole('textbox').fill(name);
-  await peopleForm.getByRole('button', { name: 'Přidat osobu' }).click();
-};
-
-/**
- * @param {Page} page
- * @returns {Promise<string[]>}
- */
-const getGiftFormNames = async (page) =>
-  page.locator('#gift-form select[name="name"] option').allInnerTexts();
+import { addPerson, confirmByTestId, getGiftFormNames, giftRow, giftRows } from './helpers';
 
 test('TS-11: přidání osoby ji zobrazí v seznamu a ve formuláři pro dárky', async ({ page }) => {
   const newPerson = 'Iveta';
@@ -27,6 +9,7 @@ test('TS-11: přidání osoby ji zobrazí v seznamu a ve formuláři pro dárky'
     await addPerson(page, newPerson);
 
     await expect(page.getByTestId('people-list')).toContainText(newPerson);
+    await expect(page.getByTestId('people-list')).toContainText('Anna');
   });
 
   await test.step('Nová osoba je dostupná ve formuláři pro přidání dárku', async () => {
@@ -52,30 +35,50 @@ test('TS-12: duplicitní osoba se bez ohledu na velikost písmen neuloží', asy
     await expect.poll(async () => getGiftFormNames(page)).toEqual(
       expect.arrayContaining(['Eva']),
     );
+    await expect.poll(async () => getGiftFormNames(page)).not.toContain('eva');
+  });
+});
+
+test('TS-12b: jméno se před uložením otrimuje a příliš krátké jméno nelze přidat', async ({
+  page,
+}) => {
+  await test.step('Jednopísmenné jméno drží formulář neaktivní', async () => {
+    const peopleForm = page.getByTestId('people-form');
+    await peopleForm.getByRole('textbox').fill('A');
+    await expect(peopleForm.getByRole('button', { name: 'Přidat osobu' })).toBeDisabled();
+  });
+
+  await test.step('Jméno s mezerami se uloží otrimované', async () => {
+    await addPerson(page, '  Iveta  ');
+
+    await expect(page.getByTestId('people-list')).toContainText('Iveta');
+    await expect.poll(async () => getGiftFormNames(page)).toContain('Iveta');
   });
 });
 
 test('TS-13: smazání osoby odstraní ji i její dárky z aktivního roku', async ({ page }) => {
   await test.step('Smazání osoby s dárky', async () => {
     await expect(page.getByTestId('people-list')).toContainText('Anna');
-    await expect(page.getByTestId('gift-table')).toContainText('Výlet do lázní');
+    await expect(giftRows(page)).toHaveCount(8);
+    await expect(giftRow(page, '2026-anna-1')).toContainText('Výlet do lázní');
 
     await page.getByRole('button', { name: 'Odebrat osobu Anna' }).click();
-    await page.getByTestId('people-remove-confirm-confirm').click();
+    await confirmByTestId(page, 'people-remove-confirm');
   });
 
   await test.step('Osoba zmizí ze seznamu, formuláře i tabulky', async () => {
     await expect(page.getByTestId('people-list')).not.toContainText('Anna');
     await expect.poll(async () => getGiftFormNames(page)).not.toContain('Anna');
-    await expect(page.getByTestId('gift-table')).not.toContainText('Výlet do lázní');
-    await expect(page.getByTestId('gift-table')).not.toContainText('Čtečka knih');
+    await expect(giftRows(page)).toHaveCount(6);
+    await expect(giftRow(page, '2026-anna-1')).toHaveCount(0);
+    await expect(giftRow(page, '2026-anna-2')).toHaveCount(0);
   });
 });
 
 test('TS-14: undo po smazání osoby vrátí osobu, nabídku i dárky', async ({ page }) => {
   await test.step('Smazání osoby zobrazí undo toast', async () => {
     await page.getByRole('button', { name: 'Odebrat osobu Anna' }).click();
-    await page.getByTestId('people-remove-confirm-confirm').click();
+    await confirmByTestId(page, 'people-remove-confirm');
 
     await expect(page.getByRole('status')).toContainText('Jméno bylo odebráno.');
     await expect(page.getByRole('button', { name: 'Zpět' })).toBeVisible();
@@ -86,7 +89,8 @@ test('TS-14: undo po smazání osoby vrátí osobu, nabídku i dárky', async ({
 
     await expect(page.getByTestId('people-list')).toContainText('Anna');
     await expect.poll(async () => getGiftFormNames(page)).toContain('Anna');
-    await expect(page.getByTestId('gift-table')).toContainText('Výlet do lázní');
-    await expect(page.getByTestId('gift-table')).toContainText('Čtečka knih');
+    await expect(giftRows(page)).toHaveCount(8);
+    await expect(giftRow(page, '2026-anna-1')).toContainText('Výlet do lázní');
+    await expect(giftRow(page, '2026-anna-2')).toContainText('Čtečka knih');
   });
 });

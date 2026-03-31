@@ -1,5 +1,6 @@
 // @ts-check
 import { test, expect } from './fixtures';
+import { giftRow, giftRows, historyRow, historyRows } from './helpers';
 
 test('TS-20: tabulka seznam dárků filtruje podle hledání, stavu a roku', async ({ page }) => {
   const searchInput = page.getByTestId('gift-table-search');
@@ -10,27 +11,29 @@ test('TS-20: tabulka seznam dárků filtruje podle hledání, stavu a roku', asy
   await test.step('Hledání omezuje tabulku na relevantní položky', async () => {
     await searchInput.fill('lázní');
 
-    await expect(giftTable).toContainText('Výlet do lázní');
-    await expect(giftTable).not.toContainText('Kolo');
+    await expect(giftRows(page)).toHaveCount(1);
+    await expect(giftRow(page, '2026-anna-1')).toContainText('Výlet do lázní');
   });
 
   await test.step('Filtr stavu zobrazí jen plánované dárky', async () => {
     await searchInput.clear();
     await statusFilter.selectOption('idea');
 
-    await expect(giftTable).toContainText('Čtečka knih');
-    await expect(giftTable).toContainText('Skicovací sada');
-    await expect(giftTable).not.toContainText('Výlet do lázní');
-    await expect(giftTable).not.toContainText('Kolo');
+    await expect(giftRows(page)).toHaveCount(3);
+    await expect(giftRow(page, '2026-anna-2')).toContainText('Čtečka knih');
+    await expect(giftRow(page, '2026-petra-2')).toContainText('Skicovací sada');
+    await expect(giftRow(page, '2026-martin-1')).toContainText('Projektor');
   });
 
   await test.step('Filtr stavu zobrazí jen koupené dárky', async () => {
     await statusFilter.selectOption('bought');
 
-    await expect(giftTable).toContainText('Výlet do lázní');
-    await expect(giftTable).toContainText('Kolo');
-    await expect(giftTable).not.toContainText('Čtečka knih');
-    await expect(giftTable).not.toContainText('Skicovací sada');
+    await expect(giftRows(page)).toHaveCount(5);
+    await expect(giftRow(page, '2026-anna-1')).toContainText('Výlet do lázní');
+    await expect(giftRow(page, '2026-jakub-1')).toContainText('Kolo');
+    await expect(giftRow(page, '2026-petra-1')).toContainText('Kurz vaření');
+    await expect(giftRow(page, '2026-eva-1')).toContainText('Wellness balíček');
+    await expect(giftRow(page, '2026-david-1')).toContainText('Sportovní bunda');
   });
 
   await test.step('Přepnutí roku v tabulce zobrazí pouze data z daného roku', async () => {
@@ -38,10 +41,13 @@ test('TS-20: tabulka seznam dárků filtruje podle hledání, stavu a roku', asy
     await yearFilter.selectOption('2025');
 
     await expect(page.getByTestId('gift-hero-year')).toHaveText('2025');
-    await expect(giftTable).toContainText('Noise-cancelling sluchátka');
-    await expect(giftTable).toContainText('Kožená taška');
-    await expect(giftTable).not.toContainText('Výlet do lázní');
-    await expect(giftTable).not.toContainText('Sportovní bunda');
+    await expect(giftRows(page)).toHaveCount(6);
+    await expect(giftRow(page, '2025-anna-1')).toContainText('Noise-cancelling sluchátka');
+    await expect(giftRow(page, '2025-tomas-1')).toContainText('Kožená taška');
+    await expect(giftRow(page, '2025-jakub-1')).toContainText('Outdoorová výbava');
+    await expect(giftRow(page, '2025-petra-1')).toContainText('Workshop keramiky');
+    await expect(giftRow(page, '2025-martin-1')).toContainText('Herní monitor');
+    await expect(giftRow(page, '2025-lucie-1')).toContainText('Kurz baristy');
   });
 });
 
@@ -50,23 +56,20 @@ test('TS-21: historie dárků podle osoby se přepíná napříč roky', async (
   const historyTable = page.getByTestId('person-history-table');
 
   await test.step('Výchozí historie osoby Anna obsahuje koupené dárky z více let', async () => {
-    await expect(historyTable).toContainText('2026');
-    await expect(historyTable).toContainText('Výlet do lázní');
-    await expect(historyTable).toContainText('2025');
-    await expect(historyTable).toContainText('Noise-cancelling sluchátka');
-    await expect(historyTable).toContainText('2024');
-    await expect(historyTable).toContainText('Designový parfém');
-    await expect(historyTable).toContainText('2023');
-    await expect(historyTable).toContainText('Šperkovnice');
+    await expect(historyRows(page)).toHaveCount(4);
+    await expect(historyRow(page, '2026-anna-1')).toContainText('Výlet do lázní');
+    await expect(historyRow(page, '2025-anna-1')).toContainText('Noise-cancelling sluchátka');
+    await expect(historyRow(page, '2024-anna-1')).toContainText('Designový parfém');
+    await expect(historyRow(page, '2023-anna-1')).toContainText('Šperkovnice');
   });
 
   await test.step('Přepnutí osoby změní obsah historie', async () => {
     await personFilter.selectOption('Petra');
 
-    await expect(historyTable).toContainText('Kurz vaření');
-    await expect(historyTable).toContainText('Kurz focení');
-    await expect(historyTable).not.toContainText('Výlet do lázní');
-    await expect(historyTable).not.toContainText('Noise-cancelling sluchátka');
+    await expect(historyRows(page)).toHaveCount(3);
+    await expect(historyRow(page, '2026-petra-1')).toContainText('Kurz vaření');
+    await expect(historyRow(page, '2024-petra-1')).toContainText('Kurz focení');
+    await expect(historyRow(page, '2023-petra-1')).toContainText('Sportovní míč');
   });
 });
 

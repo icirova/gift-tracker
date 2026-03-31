@@ -1,8 +1,6 @@
 // @ts-check
 import { test, expect } from './fixtures';
-
-/** @param {import('@playwright/test').Page} page */
-const giftRows = (page) => page.locator('[data-testid^="gift-table-row-"]');
+import { giftRow, giftRows, historyRows } from './helpers';
 
 test('TS-01: první načtení aplikace načte demo data', async ({ page }) => {
   await test.step('Základní sekce jsou viditelné', async () => {
@@ -10,6 +8,8 @@ test('TS-01: první načtení aplikace načte demo data', async ({ page }) => {
     await expect(page.getByRole('heading', { name: 'Seznam osob' })).toBeVisible();
     await expect(page.getByTestId('people-list')).toBeVisible();
     await expect(page.getByTestId('people-list')).toContainText('Anna');
+    await expect(page.getByTestId('people-list')).toContainText('Jakub');
+    await expect(page.getByTestId('people-list')).toContainText('Petra');
   });
 
   await test.step('Formulář pro přidání dárku je dostupný', async () => {
@@ -28,7 +28,11 @@ test('TS-01: první načtení aplikace načte demo data', async ({ page }) => {
   await test.step('Historie, grafy a statistiky jsou zobrazené', async () => {
     await expect(page.getByRole('heading', { name: 'Historie dárků podle osoby' })).toBeVisible();
     await expect(page.getByTestId('person-history-table')).toBeVisible();
+    await expect(historyRows(page)).toHaveCount(4);
     await expect(page.getByTestId('person-history-row-2026-anna-1')).toContainText('Výlet do lázní');
+    await expect(page.getByTestId('person-history-row-2025-anna-1')).toContainText(
+      'Noise-cancelling sluchátka',
+    );
     await expect(page.getByRole('heading', { name: 'Počet dárků' })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Utraceno podle osob' })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Historie utracené částky' })).toBeVisible();
@@ -53,6 +57,8 @@ test('TS-02: data zůstávají po refreshi a nepřepíší se demo daty', async 
 
     await expect(giftRows(page)).toHaveCount(9);
     await expect(giftRows(page).filter({ hasText: addedGiftName })).toHaveCount(1);
+    await expect(giftRows(page).filter({ hasText: addedGiftName })).toContainText('1 234');
+    await expect(giftRows(page).filter({ hasText: addedGiftName })).toContainText('Koupeno');
   });
 
   await test.step('Po refreshi zůstávají změny', async () => {
@@ -60,6 +66,7 @@ test('TS-02: data zůstávají po refreshi a nepřepíší se demo daty', async 
 
     await expect(giftRows(page)).toHaveCount(9);
     await expect(giftRows(page).filter({ hasText: addedGiftName })).toHaveCount(1);
-    await expect(page.getByTestId('gift-table-row-2026-anna-1')).toContainText('Výlet do lázní');
+    await expect(giftRows(page).filter({ hasText: addedGiftName })).toContainText('1 234');
+    await expect(giftRow(page, '2026-anna-1')).toContainText('Výlet do lázní');
   });
 });

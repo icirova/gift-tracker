@@ -1,24 +1,6 @@
 // @ts-check
 import { test, expect } from './fixtures';
-
-/** @typedef {import('@playwright/test').Page} Page */
-
-/**
- * @param {Page} page
- * @param {{ name?: string, status?: 'Koupeno'|'Plánováno', gift: string, price?: string }} gift
- */
-const fillGiftForm = async (page, { name = 'Anna', status = 'Koupeno', gift, price = '' }) => {
-  const form = page.locator('#gift-form');
-  await form.locator('select[name="name"]').selectOption(name);
-  await form.locator('select[name="status"]').selectOption(status === 'Koupeno' ? 'bought' : 'idea');
-  await form.locator('input[name="gift"]').fill(gift);
-  await form.locator('input[name="price"]').fill(price);
-};
-
-/** @param {Page} page */
-const submitGiftForm = async (page) => {
-  await page.locator('#gift-form').getByRole('button', { name: 'Přidat dárek' }).click();
-};
+import { confirmByTestId, fillGiftForm, giftRow, giftRows, submitGiftForm } from './helpers';
 
 test('TS-15: plánovaný dárek bez ceny se uloží a zobrazí v tabulce', async ({ page }) => {
   const giftName = 'Test plánovaný dárek TS-15';
@@ -36,8 +18,9 @@ test('TS-15: plánovaný dárek bez ceny se uloží a zobrazí v tabulce', async
 
   await test.step('Nový dárek je vidět v tabulce jako plánovaný', async () => {
     await expect(page.getByRole('status')).toContainText('Dárek byl přidán.');
-    await expect(page.getByTestId('gift-table')).toContainText(giftName);
-    await expect(page.getByTestId('gift-table')).toContainText('Plánováno');
+    await expect(giftRows(page)).toHaveCount(9);
+    await expect(giftRows(page).filter({ hasText: giftName })).toHaveCount(1);
+    await expect(giftRows(page).filter({ hasText: giftName })).toContainText('Plánováno');
   });
 });
 
@@ -57,11 +40,11 @@ test('TS-16: koupený dárek s cenou se uloží a přepočítá rozpočet', asyn
   });
 
   await test.step('Dárek se uloží a souhrny se přepočítají', async () => {
-    await expect(page.getByTestId('gift-table')).toContainText(giftName);
-    await expect(page.getByTestId('gift-budget-spent')).toContainText('18');
-    await expect(page.getByTestId('gift-budget-spent')).toContainText('700 Kč');
-    await expect(page.getByTestId('gift-budget-total')).toContainText('26');
-    await expect(page.getByTestId('gift-budget-total')).toContainText('900 Kč');
+    await expect(giftRows(page)).toHaveCount(9);
+    await expect(giftRows(page).filter({ hasText: giftName })).toHaveCount(1);
+    await expect(giftRows(page).filter({ hasText: giftName })).toContainText('Koupeno');
+    await expect(page.getByTestId('gift-budget-spent')).toContainText('18 700 Kč');
+    await expect(page.getByTestId('gift-budget-total')).toContainText('26 900 Kč');
     await expect(page.getByTestId('gift-hero-spent')).toHaveText(/18.?700 Kč/);
   });
 });
@@ -78,7 +61,32 @@ test('TS-17: koupený dárek bez ceny nelze uložit', async ({ page }) => {
   });
 
   await test.step('Nevalidní dárek se do tabulky neuloží', async () => {
-    await expect(page.getByTestId('gift-table')).not.toContainText('Nevalidní dárek TS-17');
+    await expect(giftRows(page).filter({ hasText: 'Nevalidní dárek TS-17' })).toHaveCount(0);
+  });
+});
+
+test('TS-17b: dárek se při uložení otrimuje a záporná cena zůstane nevalidní', async ({ page }) => {
+  await test.step('Koupený dárek se zápornou cenou nelze uložit', async () => {
+    await fillGiftForm(page, {
+      name: 'Anna',
+      status: 'Koupeno',
+      gift: 'Nevalidní záporná cena TS-17b',
+      price: '-100',
+    });
+
+    await expect(page.locator('#gift-form').getByRole('button', { name: 'Přidat dárek' })).toBeDisabled();
+    await expect(giftRows(page).filter({ hasText: 'Nevalidní záporná cena TS-17b' })).toHaveCount(0);
+  });
+
+  await test.step('Plánovaný dárek s mezerami se uloží otrimovaný', async () => {
+    await fillGiftForm(page, {
+      name: 'Anna',
+      status: 'Plánováno',
+      gift: '  Trim dárek TS-17b  ',
+    });
+    await submitGiftForm(page);
+
+    await expect(giftRows(page).filter({ hasText: 'Trim dárek TS-17b' })).toHaveCount(1);
   });
 });
 
@@ -107,17 +115,17 @@ test('TS-18: editace ceny plánovaného dárku se projeví v tabulce i statistik
 test('TS-19: smazání dárku a undo vrátí dárek do tabulky', async ({ page }) => {
   await test.step('Smazání dárku zobrazí undo toast', async () => {
     await page.getByRole('button', { name: 'Smazat dárek Sportovní bunda pro David' }).click();
-    await page.getByTestId('gift-delete-confirm-2026-david-1-confirm').click();
+    await confirmByTestId(page, 'gift-delete-confirm-2026-david-1');
 
     await expect(page.getByRole('status')).toContainText('Dárek byl smazán.');
     await expect(page.getByRole('button', { name: 'Vrátit zpět' })).toBeVisible();
-    await expect(page.getByTestId('gift-table')).not.toContainText('Sportovní bunda');
+    await expect(giftRow(page, '2026-david-1')).toHaveCount(0);
   });
 
   await test.step('Undo vrátí smazaný dárek zpět', async () => {
     await page.getByRole('button', { name: 'Vrátit zpět' }).click();
 
-    await expect(page.getByTestId('gift-table')).toContainText('Sportovní bunda');
-    await expect(page.getByTestId('gift-table')).toContainText('David');
+    await expect(giftRow(page, '2026-david-1')).toContainText('Sportovní bunda');
+    await expect(giftRow(page, '2026-david-1')).toContainText('David');
   });
 });
