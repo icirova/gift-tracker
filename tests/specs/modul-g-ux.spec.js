@@ -37,7 +37,7 @@ test('TS-23: CTA v hero sekci scrolluje na formulář a v needitovatelném roce 
       })();
     `);
 
-    await page.locator('.hero__cta').click();
+    await page.getByTestId('gift-hero-cta').click();
 
     await expect
       .poll(() => page.evaluate('window.__giftFormScrollCalled'))
@@ -47,7 +47,7 @@ test('TS-23: CTA v hero sekci scrolluje na formulář a v needitovatelném roce 
   await test.step('V needitovatelném minulém roce je CTA disabled', async () => {
     await page.getByRole('tab', { name: '2025' }).click();
 
-    await expect(page.locator('.hero__cta')).toBeDisabled();
+    await expect(page.getByTestId('gift-hero-cta')).toBeDisabled();
   });
 });
 
@@ -55,7 +55,7 @@ test('TS-24: toast odpovídá akci, undo funguje a toast po timeoutu zmizí', as
   await test.step('Po smazání dárku se zobrazí toast a undo ho vrátí', async () => {
     await installClock(page);
     await page.getByRole('button', { name: 'Smazat dárek Sportovní bunda pro David' }).click();
-    await page.locator('.table-status__confirm--wrap').getByRole('button', { name: 'Ano' }).click();
+    await page.getByTestId('gift-delete-confirm-2026-david-1-confirm').click();
 
     await expect(page.getByRole('status')).toContainText('Dárek byl smazán.');
     await page.getByRole('button', { name: 'Vrátit zpět' }).click();
@@ -64,7 +64,7 @@ test('TS-24: toast odpovídá akci, undo funguje a toast po timeoutu zmizí', as
 
   await test.step('Toast po časovém limitu zmizí', async () => {
     await page.getByRole('button', { name: 'Smazat dárek Sportovní bunda pro David' }).click();
-    await page.locator('.table-status__confirm--wrap').getByRole('button', { name: 'Ano' }).click();
+    await page.getByTestId('gift-delete-confirm-2026-david-1-confirm').click();
 
     await expect(page.getByRole('status')).toContainText('Dárek byl smazán.');
     await page.clock.runFor(5000);

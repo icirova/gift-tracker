@@ -50,7 +50,11 @@ const PersonHistory = ({ gifts, names }) => {
       <div className="person-history__toolbar">
         <label className="person-history__filter">
           <span>Osoba</span>
-          <select value={selectedName} onChange={(event) => setSelectedName(event.target.value)}>
+          <select
+            value={selectedName}
+            onChange={(event) => setSelectedName(event.target.value)}
+            data-testid="person-history-filter"
+          >
             {names.map((name) => (
               <option key={name} value={name}>
                 {name}
@@ -61,7 +65,7 @@ const PersonHistory = ({ gifts, names }) => {
       </div>
 
       {groupedHistory.length ? (
-        <div className="person-history__table">
+        <div className="person-history__table" data-testid="person-history-table">
           <div className="person-history__scroll">
             <table>
               <thead>
@@ -77,6 +81,7 @@ const PersonHistory = ({ gifts, names }) => {
                     {items.map((gift, index) => (
                       <tr
                         key={gift.id}
+                        data-testid={`person-history-row-${gift.id}`}
                         className={index === 0 ? 'person-history__row-group-start' : ''}
                       >
                         {index === 0 && (

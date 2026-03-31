@@ -239,6 +239,7 @@ const Table = ({
             placeholder="Hledat podle jména nebo dárku"
             value={searchQuery}
             onChange={(event) => setSearchQuery(event.target.value)}
+            data-testid="gift-table-search"
           />
         </label>
         <label className="table-filter">
@@ -246,6 +247,7 @@ const Table = ({
           <select
             value={statusFilter}
             onChange={(event) => setStatusFilter(event.target.value)}
+            data-testid="gift-table-status-filter"
           >
             <option value="all">Vše</option>
             <option value="idea">Plánováno</option>
@@ -257,6 +259,7 @@ const Table = ({
           <select
             value={selectedYear}
             onChange={(event) => onYearChange(Number(event.target.value))}
+            data-testid="gift-table-year-filter"
           >
             {availableYears.map((year) => (
               <option key={year} value={year}>
@@ -325,6 +328,7 @@ const Table = ({
                                   type="text"
                                   inputMode="numeric"
                                   className="table-price__input"
+                                  data-testid={`gift-table-price-input-${gift.id}`}
                                   value={editingPriceValue}
                                   onChange={(event) => setEditingPriceValue(event.target.value)}
                                   onKeyDown={(event) => {
@@ -405,6 +409,7 @@ const Table = ({
                                     message="Koupeno? Zamkne úpravy."
                                     onConfirm={() => confirmStatusBought(gift)}
                                     onCancel={cancelStatusConfirm}
+                                    testId={`gift-status-confirm-${gift.id}`}
                                   />
                                 ) : isEditable ? (
                                   <button
@@ -442,6 +447,7 @@ const Table = ({
                                       setPendingDeleteId(null);
                                     }}
                                     onCancel={() => setPendingDeleteId(null)}
+                                    testId={`gift-delete-confirm-${gift.id}`}
                                   />
                                 ) : (
                                   <button

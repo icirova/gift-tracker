@@ -8,14 +8,28 @@ const Confirm = ({
   confirmLabel = 'Ano',
   cancelLabel = 'Ne',
   className = '',
+  testId,
 }) => (
-  <div className={`table-status__confirm${className ? ` ${className}` : ''}`}>
+  <div
+    className={`table-status__confirm${className ? ` ${className}` : ''}`}
+    data-testid={testId}
+  >
     <span className="table-status__confirm-text">{message}</span>
     <div className="table-status__confirm-actions">
-      <button type="button" className="table-status__confirm-button" onClick={onConfirm}>
+      <button
+        type="button"
+        className="table-status__confirm-button"
+        onClick={onConfirm}
+        data-testid={testId ? `${testId}-confirm` : undefined}
+      >
         {confirmLabel}
       </button>
-      <button type="button" className="table-status__confirm-button" onClick={onCancel}>
+      <button
+        type="button"
+        className="table-status__confirm-button"
+        onClick={onCancel}
+        data-testid={testId ? `${testId}-cancel` : undefined}
+      >
         {cancelLabel}
       </button>
     </div>
@@ -29,6 +43,7 @@ Confirm.propTypes = {
   confirmLabel: PropTypes.string,
   cancelLabel: PropTypes.string,
   className: PropTypes.string,
+  testId: PropTypes.string,
 };
 
 export default Confirm;

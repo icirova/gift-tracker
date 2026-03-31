@@ -65,11 +65,11 @@ const PeopleManager = ({ names, onAddName, onRemoveName, canEdit = true }) => {
   return (
     <div className="people-manager">
       {canEdit ? (
-        <form className="people-manager__form" onSubmit={handleSubmit}>
+        <form className="people-manager__form" onSubmit={handleSubmit} data-testid="people-form">
           <label className="people-manager__field">
             <span className="people-manager__label-row">
               <span>Jméno</span>
-              <span className="people-manager__error" aria-live="polite">
+              <span className="people-manager__error" aria-live="polite" data-testid="people-form-error">
                 {error}
               </span>
             </span>
@@ -92,7 +92,7 @@ const PeopleManager = ({ names, onAddName, onRemoveName, canEdit = true }) => {
       ) : null}
 
       {names.length ? (
-        <div className="people-manager__list">
+        <div className="people-manager__list" data-testid="people-list">
           {names.map((name) => (
             <div key={name} className="people-manager__item">
               <span>{name}</span>
@@ -117,6 +117,7 @@ const PeopleManager = ({ names, onAddName, onRemoveName, canEdit = true }) => {
                       message="Odebrat? Smaže dárky v tabulce."
                       onConfirm={handleConfirmRemove}
                       onCancel={handleCancelRemove}
+                      testId="people-remove-confirm"
                     />
                   ) : null}
                 </>

@@ -145,6 +145,7 @@ const HeroHeader = ({
           className="hero__cta"
           onClick={onScrollToGiftForm}
           disabled={!canAddGift}
+          data-testid="gift-hero-cta"
         >
           Přidat dárek
         </button>
@@ -164,6 +165,7 @@ const HeroHeader = ({
                   message={`Přidat ${nextYear}?`}
                   onConfirm={handleAddYear}
                   onCancel={() => setAddYearConfirmOpen(false)}
+                  testId="hero-add-year-confirm"
                 />
               ) : null}
             </div>
@@ -276,6 +278,7 @@ const HeroHeader = ({
                       setUnlockConfirmOpen(false);
                     }}
                     onCancel={() => setUnlockConfirmOpen(false)}
+                    testId="year-lock-confirm"
                   />
                 ) : (
                   <button

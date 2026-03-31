@@ -2,9 +2,9 @@
 import { test, expect } from './fixtures';
 
 test('TS-20: tabulka seznam dárků filtruje podle hledání, stavu a roku', async ({ page }) => {
-  const searchInput = page.getByRole('textbox', { name: 'Filtrování' });
-  const statusFilter = page.locator('.table-filter select');
-  const yearFilter = page.locator('.table-year select');
+  const searchInput = page.getByTestId('gift-table-search');
+  const statusFilter = page.getByTestId('gift-table-status-filter');
+  const yearFilter = page.getByTestId('gift-table-year-filter');
   const giftTable = page.getByTestId('gift-table');
 
   await test.step('Hledání omezuje tabulku na relevantní položky', async () => {
@@ -46,8 +46,8 @@ test('TS-20: tabulka seznam dárků filtruje podle hledání, stavu a roku', asy
 });
 
 test('TS-21: historie dárků podle osoby se přepíná napříč roky', async ({ page }) => {
-  const personFilter = page.getByRole('combobox', { name: 'Osoba' });
-  const historyTable = page.locator('.person-history__table');
+  const personFilter = page.getByTestId('person-history-filter');
+  const historyTable = page.getByTestId('person-history-table');
 
   await test.step('Výchozí historie osoby Anna obsahuje koupené dárky z více let', async () => {
     await expect(historyTable).toContainText('2026');

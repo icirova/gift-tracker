@@ -8,8 +8,8 @@ test('TS-01: první načtení aplikace načte demo data', async ({ page }) => {
   await test.step('Základní sekce jsou viditelné', async () => {
     await expect(page.getByRole('heading', { name: 'Plán rozpočtu' })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Seznam osob' })).toBeVisible();
-    await expect(page.locator('.people-manager__list')).toBeVisible();
-    await expect(page.locator('.people-manager__list')).toContainText('Anna');
+    await expect(page.getByTestId('people-list')).toBeVisible();
+    await expect(page.getByTestId('people-list')).toContainText('Anna');
   });
 
   await test.step('Formulář pro přidání dárku je dostupný', async () => {
@@ -27,8 +27,8 @@ test('TS-01: první načtení aplikace načte demo data', async ({ page }) => {
 
   await test.step('Historie, grafy a statistiky jsou zobrazené', async () => {
     await expect(page.getByRole('heading', { name: 'Historie dárků podle osoby' })).toBeVisible();
-    await expect(page.locator('.person-history__table')).toBeVisible();
-    await expect(page.locator('.person-history__table')).toContainText('Výlet do lázní');
+    await expect(page.getByTestId('person-history-table')).toBeVisible();
+    await expect(page.getByTestId('person-history-row-2026-anna-1')).toContainText('Výlet do lázní');
     await expect(page.getByRole('heading', { name: 'Počet dárků' })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Utraceno podle osob' })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Historie utracené částky' })).toBeVisible();

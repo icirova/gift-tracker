@@ -17,7 +17,7 @@ const selectYearInHeader = async (page, year) => {
 
 /** @param {Page} page */
 const expectGiftFormLocked = async (page) => {
-  await expect(page.locator('.hero__cta')).toBeDisabled();
+  await expect(page.getByTestId('gift-hero-cta')).toBeDisabled();
   await expect(page.getByRole('heading', { name: 'Přidat dárek do seznamu' })).toHaveCount(0);
   await expect(page.locator('#gift-form')).toHaveCount(0);
 };
@@ -111,7 +111,7 @@ test('TS-04: ruční přidání následujícího roku aktivuje nový editovateln
 
     await expect(addYearButton).toBeVisible();
     await addYearButton.click();
-    await page.locator('.hero__year-confirm').getByRole('button', { name: 'Ano' }).click();
+    await page.getByTestId('hero-add-year-confirm-confirm').click();
 
     await expect(page.getByTestId('gift-hero-year')).toHaveText('2027');
     await expect(page.getByRole('combobox', { name: 'Rok' })).toHaveValue('2027');
@@ -121,8 +121,8 @@ test('TS-04: ruční přidání následujícího roku aktivuje nový editovateln
   await test.step('Nový rok je editovatelný a přebírá seznam osob', async () => {
     await expect(page.getByRole('button', { name: 'Nastavit rozpočet' })).toBeVisible();
     await expectGiftFormEditable(page);
-    await expect(page.locator('.people-manager__list')).toContainText('Anna');
-    await expect(page.locator('.people-manager__list')).toContainText('Jakub');
+    await expect(page.getByTestId('people-list')).toContainText('Anna');
+    await expect(page.getByTestId('people-list')).toContainText('Jakub');
     await expect(page.getByRole('heading', { name: /Seznam dárků 2027/ })).toBeVisible();
   });
 });
@@ -141,7 +141,7 @@ test(
     });
 
     await test.step('Nový aktuální rok je editovatelný', async () => {
-      await expect(page.locator('.hero__cta')).toBeEnabled();
+      await expect(page.getByTestId('gift-hero-cta')).toBeEnabled();
       await expect(page.getByRole('button', { name: 'Nastavit rozpočet' })).toBeVisible();
       await expectGiftFormEditable(page);
     });
@@ -163,7 +163,7 @@ test(
 
     await test.step('CTA umožní přidat rok aktuální + 1', async () => {
       await page.getByRole('button', { name: '+ 2028' }).click();
-      await page.locator('.hero__year-confirm').getByRole('button', { name: 'Ano' }).click();
+      await page.getByTestId('hero-add-year-confirm-confirm').click();
 
       await expect(page.getByTestId('gift-hero-year')).toHaveText('2028');
       await expect(page.getByRole('combobox', { name: 'Rok' })).toHaveValue('2028');
@@ -202,7 +202,7 @@ test('TS-07: po odemknutí lze minulý rok upravit a změny přetrvají po refre
     await selectYearInHeader(page, 2025);
 
     await page.getByRole('button', { name: 'Odemknout úpravy' }).click();
-    await page.locator('.year-lock__confirm').getByRole('button', { name: 'Ano' }).click();
+    await page.getByTestId('year-lock-confirm-confirm').click();
 
     await expect(page.getByRole('button', { name: 'Zamknout úpravy' })).toBeVisible();
     await expect(page.getByRole('button', { name: 'Upravit rozpočet' })).toBeVisible();

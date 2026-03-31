@@ -89,8 +89,8 @@ test('TS-18: editace ceny plánovaného dárku se projeví v tabulce i statistik
     await page
       .locator('button.table-price__clickable[aria-label="Doplnit cenu pro dárek Skicovací sada"]')
       .click();
-    await page.locator('.table-price__input').fill('1500');
-    await page.locator('.table-price__input').press('Enter');
+    await page.getByTestId('gift-table-price-input-2026-petra-2').fill('1500');
+    await page.getByTestId('gift-table-price-input-2026-petra-2').press('Enter');
   });
 
   await test.step('Nová cena se promítne do tabulky i souhrnů rozpočtu', async () => {
@@ -107,7 +107,7 @@ test('TS-18: editace ceny plánovaného dárku se projeví v tabulce i statistik
 test('TS-19: smazání dárku a undo vrátí dárek do tabulky', async ({ page }) => {
   await test.step('Smazání dárku zobrazí undo toast', async () => {
     await page.getByRole('button', { name: 'Smazat dárek Sportovní bunda pro David' }).click();
-    await page.locator('.table-status__confirm--wrap').getByRole('button', { name: 'Ano' }).click();
+    await page.getByTestId('gift-delete-confirm-2026-david-1-confirm').click();
 
     await expect(page.getByRole('status')).toContainText('Dárek byl smazán.');
     await expect(page.getByRole('button', { name: 'Vrátit zpět' })).toBeVisible();
