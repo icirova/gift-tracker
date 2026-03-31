@@ -1,24 +1,6 @@
 // @ts-check
 import { test, expect } from './fixtures';
-
-/** @typedef {import('@playwright/test').Page} Page */
-
-/** @param {Page} page */
-const installClock = async (page) => {
-  await page.clock.install();
-};
-
-/**
- * @param {Page} page
- * @param {string} giftName
- */
-const fillGiftForm = async (page, giftName) => {
-  const form = page.locator('#gift-form');
-  await form.locator('select[name="name"]').selectOption('Anna');
-  await form.locator('select[name="status"]').selectOption('bought');
-  await form.locator('input[name="gift"]').fill(giftName);
-  await form.locator('input[name="price"]').fill('321');
-};
+import { confirmByTestId, fillGiftForm, heroCta, installClock, selectYear, submitGiftForm } from './helpers';
 
 test('TS-23: CTA v hero sekci scrolluje na formulář a v needitovatelném roce je neaktivní', async ({
   page,
@@ -37,7 +19,7 @@ test('TS-23: CTA v hero sekci scrolluje na formulář a v needitovatelném roce 
       })();
     `);
 
-    await page.getByTestId('gift-hero-cta').click();
+    await heroCta(page).click();
 
     await expect
       .poll(() => page.evaluate('window.__giftFormScrollCalled'))
@@ -45,9 +27,9 @@ test('TS-23: CTA v hero sekci scrolluje na formulář a v needitovatelném roce 
   });
 
   await test.step('V needitovatelném minulém roce je CTA disabled', async () => {
-    await page.getByRole('tab', { name: '2025' }).click();
+    await selectYear(page, 2025);
 
-    await expect(page.getByTestId('gift-hero-cta')).toBeDisabled();
+    await expect(heroCta(page)).toBeDisabled();
   });
 });
 
@@ -55,7 +37,7 @@ test('TS-24: toast odpovídá akci, undo funguje a toast po timeoutu zmizí', as
   await test.step('Po smazání dárku se zobrazí toast a undo ho vrátí', async () => {
     await installClock(page);
     await page.getByRole('button', { name: 'Smazat dárek Sportovní bunda pro David' }).click();
-    await page.getByTestId('gift-delete-confirm-2026-david-1-confirm').click();
+    await confirmByTestId(page, 'gift-delete-confirm-2026-david-1');
 
     await expect(page.getByRole('status')).toContainText('Dárek byl smazán.');
     await page.getByRole('button', { name: 'Vrátit zpět' }).click();
@@ -64,7 +46,7 @@ test('TS-24: toast odpovídá akci, undo funguje a toast po timeoutu zmizí', as
 
   await test.step('Toast po časovém limitu zmizí', async () => {
     await page.getByRole('button', { name: 'Smazat dárek Sportovní bunda pro David' }).click();
-    await page.getByTestId('gift-delete-confirm-2026-david-1-confirm').click();
+    await confirmByTestId(page, 'gift-delete-confirm-2026-david-1');
 
     await expect(page.getByRole('status')).toContainText('Dárek byl smazán.');
     await page.clock.runFor(5000);
@@ -78,8 +60,8 @@ test('TS-25: nově přidaná položka je dočasně zvýrazněná v tabulce', asy
 
   await test.step('Po přidání dárku je nový řádek zvýrazněný', async () => {
     await installClock(page);
-    await fillGiftForm(page, giftName);
-    await page.locator('#gift-form').getByRole('button', { name: 'Přidat dárek' }).click();
+    await fillGiftForm(page, { status: 'Koupeno', gift: giftName, price: '321' });
+    await submitGiftForm(page);
 
     await expect(page.getByRole('status')).toContainText('Dárek byl přidán.');
     await expect(highlightedRow).toBeVisible();
