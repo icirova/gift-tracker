@@ -6,7 +6,6 @@ test('TS-20: tabulka seznam dárků filtruje podle hledání, stavu a roku', asy
   const searchInput = page.getByTestId('gift-table-search');
   const statusFilter = page.getByTestId('gift-table-status-filter');
   const yearFilter = page.getByTestId('gift-table-year-filter');
-  const giftTable = page.getByTestId('gift-table');
 
   await test.step('Hledání omezuje tabulku na relevantní položky', async () => {
     await searchInput.fill('lázní');
@@ -53,7 +52,6 @@ test('TS-20: tabulka seznam dárků filtruje podle hledání, stavu a roku', asy
 
 test('TS-21: historie dárků podle osoby se přepíná napříč roky', async ({ page }) => {
   const personFilter = page.getByTestId('person-history-filter');
-  const historyTable = page.getByTestId('person-history-table');
 
   await test.step('Výchozí historie osoby Anna obsahuje koupené dárky z více let', async () => {
     await expect(historyRows(page)).toHaveCount(4);

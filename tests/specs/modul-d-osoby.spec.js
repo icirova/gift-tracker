@@ -19,8 +19,6 @@ test('TS-11: přidání osoby ji zobrazí v seznamu a ve formuláři pro dárky'
 });
 
 test('TS-12: duplicitní osoba se bez ohledu na velikost písmen neuloží', async ({ page }) => {
-  const peopleForm = page.getByTestId('people-form');
-
   await test.step('Pokus o přidání osoby se stejným jménem jiným case skončí chybou', async () => {
     await addPerson(page, 'eva');
 
